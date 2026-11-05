@@ -1,0 +1,1673 @@
+/* Source: PM/static/css/dynamic_form.css; scoped to PM only. */
+@scope (.pm-reference) {
+/* ═══════════════════════════════════════════════════════════
+   dynamic_form.css - النمط الموحد الجديد (1200px)
+   ✅ شبكة 12 عموداً + أصناف العرض (w-half/w-third/w-quarter)
+   ✅ قائمة كومبوبوكس بخلفية معتمة 100% + z-index عالي
+   ✅ إصلاح سياق التراص (backwards + :has + .dfm-z-open)
+   ✅ بطاقات الاحتياجات المرنة (بدل الجدول العريض)
+   ✅ إصلاح التمرير مع احتواء المحتوى
+   ✅ تم التكبير من 900px إلى 1200px لاستيعاب شبكة 12 عموداً
+   ✅ إصلاح ظهور الكومبوبوكس فوق جميع المحتويات
+   ═══════════════════════════════════════════════════════════ */
+
+:scope {
+    /* ✅ تم التكبير من 900px إلى 1200px لاستيعاب شبكة 12 عموداً بشكل مريح */
+    --dfm-width: 1200px;
+    --dfm-bg: #ffffff;
+    --dfm-border: #e0e5ea;
+    --dfm-primary: #27AE60;
+    --dfm-primary-light: #2ecc71;
+    --dfm-gold: #d4af37;
+    --dfm-dark: #1a2a3a;
+    --dfm-text: #2C3E50;
+    --dfm-muted: #7f8c8d;
+    --dfm-light: #f8f9fb;
+    --dfm-danger: #e74c3c;
+    --dfm-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ═══════════ الخلفية ═══════════ */
+.dfm-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(26, 42, 58, 0.7);
+    backdrop-filter: blur(8px);
+    z-index: 99999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.dfm-overlay.active {
+    display: flex;
+    animation: dfm-fadeIn 0.3s ease;
+}
+
+@keyframes dfm-fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* ═══════════ حاوية النموذج ═══════════ */
+.dfm-container {
+    background: var(--dfm-bg);
+    border-radius: 24px;
+    width: 100%;
+    max-width: var(--dfm-width);
+    /* ✅ تم التكبير من 90vh إلى 94vh لإظهار المزيد من صفوف الجدول */
+    max-height: 94vh;
+    min-height: 600px;
+    /* ✅ ضمان حد أدنى مناسب */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.4);
+    animation: dfm-popIn 0.5s var(--dfm-ease);
+}
+
+/* لم نعد نحتاج .dfm-wide لأن الحجم الافتراضي أصبح كبيراً بما يكفي */
+
+@keyframes dfm-popIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* ═══════════ رأس النموذج ═══════════ */
+.dfm-header {
+    background: linear-gradient(135deg, var(--dfm-dark), #2C3E50);
+    color: white;
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-shrink: 0;
+}
+
+.dfm-header-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--dfm-gold), #f4d03f);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--dfm-dark);
+    flex-shrink: 0;
+}
+
+.dfm-header-info {
+    flex: 1;
+}
+
+.dfm-header-info h2 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.dfm-header-info p {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+.dfm-close-btn {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.3s var(--dfm-ease);
+    flex-shrink: 0;
+}
+
+.dfm-close-btn:hover {
+    background: var(--dfm-danger);
+    transform: rotate(90deg);
+}
+
+/* ═══════════ جسم النموذج ═══════════ */
+.dfm-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: visible !important;
+    /* ✅ مهم - يسمح بالظهور الأفقي */
+    padding: 28px 32px;
+    position: relative;
+}
+
+/* حالة التحميل */
+.dfm-loading {
+    text-align: center;
+    padding: 60px;
+    color: var(--dfm-muted);
+}
+
+.dfm-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--dfm-border);
+    border-top-color: var(--dfm-primary);
+    border-radius: 50%;
+    animation: dfm-spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+}
+
+@keyframes dfm-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ═══════════ رسالة المساعدة - خط كبير ═══════════ */
+.dfm-helper {
+    background: linear-gradient(135deg, #fff8e6, #fff3d6);
+    border: 2px solid var(--dfm-gold);
+    border-radius: 14px;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    animation: dfm-fadeInUp 0.4s var(--dfm-ease);
+}
+
+.dfm-helper-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--dfm-gold);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.dfm-helper-text {
+    font-size: 1.1rem;
+    color: #7d5a00;
+    line-height: 1.8;
+}
+
+@keyframes dfm-fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ═══════════ حاوية الحقول - شبكة 12 عموداً ═══════════ */
+.dfm-fields-container {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 20px;
+    overflow: visible !important;
+    /* ✅ مهم جداً - يسمح للكومبوبوكس بالظهور خارج الحاوية */
+}
+
+/* أقسام الحقول */
+.dfm-section-title {
+    grid-column: 1 / -1;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--dfm-text);
+    margin-top: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--dfm-light);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dfm-section-title i {
+    color: var(--dfm-primary);
+}
+
+/* قسم الملاحظات والمرفقات في نهاية نموذج النشاط */
+.dfm-section-title[data-section="الملاحظات والمرفقات"] {
+    margin-top: 18px;
+    padding: 12px 14px;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #eff6ff, #f8fafc);
+    color: #1e3a8a;
+}
+
+.dfm-section-title[data-section="الملاحظات والمرفقات"] i {
+    color: #2563eb;
+}
+
+/* ═══════════ مجموعة الحقل - عرض نصف افتراضي ═══════════ */
+.dfm-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    animation: dfm-fadeInUp 0.5s var(--dfm-ease) backwards;
+    grid-column: span 6;
+    position: relative;
+    z-index: 1;
+    overflow: visible !important;
+}
+
+/* ✅ رفع مجموعة الحقل التي تحتوي كومبوبوكس مفتوح */
+.dfm-form-group:has(.dfm-combobox-wrapper.open) {
+    position: relative !important;
+    z-index: 9000 !important;
+}
+
+/* ✅ بديل للمتصفحات الأقدم */
+.dfm-form-group.dfm-z-open {
+    position: relative !important;
+    z-index: 9000 !important;
+}
+
+.dfm-form-group.w-half {
+    grid-column: span 6;
+}
+
+.dfm-form-group.w-third {
+    grid-column: span 4;
+}
+
+.dfm-form-group.w-quarter {
+    grid-column: span 3;
+}
+
+.dfm-form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.dfm-form-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--dfm-text);
+}
+
+.dfm-form-label .required-mark {
+    color: var(--dfm-danger);
+    font-weight: 700;
+}
+
+/* أيقونة المساعدة */
+.dfm-help-icon {
+    width: 18px;
+    height: 18px;
+    background: var(--dfm-border);
+    color: var(--dfm-muted);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    cursor: help;
+    transition: all 0.3s ease;
+    position: relative;
+    margin-right: auto;
+}
+
+.dfm-help-icon:hover {
+    background: var(--dfm-primary);
+    color: white;
+    transform: scale(1.15);
+}
+
+.dfm-help-tooltip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    right: 50%;
+    transform: translateX(50%);
+    background: var(--dfm-dark);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 400;
+    width: 240px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s var(--dfm-ease);
+    z-index: 100;
+    line-height: 1.5;
+    text-align: right;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.dfm-help-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    right: 50%;
+    transform: translateX(50%);
+    border: 6px solid transparent;
+    border-top-color: var(--dfm-dark);
+}
+
+.dfm-help-icon:hover .dfm-help-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ═══════════ حقول الإدخال ═══════════ */
+.dfm-input,
+.dfm-select,
+.dfm-textarea,
+.dfm-combobox-input {
+    padding: 12px 16px;
+    border: 2px solid var(--dfm-border);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    background: white;
+    color: var(--dfm-text);
+    transition: all 0.3s var(--dfm-ease);
+    width: 100%;
+}
+
+.dfm-input:focus,
+.dfm-select:focus,
+.dfm-textarea:focus,
+.dfm-combobox-input:focus {
+    outline: none;
+    border-color: var(--dfm-primary);
+    box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.12);
+    transform: translateY(-1px);
+}
+
+.dfm-input.error,
+.dfm-select.error,
+.dfm-combobox-input.error {
+    border-color: var(--dfm-danger);
+    box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.1);
+}
+
+.dfm-input.success,
+.dfm-select.success {
+    border-color: var(--dfm-primary);
+}
+
+.dfm-input:disabled,
+.dfm-select:disabled {
+    background: var(--dfm-light);
+    color: var(--dfm-muted);
+    cursor: not-allowed;
+}
+
+.dfm-textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+/* ═══════════ الحقول المحسوبة ═══════════ */
+.dfm-calculated-field {
+    background: var(--dfm-light);
+    border: 2px dashed var(--dfm-border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--dfm-muted);
+    font-weight: 600;
+    font-size: 0.95rem;
+    min-height: 48px;
+}
+
+.dfm-calculated-field i {
+    color: var(--dfm-primary);
+    opacity: 0.6;
+}
+
+.dfm-calculated-value {
+    color: var(--dfm-text);
+    font-weight: 700;
+}
+
+/* ════════════════════════════════════════════════════════
+   ✅ الكومبوبوكس - ضمان الظهور فوق جميع المحتويات
+   ════════════════════════════════════════════════════════ */
+
+/* ✅ الحاوية الرئيسية للكومبوبوكس */
+.dfm-combobox-wrapper {
+    position: relative !important;
+    z-index: 1000 !important;
+    isolation: isolate !important;
+    overflow: visible !important;
+}
+
+/* ✅ عند فتح الكومبوبوكس - رفع z-index */
+.dfm-combobox-wrapper.open {
+    z-index: 9999 !important;
+    isolation: isolate !important;
+}
+
+.dfm-combobox-input {
+    padding-left: 40px;
+}
+
+.dfm-combobox-arrow {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--dfm-muted);
+    pointer-events: none;
+    transition: transform 0.3s ease;
+}
+
+.dfm-combobox-wrapper.open .dfm-combobox-arrow {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+/* ✅ القائمة المنسدلة - فوق كل شيء */
+.dfm-combobox-dropdown {
+    position: absolute !important;
+    top: calc(100% + 6px) !important;
+    right: 0 !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    border: 2px solid var(--dfm-primary) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35) !important;
+    z-index: 9999999 !important;
+    display: none;
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 6px;
+    isolation: isolate !important;
+}
+
+.dfm-combobox-wrapper.open .dfm-combobox-dropdown {
+    display: block;
+    animation: dfm-fadeInUp 0.3s var(--dfm-ease);
+}
+
+/* ✅ خيارات القائمة - فوق كل شيء */
+.dfm-combobox-option {
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    margin-bottom: 4px;
+    font-size: 0.92rem;
+    background: #ffffff !important;
+    position: relative !important;
+    z-index: 9999999 !important;
+}
+
+.dfm-combobox-option:hover {
+    background: #eafaf1 !important;
+    color: var(--dfm-primary);
+}
+
+.dfm-combobox-option.highlighted {
+    border-color: var(--dfm-gold) !important;
+    background: #fbf3da !important;
+}
+
+.dfm-combobox-option.highlighted i {
+    opacity: 1 !important;
+    color: var(--dfm-gold);
+}
+
+/* ✅ خيار الإضافة */
+.dfm-combobox-add {
+    padding: 12px 16px;
+    cursor: pointer;
+    color: var(--dfm-primary);
+    font-weight: 700;
+    border-top: 2px dashed var(--dfm-border);
+    margin-top: 6px;
+    padding-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 10px;
+    background: #ffffff !important;
+    position: relative !important;
+    z-index: 9999999 !important;
+}
+
+.dfm-combobox-add:hover {
+    background: #eafaf1 !important;
+}
+
+/* ✅ حالة فارغة */
+.dfm-combobox-empty {
+    padding: 20px;
+    text-align: center;
+    color: var(--dfm-muted);
+    font-size: 0.85rem;
+    background: #ffffff !important;
+}
+
+/* ═══════════ منتقي التاريخ ═══════════ */
+.dfm-date-input {
+    position: relative;
+}
+
+.dfm-date-input input[type="date"],
+.dfm-date-input input[type="datetime-local"] {
+    padding: 12px 16px;
+    border: 2px solid var(--dfm-border);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    background: white;
+    color: var(--dfm-text);
+    transition: all 0.3s var(--dfm-ease);
+    width: 100%;
+    cursor: pointer;
+}
+
+.dfm-date-input input:focus {
+    outline: none;
+    border-color: var(--dfm-primary);
+    box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.12);
+}
+
+/* ═══════════ رفع الملفات ═══════════ */
+.dfm-file-input-wrapper {
+    border: 2px dashed var(--dfm-border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s var(--dfm-ease);
+    background: var(--dfm-light);
+}
+
+.dfm-file-input-wrapper:hover {
+    border-color: var(--dfm-primary);
+    background: rgba(39, 174, 96, 0.05);
+}
+
+.dfm-file-input-wrapper:focus-within {
+    border-color: #2563eb;
+    background: #eff6ff;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.dfm-file-text {
+    margin-top: 8px;
+    color: var(--dfm-text);
+    font-size: 0.84rem;
+    font-weight: 700;
+}
+
+.dfm-file-icon {
+    color: #2563eb;
+    font-size: 1.35rem;
+}
+
+.dfm-file-input-wrapper input[type="file"] {
+    display: none;
+}
+
+.dfm-file-icon {
+    font-size: 1.5rem;
+    color: var(--dfm-muted);
+    margin-bottom: 8px;
+}
+
+.dfm-file-text {
+    font-size: 0.85rem;
+    color: var(--dfm-muted);
+}
+
+/* ═══════════ رسائل الخطأ والنجاح ═══════════ */
+.dfm-field-error {
+    font-size: 0.78rem;
+    color: var(--dfm-danger);
+    display: none;
+    align-items: center;
+    gap: 5px;
+}
+
+.dfm-field-error.show {
+    display: flex;
+    animation: dfm-shake 0.4s ease;
+}
+
+@keyframes dfm-shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+.dfm-field-success {
+    font-size: 0.78rem;
+    color: var(--dfm-primary);
+    display: none;
+    align-items: center;
+    gap: 5px;
+}
+
+.dfm-field-success.show {
+    display: flex;
+}
+
+/* ═══════════ أزرار النموذج ═══════════ */
+.dfm-footer {
+    padding: 20px 32px;
+    background: var(--dfm-light);
+    border-top: 2px solid var(--dfm-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.dfm-footer-right,
+.dfm-footer-left {
+    display: flex;
+    gap: 12px;
+}
+
+.dfm-btn {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s var(--dfm-ease);
+}
+
+.dfm-btn-save {
+    background: linear-gradient(135deg, var(--dfm-primary), var(--dfm-primary-light));
+    color: white;
+    box-shadow: 0 4px 14px rgba(39, 174, 96, 0.35);
+}
+
+.dfm-btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(39, 174, 96, 0.45);
+}
+
+.dfm-btn-save:disabled {
+    background: var(--dfm-border);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.dfm-btn-draft {
+    background: white;
+    color: var(--dfm-muted);
+    border: 2px dashed var(--dfm-border);
+}
+
+.dfm-btn-draft:hover {
+    border-color: var(--dfm-primary);
+    color: var(--dfm-primary);
+}
+
+.dfm-btn-cancel {
+    background: white;
+    color: var(--dfm-muted);
+    border: 2px solid var(--dfm-border);
+}
+
+.dfm-btn-cancel:hover {
+    border-color: var(--dfm-muted);
+    color: var(--dfm-text);
+}
+
+.dfm-btn-danger {
+    background: var(--dfm-danger);
+    color: white;
+}
+
+.dfm-btn-danger:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+}
+
+/* ═══════════ نافذة التأكيد ═══════════ */
+.dfm-confirm-overlay,
+.dfm-success-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(26, 42, 58, 0.85);
+    backdrop-filter: blur(6px);
+    z-index: 100001;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.dfm-confirm-box,
+.dfm-success-box {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+    text-align: center;
+    max-width: 420px;
+    width: 100%;
+    animation: dfm-popIn 0.5s var(--dfm-ease);
+}
+
+.dfm-confirm-icon,
+.dfm-success-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    margin: 0 auto 20px;
+}
+
+.dfm-confirm-icon {
+    background: #fff3e0;
+    color: #ef6c00;
+}
+
+.dfm-success-icon {
+    background: #e8f5e9;
+    color: var(--dfm-primary);
+}
+
+.dfm-confirm-box h3,
+.dfm-success-box h3 {
+    color: var(--dfm-text);
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+}
+
+.dfm-confirm-box p,
+.dfm-success-box p {
+    color: var(--dfm-muted);
+    margin-bottom: 24px;
+}
+
+.dfm-confirm-actions,
+.dfm-success-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* ═══════════ بطاقات الاحتياجات (بديل الجدول العريض) ═══════════ */
+.dfm-sf-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 8px;
+    padding: 14px 12px 10px;
+    border: 1.5px solid var(--dfm-border);
+    border-radius: 12px;
+    background: #fff;
+    overflow: visible !important;
+    /* ✅ مهم جداً */
+}
+
+.dfm-sf-row:has(.dfm-subform-combobox-wrapper:focus-within) {
+    z-index: 9000 !important;
+    position: relative !important;
+}
+
+.dfm-sf-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dfm-sf-cell label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--dfm-muted);
+}
+
+.dfm-sf-cell input,
+.dfm-sf-cell select {
+    width: 100%;
+    padding: 7px 9px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 7px;
+    font-size: 0.82rem;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.dfm-sf-del {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    border: none;
+    background: #fee2e2;
+    color: #b91c1c;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+/* ═══════════ الكومبوبوكس في النماذج الفرعية ═══════════ */
+.dfm-subform-combobox-wrapper {
+    position: relative !important;
+    z-index: 1 !important;
+    isolation: isolate !important;
+    overflow: visible !important;
+}
+
+.dfm-subform-combobox-wrapper:focus-within {
+    z-index: 9000 !important;
+}
+
+.dfm-subform-combobox-dropdown {
+    position: absolute !important;
+    top: calc(100% + 4px) !important;
+    right: 0 !important;
+    width: 100% !important;
+    background: #fff !important;
+    border: 2px solid #27AE60 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3) !important;
+    z-index: 9999999 !important;
+    display: none;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 4px;
+    isolation: isolate !important;
+}
+
+.dfm-subform-combobox-wrapper:focus-within .dfm-subform-combobox-dropdown {
+    display: block;
+    animation: dfm-fadeInUp 0.3s var(--dfm-ease);
+}
+
+/* ═══════════ الحقول المجمّدة (Frozen Fields) ═══════════ */
+.dfm-frozen-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #f0fdf4, #e8f5e9);
+    border: 2px solid #a7f3d0;
+    border-radius: 12px;
+    min-height: 48px;
+    cursor: default;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.dfm-frozen-field:hover {
+    border-color: #6ee7b7;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
+}
+
+.dfm-frozen-field>i {
+    color: #10b981;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.dfm-frozen-value {
+    flex: 1;
+    font-weight: 700;
+    color: #065f46;
+    font-size: 0.95rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dfm-frozen-badge {
+    background: #d1fae5;
+    color: #059669;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* ═══════════ التسلسل الهرمي في رأس النموذج ═══════════ */
+.dfm-hierarchy-path {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 32px;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-bottom: 1px solid #e2e8f0;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+.dfm-hier-seg {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #475569;
+    background: white;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+    max-width: 200px;
+}
+
+.dfm-hier-seg i {
+    font-size: 0.75rem;
+    color: var(--seg-color, #64748b);
+}
+
+.dfm-hier-seg .dfm-hier-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* الجزء الحالي (الأخير) */
+.dfm-hier-seg.current {
+    background: var(--seg-color, #2C3E50);
+    color: white;
+    border-color: var(--seg-color, #2C3E50);
+    font-weight: 700;
+}
+
+.dfm-hier-seg.current i {
+    color: white;
+}
+
+/* الفاصل بين الأجزاء */
+.dfm-hier-sep {
+    color: #94a3b8;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* تأثير حركي عند الظهور */
+.dfm-hierarchy-path {
+    animation: dfm-fadeInUp 0.4s var(--dfm-ease);
+}
+
+/* ═══════════ تحسين رسالة النص التعليمي ═══════════ */
+.dfm-helper.help-permanent {
+    animation: dfm-fadeInUp 0.4s var(--dfm-ease);
+}
+
+.dfm-helper .dfm-helper-title {
+    font-weight: 800;
+    color: #92400e;
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+}
+
+/* ═══════════ تصميم نموذج تأكيد الإغلاق المحسّن ═══════════ */
+.dfm-confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: dfm-confirm-fade-in 0.2s ease-out;
+}
+
+.dfm-confirm-box {
+    background: #fff;
+    border-radius: 20px;
+    max-width: 520px;
+    width: 92%;
+    box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+    animation: dfm-confirm-pop 0.3s ease-out;
+}
+
+.dfm-confirm-gradient-bar {
+    height: 6px;
+    background: linear-gradient(90deg, #f59e0b 0%, #ef4444 50%, #3b82f6 100%);
+}
+
+.dfm-confirm-content {
+    padding: 32px 32px 24px;
+}
+
+.dfm-confirm-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.dfm-confirm-icon-wrapper {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 16px;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
+}
+
+.dfm-confirm-icon-wrapper i {
+    font-size: 2rem;
+    color: #d97706;
+}
+
+.dfm-confirm-header h3 {
+    margin: 0 0 10px;
+    font-size: 1.35rem;
+    color: #1a1a2e;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.dfm-confirm-question {
+    margin: 0 0 8px;
+    font-size: 1.05rem;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.dfm-confirm-description {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.dfm-confirm-notice {
+    padding: 10px 14px;
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.82rem;
+    color: #92400e;
+}
+
+.dfm-confirm-notice i {
+    color: #d97706;
+    font-size: 0.9rem;
+}
+
+.dfm-confirm-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.dfm-confirm-actions .dfm-btn {
+    flex: 1;
+    min-width: 140px;
+    padding: 13px 18px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 0.92rem;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* ألوان الأزرار وتأثيرات التمرير */
+.dfm-btn-continue {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.dfm-btn-continue:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
+}
+
+.dfm-btn-save {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+.dfm-btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35);
+}
+
+.dfm-btn-leave {
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1.5px solid #e2e8f0 !important;
+}
+
+.dfm-btn-leave:hover {
+    background: #fee2e2;
+    color: #b91c1c;
+    border-color: #fecaca !important;
+}
+
+/* أنيميشن الظهور */
+@keyframes dfm-confirm-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes dfm-confirm-pop {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* ═══════════ التجاوب مع الشاشات المختلفة ═══════════ */
+
+/* شاشات اللابتوب المتوسطة (أقل من 1366px) */
+@media (max-width: 1366px) {
+    .dfm-container {
+        max-width: 95vw;
+        max-height: 95vh;
+    }
+
+    .dfm-body {
+        padding: 24px 20px;
+    }
+}
+
+/* شاشات التابلت (أقل من 900px) */
+@media (max-width: 900px) {
+
+    .dfm-form-group,
+    .dfm-form-group.w-half,
+    .dfm-form-group.w-third,
+    .dfm-form-group.w-quarter {
+        grid-column: 1 / -1;
+        /* الحقول تأخذ العرض الكامل */
+    }
+
+    /* جعل حقول الجدول الفرعي تأخذ نصف العرض بدلاً من الازدحام */
+    .dfm-sf-cell {
+        grid-column: span 6 !important;
+    }
+}
+
+/* شاشات الجوال (أقل من 768px) */
+@media (max-width: 768px) {
+    .dfm-overlay {
+        padding: 0;
+        /* إزالة الهوامش في الجوال */
+        align-items: flex-start;
+        /* البدء من الأعلى */
+    }
+
+    .dfm-container {
+        max-width: 100vw;
+        max-height: 100vh;
+        min-height: 100vh;
+        border-radius: 0;
+        /* إزالة الزوايا الدائرية في وضع ملء الشاشة */
+    }
+
+    .dfm-header {
+        padding: 16px 20px;
+    }
+
+    .dfm-body {
+        padding: 16px 20px;
+    }
+
+    .dfm-footer {
+        flex-direction: column;
+        gap: 12px;
+        padding: 16px 20px;
+    }
+
+    .dfm-footer-right,
+    .dfm-footer-left {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .dfm-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* استجابة للشاشات الصغيرة (الجوال) - نافذة التأكيد */
+@media (max-width: 600px) {
+    .dfm-confirm-actions {
+        flex-direction: column;
+    }
+
+    .dfm-confirm-actions .dfm-btn {
+        min-width: 100%;
+    }
+
+    .dfm-confirm-content {
+        padding: 24px 20px 20px;
+    }
+
+    .dfm-confirm-header h3 {
+        font-size: 1.15rem;
+    }
+}
+
+
+/* ==========================================================================
+   INPUT-UX-NEEDS-RISKS-V2
+   ========================================================================== */
+
+.dfm-v2-card {
+    display: grid !important;
+    grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    padding: 12px !important;
+    border: 1px solid #dbe3ee !important;
+    border-radius: 12px !important;
+    background: #fff !important;
+    margin-bottom: 10px !important;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+}
+
+.dfm-v2-card-header {
+    grid-column: 1 / -1 !important;
+    margin: 0 0 2px !important;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 9px !important;
+    padding: 7px 9px !important;
+}
+
+.dfm-v2-search-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.dfm-v2-search-input {
+    padding-inline-start: 30px !important;
+}
+
+.dfm-v2-search-icon {
+    position: absolute;
+    inset-inline-start: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    pointer-events: none;
+    font-size: .78rem;
+}
+
+.dfm-v2-search-dropdown {
+    position: absolute;
+    z-index: 99999;
+    top: calc(100% + 4px);
+    inset-inline: 0;
+    max-height: 240px;
+    overflow: auto;
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 12px 26px rgba(15, 23, 42, .14);
+    display: none;
+}
+
+.dfm-v2-search-dropdown.show {
+    display: block;
+}
+
+.dfm-v2-option,
+.dfm-v2-empty {
+    display: block;
+    width: 100%;
+    border: 0;
+    background: #fff;
+    padding: 8px 10px;
+    text-align: right;
+    font-family: inherit;
+    font-size: .78rem;
+}
+
+.dfm-v2-option {
+    cursor: pointer;
+}
+
+.dfm-v2-option:hover {
+    background: #f1f5f9;
+}
+
+.dfm-v2-empty {
+    color: #94a3b8;
+}
+
+.dfm-v2-details-toggle {
+    grid-column: 1 / -1;
+    width: fit-content;
+    border: 0;
+    background: transparent;
+    color: #2563eb;
+    padding: 4px 2px;
+    font-family: inherit;
+    font-size: .75rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.dfm-v2-quick-choices {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-top: 5px;
+}
+
+.dfm-v2-choice {
+    min-width: 34px;
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    color: #475569;
+    border-radius: 7px;
+    padding: 4px 6px;
+    font-family: inherit;
+    font-size: .7rem;
+    cursor: pointer;
+}
+
+.dfm-v2-choice:hover,
+.dfm-v2-choice.active {
+    border-color: #2563eb;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-weight: 700;
+}
+
+.dfm-v2-importance-badge {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 44px;
+    border-radius: 8px;
+    padding: 6px 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.dfm-v2-importance-label {
+    font-size: .64rem;
+    color: #64748b;
+}
+
+.dfm-v2-importance-value {
+    font-size: .78rem;
+    color: #475569;
+}
+
+.dfm-v2-importance-badge[data-level="low"] {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+.dfm-v2-importance-badge[data-level="medium"] {
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+.dfm-v2-importance-badge[data-level="high"] {
+    background: #fff7ed;
+    border-color: #fed7aa;
+}
+.dfm-v2-importance-badge[data-level="critical"] {
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+@media (max-width: 900px) {
+    .dfm-v2-card {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .dfm-v2-card > * {
+        min-width: 0;
+    }
+
+    .dfm-v2-card-header,
+    .dfm-v2-details-toggle,
+    .dfm-smart-risk-description-suggestions,
+    .dfm-smart-risk-action-suggestions {
+        grid-column: 1 / -1 !important;
+    }
+}
+
+@media (max-width: 600px) {
+    .dfm-v2-card {
+        grid-template-columns: 1fr !important;
+    }
+
+    .dfm-v2-card > * {
+        grid-column: 1 / -1 !important;
+    }
+}
+
+/* END INPUT-UX-NEEDS-RISKS-V2 */
+
+
+/* ==========================================================================
+   INPUT-UX-NEEDS-RISKS-V3
+   ========================================================================== */
+
+.dfm-v3-combo-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.dfm-v3-combo-input {
+    width: 100%;
+    padding-inline-end: 34px !important;
+}
+
+.dfm-v3-combo-arrow {
+    position: absolute;
+    inset-inline-end: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border: 0;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.dfm-v3-combo-arrow:hover {
+    background: #f1f5f9;
+    color: #1d4ed8;
+}
+
+.dfm-v3-combo-dropdown {
+    position: absolute;
+    z-index: 100000;
+    top: calc(100% + 4px);
+    inset-inline: 0;
+    max-height: 260px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    box-shadow: 0 14px 32px rgba(15,23,42,.16);
+    display: none;
+}
+
+.dfm-v3-combo-dropdown.show {
+    display: block;
+}
+
+.dfm-v3-combo-option,
+.dfm-v3-combo-add {
+    width: 100%;
+    border: 0;
+    padding: 8px 10px;
+    text-align: right;
+    background: #fff;
+    font-family: inherit;
+    font-size: .78rem;
+    cursor: pointer;
+}
+
+.dfm-v3-combo-option:hover,
+.dfm-v3-combo-option.active {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.dfm-v3-combo-add {
+    color: #047857;
+    background: #f0fdf4;
+    border-top: 1px solid #dcfce7;
+    font-weight: 700;
+}
+
+.dfm-v3-combo-empty {
+    padding: 9px 10px;
+    color: #94a3b8;
+    font-size: .76rem;
+}
+
+.dfm-v3-text-suggest-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.dfm-v3-text-suggest-dropdown {
+    position: absolute;
+    z-index: 100000;
+    top: calc(100% + 4px);
+    inset-inline: 0;
+    max-height: 240px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 9px;
+    box-shadow: 0 14px 32px rgba(15,23,42,.16);
+    display: none;
+}
+
+.dfm-v3-text-suggest-dropdown.show {
+    display: block;
+}
+
+.dfm-v3-text-suggest-caption {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 7px 10px;
+    background: #f8fafc;
+    color: #475569;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: .72rem;
+    font-weight: 700;
+}
+
+.dfm-v3-text-suggest-item {
+    display: block;
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fff;
+    padding: 8px 10px;
+    text-align: right;
+    font-family: inherit;
+    font-size: .76rem;
+    line-height: 1.5;
+    color: #334155;
+    cursor: pointer;
+}
+
+.dfm-v3-text-suggest-item:hover {
+    background: #f8fafc;
+    color: #1d4ed8;
+}
+
+.dfm-v3-text-suggest-empty {
+    padding: 9px 10px;
+    color: #94a3b8;
+    font-size: .74rem;
+}
+
+/* END INPUT-UX-NEEDS-RISKS-V3 */
+
+}

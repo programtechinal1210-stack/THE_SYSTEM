@@ -1,0 +1,166 @@
+﻿<!-- ============================================================
+     فلاتر سجل التدقيق
+     ============================================================ -->
+<div class="filter-bar" id="auditFilterBar">
+    <!-- بحث -->
+    <div class="filter-group">
+        <label>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            بحث
+        </label>
+        <input type="text" 
+               name="search" 
+               placeholder="مستخدم، كيان، إجراء..." 
+               value="{{ filters.search|default:'' }}"
+               hx-get="/audit/api/logs/"
+               hx-trigger="keyup changed delay:500ms"
+               hx-target="#auditTable"
+               hx-include="#auditFilterBar">
+    </div>
+
+    <!-- الإجراء -->
+    <div class="filter-group">
+        <label>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="14 2 18 6 14 10"/><path d="M3 12v3a2 2 0 002 2h14a2 2 0 002-2v-3"/>
+            </svg>
+            الإجراء
+        </label>
+        <select name="action_type"
+                hx-get="/audit/api/logs/"
+                hx-trigger="change"
+                hx-target="#auditTable"
+                hx-include="#auditFilterBar">
+            <option value="">الكل</option>
+            <option value="CREATE" {% if filters.action_type == 'CREATE' %}selected{% endif %}>إنشاء</option>
+            <option value="UPDATE" {% if filters.action_type == 'UPDATE' %}selected{% endif %}>تحديث</option>
+            <option value="DELETE" {% if filters.action_type == 'DELETE' %}selected{% endif %}>حذف</option>
+            <option value="VIEW" {% if filters.action_type == 'VIEW' %}selected{% endif %}>عرض</option>
+            <option value="LOGIN" {% if filters.action_type == 'LOGIN' %}selected{% endif %}>تسجيل دخول</option>
+            <option value="EXPORT" {% if filters.action_type == 'EXPORT' %}selected{% endif %}>تصدير</option>
+        </select>
+    </div>
+
+    <!-- الوحدة -->
+    <div class="filter-group">
+        <label>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+            الوحدة
+        </label>
+        <select name="module"
+                hx-get="/audit/api/logs/"
+                hx-trigger="change"
+                hx-target="#auditTable"
+                hx-include="#auditFilterBar">
+            <option value="">الكل</option>
+            <option value="cases" {% if filters.module == 'cases' %}selected{% endif %}>📋 المعاملات</option>
+            <option value="users" {% if filters.module == 'users' %}selected{% endif %}>👥 المستخدمون</option>
+            <option value="execution" {% if filters.module == 'execution' %}selected{% endif %}>⚡ التنفيذ</option>
+            <option value="directives" {% if filters.module == 'directives' %}selected{% endif %}>📢 التوجيهات</option>
+            <option value="tasks" {% if filters.module == 'tasks' %}selected{% endif %}>✅ المهام</option>
+            <option value="settings" {% if filters.module == 'settings' %}selected{% endif %}>⚙️ الإعدادات</option>
+            <option value="notifications" {% if filters.module == 'notifications' %}selected{% endif %}>🔔 الإشعارات</option>
+            <option value="audit" {% if filters.module == 'audit' %}selected{% endif %}>🔍 التدقيق</option>
+        </select>
+    </div>
+
+    <!-- الخطورة -->
+    <div class="filter-group">
+        <label>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            الخطورة
+        </label>
+        <select name="severity"
+                hx-get="/audit/api/logs/"
+                hx-trigger="change"
+                hx-target="#auditTable"
+                hx-include="#auditFilterBar">
+            <option value="">الكل</option>
+            <option value="info" {% if filters.severity == 'info' %}selected{% endif %}>ℹ️ معلومات</option>
+            <option value="warning" {% if filters.severity == 'warning' %}selected{% endif %}>⚠️ تحذير</option>
+            <option value="critical" {% if filters.severity == 'critical' %}selected{% endif %}>🔴 حرج</option>
+        </select>
+    </div>
+
+    <!-- التاريخ -->
+    <div class="filter-group">
+        <label>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            من تاريخ
+        </label>
+        <input type="date" 
+               name="date_from" 
+               value="{{ filters.date_from|default:'' }}"
+               hx-get="/audit/api/logs/"
+               hx-trigger="change"
+               hx-target="#auditTable"
+               hx-include="#auditFilterBar">
+    </div>
+
+    <!-- إلى تاريخ -->
+    <div class="filter-group">
+        <label>إلى تاريخ</label>
+        <input type="date" 
+               name="date_to" 
+               value="{{ filters.date_to|default:'' }}"
+               hx-get="/audit/api/logs/"
+               hx-trigger="change"
+               hx-target="#auditTable"
+               hx-include="#auditFilterBar">
+    </div>
+
+    <!-- إجراءات نظامية -->
+    <div class="filter-group" style="flex: 0 0 auto; justify-content: flex-end;">
+        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px;">
+            <input type="checkbox" 
+                   name="is_system_action" 
+                   value="true"
+                   {% if filters.is_system_action %}checked{% endif %}
+                   hx-get="/audit/api/logs/"
+                   hx-trigger="change"
+                   hx-target="#auditTable"
+                   hx-include="#auditFilterBar">
+            إجراءات نظامية فقط
+        </label>
+    </div>
+
+    <!-- أزرار -->
+    <button class="btn-search" 
+            hx-get="/audit/api/logs/" 
+            hx-target="#auditTable" 
+            hx-include="#auditFilterBar"
+            hx-trigger="click">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        بحث
+    </button>
+    
+    <button class="btn-reset" 
+            onclick="resetAuditFilters()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
+        </svg>
+        إعادة تعيين
+    </button>
+
+    <button class="btn-search" style="background: #f59e0b;" 
+            onclick="openModal('exportModal')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        تصدير
+    </button>
+</div>

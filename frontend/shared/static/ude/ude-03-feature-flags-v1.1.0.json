@@ -1,0 +1,7 @@
+{
+  "schema": "ude.feature-flags.v1",
+  "package": "UDE-03",
+  "default_enabled": false,
+  "production_load": false,
+  "lab_route": "/ude-03/lab/"
+}

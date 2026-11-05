@@ -1,0 +1,50 @@
+/* Scoped planning hierarchy: levels use labels as well as color. */
+.pm-reference .project-mode{--text-primary:#172b45;--text-secondary:#52647a;--bg-card:#fff;color:#172b45;background:transparent;line-height:1.8;padding:0;}
+.pm-reference .project-mode h1{font-size:1.5rem;margin:0;font-weight:800;}
+.pm-reference .project-mode h3{font-size:1.15rem;font-weight:800;}
+.pm-reference .project-mode small{color:#52647a;}
+.pm-reference .project-mode .pl-topbar{position:static;display:flex;flex-wrap:wrap;gap:16px;height:auto;min-height:88px;padding:18px 22px;border:1px solid #d6e2f0;border-radius:16px;background:#fff;box-shadow:0 3px 14px #243d6510;}
+.pm-reference .project-mode .pl-topbar-back{width:auto;flex:none;white-space:nowrap;font-size:.88rem;color:#2455a4;padding:8px 12px;background:#eff5ff;border-radius:8px;}
+.pm-reference .project-mode .pl-topbar-center{flex:1;min-width:150px;}
+.pm-reference .project-mode .pl-topbar-name{font-size:1.35rem;color:#172b45;}
+.pm-reference .project-mode .pl-topbar-code{background:#eef2f7;padding:2px 9px;border-radius:6px;color:#52647a;}
+.pm-reference .project-mode .pl-main-tabs{gap:8px;border:0;padding:12px;background:#fff;border-radius:14px;border:1px solid #dce5f0;}
+.pm-reference .project-mode .pl-tab-btn{border:1px solid #dce5f0;border-radius:8px;background:#f8fafc;color:#344a64;padding:9px 14px;font-size:.9rem;}
+.pm-reference .project-mode .pl-tab-btn.active{background:#245bc2;border-color:#245bc2;color:#fff;box-shadow:0 3px 8px #245bc225;}
+.pm-reference .project-mode .pm-panel{background:#fff;border:1px solid #dce5f0;border-radius:16px;padding:22px;box-shadow:0 3px 12px #23395508;}
+.pm-reference .project-mode .pm-detail-grid{gap:12px;margin-block:18px;}
+.pm-reference .project-mode .pm-detail-grid>div,.pm-reference .project-mode .pm-detail-grid>span{display:block;background:#f4f7fc;border:1px solid #e1e8f2;border-radius:10px;padding:14px 16px;min-width:0;overflow-wrap:anywhere;}
+.pm-reference .project-mode .pm-kpi-value{font-size:1.45rem;line-height:1.5;color:#173b72;margin:8px 0;font-variant-numeric:tabular-nums;}
+.pm-reference .project-mode .pm-card-actions{padding-top:14px;border-top:1px solid #e2e8f0;align-items:center;gap:8px;}
+.pm-reference .project-mode .pm-card-actions a,.pm-reference .project-mode .pm-button,.pm-reference .project-mode button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:42px;box-sizing:border-box;margin:0;padding:8px 14px;border:1px solid #b9cce5;border-radius:8px;background:#fff;color:#244c82;font-weight:700;font-size:.9rem;text-decoration:none;line-height:1.5;cursor:pointer;}
+.pm-reference .project-mode .pm-button.primary,.pm-reference .project-mode .pm-card-actions a[data-pm-dialog]:last-child{background:#245bc2;border-color:#245bc2;color:#fff;}
+.pm-reference .project-mode a:hover,.pm-reference .project-mode button:hover{filter:brightness(.94);text-decoration:none;}
+.pm-reference .project-mode :focus-visible{outline:3px solid #d88b13;outline-offset:3px;}
+.pm-reference .project-mode>.pm-list-toolbar{padding:16px;background:#fff;border:1px solid #dce5f0;border-radius:12px;justify-content:flex-start;}
+.pm-reference .project-mode>.pm-list-toolbar label{flex:1;min-width:240px;font-size:.9rem;font-weight:700;}
+.pm-reference .project-mode input[type=search]{display:block;width:100%;margin-top:5px;background:#f8fafc;border:1px solid #b9cce5;min-height:44px;box-sizing:border-box;}
+.pm-reference .project-mode .pl-help-banner{background:#edf5ff;color:#294d76;border:1px solid #c9ddf8;border-inline-start:4px solid #3776cb;border-radius:10px;padding:12px 16px;font-size:.9rem;}
+.pm-reference .project-mode .pm-hierarchy>.pm-phase{margin:22px 0;padding:18px;border:1px solid #c5d8f1;border-inline-start:5px solid #2962b2;border-radius:14px;background:#f0f6ff;box-shadow:0 3px 12px #23426b09;}
+.pm-reference .project-mode .pm-hierarchy .pm-task{margin:18px 10px 8px;padding:18px;border:1px solid #d8d1ed;border-inline-start:5px solid #7854b2;border-radius:12px;background:#faf8ff;}
+.pm-reference .project-mode .pm-hierarchy .pm-activity{margin:18px 8px 8px;padding:20px;border:1px solid #bcded6;border-inline-start:5px solid #14806c;background:#fff;border-radius:12px;}
+.pm-reference .project-mode .pm-phase>summary,.pm-reference .project-mode .pm-task>summary{font-size:1.08rem;color:#203d65;padding:4px 0 12px;border-bottom:1px solid #cdddf0;cursor:pointer;}
+.pm-reference .project-mode .pm-task>summary{color:#56368b;border-color:#ded5ef;}
+.pm-reference .project-mode .pm-level{display:inline-block;padding:2px 10px;margin-inline:8px;border-radius:6px;font-size:.78rem;font-weight:700;background:#dbe9ff;color:#224e8b;}
+.pm-reference .project-mode .pm-task .pm-level{background:#ebe3fa;color:#604092;}
+.pm-reference .project-mode .pm-activity .pm-level{background:#dff3ec;color:#146550;}
+.pm-reference .project-mode .pm-hierarchy p{color:#52647a;font-size:.92rem;}
+.pm-reference .project-mode .pm-activity>header{padding-bottom:14px;border-bottom:1px solid #e0ece8;}
+.pm-reference .project-mode .pm-activity h3{margin:8px 0;}
+.pm-reference .project-mode .pm-activity h3 a{margin:0;color:#174f45;}
+.pm-reference .project-mode .pm-state{font-size:.82rem;font-weight:700;border:1px solid #e8d399;}
+.pm-reference .project-mode .pm-state-approved{border-color:#9dd6ad;}
+.pm-reference .project-mode .pm-state-rejected{border-color:#efb5b5;}
+.pm-reference .project-mode .pm-activity details{margin:18px 0 0;padding:14px;border:1px solid #dce6e2;border-radius:10px;background:#f7faf9;}
+.pm-reference .project-mode .pm-table{margin-top:12px;border:1px solid #dce5ec;border-radius:8px;}
+.pm-reference .project-mode th{background:#edf2f8;color:#344c67;font-weight:700;white-space:nowrap;}
+.pm-reference .project-mode td{color:#283f58;}
+.pm-reference .project-mode tbody tr:nth-child(even){background:#f8fafc;}
+.pm-reference .project-mode .pm-table a{color:#245bc2;text-decoration:underline;margin:0;}
+.pm-reference .project-mode .pm-order-handle{min-height:32px;padding:3px 10px;margin-inline-start:10px;color:#52647a;background:#fff;cursor:grab;}
+@media(max-width:760px){.pm-reference .project-mode .pl-topbar{padding:14px;gap:10px}.pm-reference .project-mode .pl-tab-btn{padding:8px 10px;flex:1 0 auto}.pm-reference .project-mode .pm-panel{padding:14px}.pm-reference .project-mode .pm-hierarchy .pm-task,.pm-reference .project-mode .pm-hierarchy .pm-activity{margin-inline:0;padding:12px}.pm-reference .project-mode .pm-hierarchy>.pm-phase{padding:12px}.pm-reference .project-mode .pm-card-actions a{flex:1 1 auto}.pm-reference .project-mode>.pm-list-toolbar label{min-width:100%}}
+@media print{.pm-reference .project-mode .pm-card-actions,.pm-reference .project-mode .pm-order-handle{display:none!important}.pm-reference .project-mode .pm-panel,.pm-reference .project-mode .pm-hierarchy details{box-shadow:none;background:white}}

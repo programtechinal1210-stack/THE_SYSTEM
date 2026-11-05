@@ -1,0 +1,39 @@
+﻿<div class="table-responsive">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>الاسم</th>
+                <th>النوع</th>
+                <th>الكيان</th>
+                <th>السجلات</th>
+                <th>الحالة</th>
+                <th>التاريخ</th>
+                <th>إجراء</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if exports %}
+                {% for e in exports %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ e.export_name|default:"تصدير" }}</td>
+                    <td><span class="badge badge-info">{{ e.export_type|upper }}</span></td>
+                    <td><span class="badge badge-secondary">{{ e.entity_type }}</span></td>
+                    <td>{{ e.record_count|default:0 }}</td>
+                    <td><span class="badge {% if e.status == 'completed' %}badge-success{% else %}badge-warning{% endif %}">{{ e.status }}</span></td>
+                    <td style="font-size:11px;">{{ e.created_at|slice:":19" }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-success" onclick="openModal('exportModal')">📥</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td colspan="8" style="text-align:center;padding:40px;">
+                    <p>لا توجد عمليات تصدير</p>
+                    <button class="btn btn-primary" onclick="openModal('exportModal')">📥 تصدير جديد</button>
+                </td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>

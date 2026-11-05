@@ -1,0 +1,48 @@
+﻿{% extends "base.html" %}
+
+{% block title %}النواة المؤسسية{% endblock %}
+{% block page_title %}النواة المؤسسية{% endblock %}
+{% block breadcrumb_text %}الرئيسية{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div style="margin-bottom:1.5rem;">
+        <h2 style="margin:0 0 .5rem 0;">مرحباً {{ user_full_name }}</h2>
+        <p style="color:var(--text-muted);margin:0;">
+            هذه هي النواة المشتركة للمؤسسة. يمكن إضافة أنظمة الأعمال إليها كوحدات مستقلة لاحقاً.
+        </p>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;">
+        <a href="{% url 'users:list' %}" class="card" style="padding:1.2rem;text-decoration:none;">
+            <div style="font-size:1.7rem;">👥</div>
+            <h3>المستخدمون والصلاحيات</h3>
+            <p style="color:var(--text-muted);">إدارة المستخدمين والأدوار والصلاحيات.</p>
+        </a>
+
+        <a href="{% url 'organizations:list' %}" class="card" style="padding:1.2rem;text-decoration:none;">
+            <div style="font-size:1.7rem;">🏢</div>
+            <h3>الجهات</h3>
+            <p style="color:var(--text-muted);">الدليل والهيكل التنظيمي المشترك.</p>
+        </a>
+
+        <a href="{% url 'notifications:list' %}" class="card" style="padding:1.2rem;text-decoration:none;">
+            <div style="font-size:1.7rem;">🔔</div>
+            <h3>الإشعارات</h3>
+            <p style="color:var(--text-muted);">مركز الإشعارات المشترك.</p>
+        </a>
+
+        <a href="{% url 'settings:index' %}" class="card" style="padding:1.2rem;text-decoration:none;">
+            <div style="font-size:1.7rem;">⚙️</div>
+            <h3>الإعدادات</h3>
+            <p style="color:var(--text-muted);">إعدادات النظام والمستخدمين.</p>
+        </a>
+
+        <a href="{% url 'audit:index' %}" class="card" style="padding:1.2rem;text-decoration:none;">
+            <div style="font-size:1.7rem;">🛡️</div>
+            <h3>التدقيق والحوكمة</h3>
+            <p style="color:var(--text-muted);">السجلات والتنبيهات والمتابعة.</p>
+        </a>
+    </div>
+</div>
+{% endblock %}

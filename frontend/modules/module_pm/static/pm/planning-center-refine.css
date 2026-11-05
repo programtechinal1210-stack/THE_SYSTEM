@@ -1,0 +1,674 @@
+.pm-projects-planning {
+    gap: 10px;
+    margin-block-start: -8px;
+    padding-block-end: 16px;
+}
+
+.pm-projects-planning .pm-projects-heading {
+    min-height: 0;
+    align-items: center;
+}
+
+.pm-projects-planning .pm-projects-title {
+    gap: 10px;
+}
+
+.pm-projects-planning .pm-projects-title h1 {
+    font-size: clamp(1.35rem, 1.8vw, 1.65rem);
+}
+
+.pm-projects-planning .pm-projects-title p {
+    margin-block-start: 2px;
+    font-size: .78rem;
+}
+
+.pm-projects-planning .pm-projects-heading-actions {
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.pm-projects-planning .pm-planning-tabs {
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+}
+
+.pm-projects-planning .pm-planning-tab {
+    min-height: 36px;
+    flex: 1 1 150px;
+    justify-content: space-between;
+    padding: 6px 11px;
+    border-color: var(--projects-line);
+    background: var(--projects-surface);
+    font-size: .72rem;
+}
+
+.pm-projects-planning .pm-planning-tab.active {
+    border-color: var(--info, #2878ff);
+    background: var(--info, #2878ff);
+    color: #fff;
+    box-shadow: none;
+}
+
+.pm-projects-planning .pm-planning-tab:focus-visible,
+.pm-projects-planning .pm-projects-filters :focus-visible,
+.pm-projects-planning .pm-planning-lifecycle-details > summary:focus-visible {
+    outline: 2px solid var(--info, #2878ff);
+    outline-offset: 2px;
+}
+
+.pm-projects-planning .pm-projects-workspace {
+    gap: 9px;
+}
+
+.pm-projects-planning .pm-projects-filters {
+    grid-template-columns: minmax(0, 1fr) max-content max-content;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px;
+    box-shadow: none;
+}
+
+.pm-projects-planning .pm-projects-filter-heading {
+    display: flex;
+    grid-column: 1 / -1;
+    margin: 0;
+}
+
+.pm-projects-planning .pm-projects-filter-heading h2 {
+    display: block;
+    font-size: .74rem;
+}
+
+.pm-projects-planning .pm-projects-filter-heading button {
+    min-height: 30px;
+    padding-inline: 5px;
+    font-size: .67rem;
+}
+
+.pm-projects-planning .pm-project-search {
+    grid-column: 1;
+    grid-row: auto;
+    min-height: 38px;
+    border-radius: 7px;
+}
+
+.pm-projects-planning .pm-project-search input {
+    font-size: .72rem;
+}
+
+.pm-projects-planning .pm-planning-advanced-filters {
+    grid-column: 2;
+    grid-row: auto;
+    min-width: 0;
+    border: 1px solid var(--projects-line);
+    border-radius: 7px;
+    background: var(--projects-surface);
+    margin: 0;
+    padding: 0;
+}
+
+.pm-projects-planning .pm-planning-advanced-filters > summary {
+    display: flex;
+    min-height: 38px;
+    align-items: center;
+    gap: 7px;
+    padding-inline: 10px;
+    color: var(--text-secondary, #516789);
+    cursor: pointer;
+    font-size: .68rem;
+    font-weight: 700;
+    list-style: none;
+    white-space: nowrap;
+}
+
+.pm-projects-planning .pm-planning-advanced-filters > summary::-webkit-details-marker {
+    display: none;
+}
+
+.pm-projects-planning .pm-planning-advanced-filters[open] {
+    grid-column: 1 / -1;
+    padding: 8px;
+}
+
+.pm-projects-planning .pm-planning-advanced-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 9px;
+    margin-block-start: 8px;
+}
+
+.pm-projects-planning .pm-project-filter,
+.pm-projects-planning .pm-project-date-filter {
+    gap: 5px;
+}
+
+.pm-projects-planning .pm-project-filter > span,
+.pm-projects-planning .pm-project-date-filter > span {
+    font-size: .67rem;
+}
+
+.pm-projects-planning .pm-project-filter select,
+.pm-projects-planning .pm-project-date-filter input {
+    min-height: 36px;
+    font-size: .7rem;
+}
+
+.pm-projects-planning .pm-project-date-filter > div {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pm-projects-planning .pm-project-apply-filters {
+    grid-column: 3;
+    grid-row: auto;
+    min-height: 38px;
+    padding-inline: 12px;
+    font-size: .69rem;
+}
+
+.pm-projects-planning .pm-project-filter-count {
+    grid-column: 1 / -1;
+    min-height: 0;
+    margin: 0;
+    text-align: start;
+    font-size: .65rem;
+}
+
+.pm-projects-planning .pm-projects-content {
+    gap: 7px;
+}
+
+.pm-projects-planning .pm-projects-toolbar {
+    min-height: 36px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pm-projects-planning .pm-project-view-controls {
+    flex-wrap: wrap;
+}
+
+.pm-projects-planning .pm-projects-grid {
+    gap: 10px;
+}
+
+.pm-projects-planning .pm-project-card {
+    border-radius: 9px;
+    box-shadow: var(--shadow-card, 0 2px 8px rgb(25 55 95 / 5%));
+}
+
+.pm-projects-planning .pm-project-card-head {
+    grid-template-columns: minmax(68px, .65fr) minmax(0, 1.35fr);
+    align-items: center;
+    gap: 9px;
+    padding: 10px 10px 0;
+}
+
+.pm-projects-planning .pm-project-card-cover {
+    min-height: 72px;
+    border-radius: 7px;
+}
+
+.pm-projects-planning .pm-project-cover-mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    font-size: 17px;
+}
+
+.pm-projects-planning .pm-project-cover-code {
+    font-size: .58rem;
+}
+
+.pm-projects-planning .pm-project-card-title {
+    min-height: 72px;
+    align-items: center;
+    gap: 6px;
+}
+
+.pm-projects-planning .pm-project-status {
+    padding: 4px 7px;
+    font-size: .62rem;
+}
+
+.pm-projects-planning .pm-project-card-title h3 {
+    margin-block-start: 4px;
+    font-size: .84rem;
+    line-height: 1.4;
+}
+
+.pm-projects-planning .pm-project-card-title > div > span:not(.pm-project-status) {
+    margin-block-start: 3px;
+    font-size: .68rem;
+}
+
+.pm-projects-planning .pm-project-card-more {
+    width: 26px;
+    height: 26px;
+    flex-basis: 26px;
+}
+
+.pm-projects-planning .pm-project-card-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 4px 10px 10px;
+}
+
+.pm-projects-planning .pm-project-facts {
+    gap: 7px 8px;
+    padding-block: 7px;
+}
+
+.pm-projects-planning .pm-project-facts > div {
+    grid-template-columns: 15px minmax(0, 1fr);
+    gap: 2px 5px;
+}
+
+.pm-projects-planning .pm-project-facts > div > i {
+    font-size: .68rem;
+}
+
+.pm-projects-planning .pm-project-facts > div > span {
+    font-size: .65rem;
+}
+
+.pm-projects-planning .pm-project-facts > div > strong {
+    font-size: .69rem;
+}
+
+.pm-projects-planning .pm-project-facts .cost > strong small {
+    font-size: .62rem;
+}
+
+.pm-projects-planning .pm-project-card-footer {
+    min-height: 39px;
+    gap: 7px;
+}
+
+.pm-projects-planning .pm-project-manager-avatar {
+    width: 27px;
+    height: 27px;
+    flex-basis: 27px;
+}
+
+.pm-projects-planning .pm-project-manager strong {
+    font-size: .68rem;
+}
+
+.pm-projects-planning .pm-project-manager small {
+    font-size: .59rem;
+}
+
+.pm-projects-planning .pm-planning-lifecycle {
+    margin-block-start: 6px;
+    padding-block-start: 6px;
+    border-color: var(--projects-line);
+}
+
+.pm-projects-planning .pm-planning-lifecycle-details > summary {
+    min-height: 34px;
+    color: var(--projects-text);
+    cursor: pointer;
+    list-style: none;
+}
+
+.pm-projects-planning .pm-planning-lifecycle-details > summary::-webkit-details-marker {
+    display: none;
+}
+
+.pm-projects-planning .pm-planning-stage-copy {
+    display: grid;
+    gap: 2px;
+}
+
+.pm-projects-planning .pm-planning-stage-copy > strong {
+    font-size: .68rem;
+}
+
+.pm-projects-planning .pm-planning-stage-copy > span {
+    color: var(--projects-muted);
+    font-size: .68rem;
+    font-weight: 700;
+}
+
+.pm-projects-planning .pm-planning-stage-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--info, #2878ff);
+    font-size: .64rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.pm-projects-planning .pm-planning-stage-toggle i {
+    transition: transform .16s ease;
+}
+
+.pm-projects-planning .pm-planning-lifecycle-details[open] .pm-planning-stage-toggle i {
+    transform: rotate(180deg);
+}
+
+.pm-projects-planning .pm-planning-lifecycle .pm-project-lifecycle-steps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px 4px;
+    margin-block: 7px 2px;
+}
+
+.pm-projects-planning .pm-planning-lifecycle .pm-project-lifecycle-steps li:not(:last-child)::after {
+    display: none;
+}
+
+.pm-projects-planning .pm-planning-lifecycle .pm-project-lifecycle-steps small {
+    max-width: 100%;
+    min-height: 0;
+    font-size: .62rem;
+}
+
+.pm-projects-planning .pm-planning-lifecycle .pm-project-execution-progress {
+    margin-block-start: 4px;
+    padding: 5px 7px;
+    background: var(--projects-soft);
+    color: var(--projects-muted);
+    font-size: .64rem;
+}
+
+.pm-projects-planning .pm-planning-lifecycle .pm-project-execution-progress strong {
+    color: var(--text-secondary, #425a7d);
+    font-size: .65rem;
+}
+
+.pm-projects-planning .pm-planning-card-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-block-start: 7px;
+    padding-block-start: 7px;
+    border-color: var(--projects-line);
+}
+
+.pm-projects-planning .pm-planning-card-actions > form {
+    flex: 1 0 100%;
+}
+
+.pm-projects-planning .pm-planning-card-actions .pm-project-next-action {
+    width: 100%;
+    min-height: 36px;
+    padding: 7px 9px;
+    font-size: .7rem;
+}
+
+.pm-projects-planning .pm-planning-card-actions > a.pm-project-secondary-action {
+    min-height: 30px;
+    flex: 1 1 auto;
+    padding: 5px 7px;
+    font-size: .65rem;
+}
+
+.pm-projects-planning .pm-project-all-actions,
+.pm-projects-planning .pm-project-secondary-actions {
+    margin-block-start: 5px;
+}
+
+html[data-theme="dark"] .pm-projects-planning .pm-planning-lifecycle .pm-project-execution-progress,
+html[data-theme="dark"] .pm-projects-planning .pm-planning-lifecycle .pm-project-lifecycle-dot {
+    background: var(--projects-soft);
+    color: var(--projects-muted);
+}
+
+html[data-theme="dark"] .pm-projects-planning .pm-planning-lifecycle .pm-project-execution-progress strong {
+    color: var(--text-secondary, #adc3e3);
+}
+
+html[data-theme="dark"] .pm-projects-planning .pm-planning-lifecycle .pm-project-lifecycle-dot {
+    border-color: var(--projects-line);
+}
+
+html[data-theme="dark"] .pm-projects-planning .pm-planning-lifecycle .is-complete .pm-project-lifecycle-dot {
+    border-color: var(--success, #12a978);
+    background: var(--success, #12a978);
+    color: #fff;
+}
+
+html[data-theme="dark"] .pm-projects-planning .pm-planning-lifecycle .is-current .pm-project-lifecycle-dot {
+    border-color: var(--info, #2878ff);
+    background: var(--info-bg, #203b63);
+    box-shadow: 0 0 0 3px var(--info-bg, #203b63);
+}
+
+@media (max-width: 1100px) {
+    .pm-projects-planning .pm-planning-advanced-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .pm-projects-planning {
+        margin-block-start: -4px;
+    }
+
+    .pm-projects-planning .pm-projects-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 9px;
+    }
+
+    .pm-projects-planning .pm-projects-heading-actions {
+        width: 100%;
+    }
+
+    .pm-projects-planning .pm-projects-filters {
+        grid-template-columns: minmax(0, 1fr) max-content;
+    }
+
+    .pm-projects-planning .pm-projects-filter-heading,
+    .pm-projects-planning .pm-project-search,
+    .pm-projects-planning .pm-planning-advanced-filters[open],
+    .pm-projects-planning .pm-project-filter-count {
+        grid-column: 1 / -1;
+    }
+
+    .pm-projects-planning .pm-planning-advanced-filters:not([open]) {
+        grid-column: 1;
+    }
+
+    .pm-projects-planning .pm-project-apply-filters {
+        grid-column: 2;
+        padding-inline: 9px;
+    }
+
+    .pm-projects-planning .pm-planning-advanced-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pm-projects-planning .pm-planning-stage-toggle i {
+        transition: none;
+    }
+}
+
+body:has(.pm-projects-planning) .page-content {
+    padding-inline: clamp(8px, 1vw, 16px) !important;
+}
+
+body:has(.pm-projects-planning) .content-area {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    margin: 0;
+    padding-inline: 0 !important;
+}
+
+.pm-projects-planning {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    padding-inline: clamp(8px, 1vw, 16px);
+    container-name: planning-center;
+    container-type: inline-size;
+}
+
+.pm-projects-planning .pm-projects-grid[data-project-view="cards"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+}
+
+.pm-projects-planning .pm-project-card {
+    min-width: 0;
+    min-height: 0;
+}
+
+.pm-projects-planning .pm-project-card-head {
+    min-height: 112px;
+    grid-template-columns: minmax(68px, .34fr) minmax(0, 1fr);
+    align-items: stretch;
+    gap: 12px;
+}
+
+.pm-projects-planning .pm-project-card-cover {
+    min-height: 78px;
+    align-self: center;
+}
+
+.pm-projects-planning .pm-project-cover-mark {
+    width: 34px;
+    height: 34px;
+    font-size: 17px;
+}
+
+.pm-projects-planning .pm-project-cover-code {
+    font-size: .72rem;
+}
+
+.pm-projects-planning .pm-project-card-title {
+    min-width: 0;
+    min-height: 0;
+    align-items: flex-start;
+}
+
+.pm-projects-planning .pm-project-card-title > div {
+    min-width: 0;
+}
+
+.pm-projects-planning .pm-project-status {
+    font-size: .75rem;
+}
+
+.pm-projects-planning .pm-project-card-title h3 {
+    font-size: 1rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.pm-projects-planning .pm-project-card-title > div > span:not(.pm-project-status) {
+    font-size: .82rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+}
+
+.pm-projects-planning .pm-project-card-body {
+    min-width: 0;
+    justify-content: flex-start;
+}
+
+.pm-projects-planning .pm-project-facts > div > span {
+    font-size: .74rem;
+    line-height: 1.4;
+    white-space: normal;
+}
+
+.pm-projects-planning .pm-project-facts > div > strong {
+    font-size: .8rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
+.pm-projects-planning .pm-project-facts .cost > strong small {
+    font-size: .74rem;
+}
+
+.pm-projects-planning .pm-project-manager-avatar {
+    width: 25px;
+    height: 25px;
+    flex-basis: 25px;
+}
+
+.pm-projects-planning .pm-project-manager strong {
+    font-size: .82rem;
+    overflow-wrap: anywhere;
+}
+
+.pm-projects-planning .pm-project-manager small {
+    font-size: .72rem;
+}
+
+.pm-projects-planning .pm-planning-stage-copy > strong,
+.pm-projects-planning .pm-planning-stage-copy > span {
+    font-size: .78rem;
+    line-height: 1.4;
+}
+
+.pm-projects-planning .pm-planning-stage-toggle {
+    font-size: .74rem;
+}
+
+.pm-projects-planning .pm-planning-lifecycle .pm-project-execution-progress,
+.pm-projects-planning .pm-planning-lifecycle .pm-project-execution-progress strong {
+    font-size: .76rem;
+}
+
+.pm-projects-planning .pm-planning-card-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+}
+
+.pm-projects-planning .pm-planning-card-actions .pm-project-next-action {
+    grid-column: 1 / -1;
+    min-height: 42px;
+    font-size: .82rem;
+    overflow-wrap: anywhere;
+}
+
+.pm-projects-planning .pm-planning-card-actions > a.pm-project-secondary-action {
+    min-width: 0;
+    min-height: 38px;
+    font-size: .74rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+    text-align: center;
+    white-space: normal;
+}
+
+@container planning-center (max-width: 900px) {
+    .pm-projects-planning .pm-projects-grid[data-project-view="cards"] {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@container planning-center (max-width: 600px) {
+    .pm-projects-planning .pm-projects-grid[data-project-view="cards"] {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pm-projects-planning .pm-project-card-head {
+        grid-template-columns: minmax(64px, .24fr) minmax(0, 1fr);
+    }
+}
+
+.pm-projects-planning .pm-projects-grid[data-project-view="list"],
+.pm-projects-planning .pm-projects-grid[data-project-view="table"] {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+@container planning-center (max-width: 1050px) {
+    .pm-projects-planning .pm-projects-workspace {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}

@@ -1,0 +1,15 @@
+{
+  "schema": "ude.color-palettes.manifest.v1",
+  "version": "1.0.0",
+  "assets": [
+    {"path":"frontend/shared/static/ude/ude-color-palettes-v1.0.json","sha256":"E2E9FB5BCEAD483D9E17C07DB53EE248F932EB60C84F51F0A81FF5F9134A10B3"},
+    {"path":"frontend/shared/static/ude/ude-color-palettes-v1.0.js","sha256":"EAE7C7BB57C63FB29F21B87B809D0BE6BC5BFA937948172E51668545FD889B5F"},
+    {"path":"frontend/shared/static/ude/ude-color-palettes-v1.0.css","sha256":"6FBECC959B35239386D89CDA302E8C411E618AB202D62FC40B72CE7DFE743EDE"},
+    {"path":"frontend/shared/static/ude/ude-color-palette-settings-v1.0.js","sha256":"C44D9DEB8DCDBBD7A92826EAC1A0BEF34BAE67300B84BB814CE941B1A012E153"},
+    {"path":"frontend/shared/static/ude/ude-color-palette-center-v1.1.js","sha256":"4686C7253E3BF852E9E72301420E46CC7B08267F7A10D3B50750D99F18699484"},
+    {"path":"frontend/shared/static/ude/ude-color-palettes-v1.0-feature-flags.json","sha256":"1B98EE9397175798F8EB6BC9503B3D9A6AD91467EACAF72CFDF14F4A0FC2DB94"},
+    {"path":"tools/ude_color_palette_validator.py","sha256":"9A5C7AE530347CF6D5DA62995456185237F520398626995A9FFC4AAE6170B519"}
+  ],
+  "external_urls": 0,
+  "production_load": false
+}

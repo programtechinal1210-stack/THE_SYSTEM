@@ -1,0 +1,75 @@
+-- EMO-01: organization-scoped equipment categories and asset registry.
+CREATE TABLE eq_categories (
+ id CHAR(32) PRIMARY KEY,
+ organization_id CHAR(32) NOT NULL REFERENCES organizations(id) ON DELETE RESTRICT,
+ category_code TEXT NOT NULL,
+ name_ar TEXT NOT NULL,
+ name_en TEXT NOT NULL DEFAULT '',
+ parent_id CHAR(32),
+ meter_type TEXT NOT NULL CHECK(meter_type IN ('hours','distance','cycles','energy','none')),
+ meter_unit TEXT NOT NULL,
+ output_unit TEXT,
+ fuel_unit TEXT,
+ spec_schema TEXT NOT NULL DEFAULT '{}',
+ inspection_schema TEXT NOT NULL DEFAULT '{}',
+ maintenance_rules TEXT NOT NULL DEFAULT '{}',
+ is_active INTEGER NOT NULL DEFAULT 1 CHECK(is_active IN (0,1)),
+ created_at TEXT NOT NULL,
+ updated_at TEXT NOT NULL,
+ created_by CHAR(32) NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+ updated_by CHAR(32) REFERENCES users(id) ON DELETE RESTRICT,
+ version INTEGER NOT NULL DEFAULT 1 CHECK(version >= 1),
+ deleted_at TEXT,
+ deleted_by CHAR(32) REFERENCES users(id) ON DELETE RESTRICT,
+ UNIQUE(organization_id,id),
+ FOREIGN KEY(organization_id,parent_id) REFERENCES eq_categories(organization_id,id) ON DELETE RESTRICT
+);
+CREATE UNIQUE INDEX ux_eq_categories_org_code ON eq_categories(organization_id,category_code);
+CREATE INDEX ix_eq_categories_parent ON eq_categories(organization_id,parent_id,is_active);
+
+CREATE TABLE eq_assets (
+ id CHAR(32) PRIMARY KEY,
+ organization_id CHAR(32) NOT NULL REFERENCES organizations(id) ON DELETE RESTRICT,
+ asset_code TEXT NOT NULL,
+ asset_name TEXT NOT NULL,
+ category_id CHAR(32) NOT NULL,
+ serial_number TEXT,
+ manufacturer TEXT,
+ model TEXT,
+ ownership_type TEXT NOT NULL CHECK(ownership_type IN ('owned','rented','leased','borrowed')),
+ owner_entity_id CHAR(32) REFERENCES organizations(id) ON DELETE RESTRICT,
+ responsible_entity_id CHAR(32) NOT NULL REFERENCES organizations(id) ON DELETE RESTRICT,
+ custodian_ref_type TEXT,
+ custodian_ref_id TEXT,
+ home_location TEXT,
+ current_location TEXT,
+ lifecycle_status TEXT NOT NULL DEFAULT 'in_service' CHECK(lifecycle_status IN ('in_service','suspended','retired','disposed')),
+ technical_status TEXT NOT NULL DEFAULT 'unknown' CHECK(technical_status IN ('ready','inspection_due','unsafe','maintenance','out_of_service','unknown')),
+ meter_initial TEXT,
+ meter_latest TEXT,
+ meter_last_at TEXT,
+ meter_type_locked TEXT NOT NULL CHECK(meter_type_locked IN ('hours','distance','cycles','energy','none')),
+ meter_unit_locked TEXT NOT NULL,
+ meter_generation INTEGER NOT NULL DEFAULT 1 CHECK(meter_generation >= 1),
+ meter_normalized_latest TEXT,
+ readiness_projection_version INTEGER NOT NULL DEFAULT 1 CHECK(readiness_projection_version >= 1),
+ acquisition_date TEXT,
+ acquisition_value TEXT,
+ currency_id CHAR(32) REFERENCES core_currencies(id) ON DELETE RESTRICT,
+ rental_contract_ref TEXT,
+ specifications TEXT NOT NULL DEFAULT '{}',
+ notes TEXT NOT NULL DEFAULT '',
+ created_at TEXT NOT NULL,
+ updated_at TEXT NOT NULL,
+ created_by CHAR(32) NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+ updated_by CHAR(32) REFERENCES users(id) ON DELETE RESTRICT,
+ version INTEGER NOT NULL DEFAULT 1 CHECK(version >= 1),
+ deleted_at TEXT,
+ deleted_by CHAR(32) REFERENCES users(id) ON DELETE RESTRICT,
+ UNIQUE(organization_id,id),
+ FOREIGN KEY(organization_id,category_id) REFERENCES eq_categories(organization_id,id) ON DELETE RESTRICT
+);
+CREATE UNIQUE INDEX ux_eq_assets_org_code ON eq_assets(organization_id,asset_code);
+CREATE UNIQUE INDEX ux_eq_assets_org_serial ON eq_assets(organization_id,serial_number) WHERE serial_number IS NOT NULL AND serial_number <> '';
+CREATE INDEX ix_eq_assets_scope_status ON eq_assets(organization_id,responsible_entity_id,technical_status,lifecycle_status);
+CREATE INDEX ix_eq_assets_category ON eq_assets(organization_id,category_id);

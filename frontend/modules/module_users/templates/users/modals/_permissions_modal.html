@@ -1,0 +1,105 @@
+﻿<!-- ===== مودال: إدارة الصلاحيات ===== -->
+<div class="modal-overlay" id="permissionsModal">
+    <div class="modal-content" style="max-width:900px;">
+        <div class="modal-header">
+            <h2><i class="fas fa-key"></i> إدارة الأدوار والصلاحيات</h2>
+            <button class="close-btn" onclick="UsersManager.closeModal('permissionsModal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div style="background:var(--bg-card);border-radius:1rem;padding:1rem;margin-bottom:1.2rem;border-right:4px solid var(--user-purple);">
+                <div style="font-weight:700;color:var(--text-primary);" id="permsUserInfo">إدارة صلاحيات المستخدم</div>
+                <div style="font-size:0.8rem;color:var(--text-muted);">يمكنك إدارة الأدوار والصلاحيات لهذا المستخدم</div>
+            </div>
+            
+            <!-- اختيار الدور -->
+            <div style="background:var(--bg-card);border-radius:1rem;padding:1rem;margin-bottom:1rem;">
+                <div style="display:flex;flex-wrap:wrap;gap:1rem;align-items:center;">
+                    <label style="font-weight:600;color:var(--text-primary);font-size:0.9rem;">
+                        <i class="fas fa-user-tag"></i> الدور:
+                    </label>
+                    <select id="permsRole" style="padding:0.6rem 1rem;border:1px solid var(--border-color);border-radius:0.8rem;background:var(--bg-input);color:var(--text-primary);font-family:var(--font-family);min-width:200px;">
+                        <option value="مدير النظام">👑 مدير النظام</option>
+                        <option value="مدير المكتب">📋 مدير المكتب</option>
+                        <option value="مراجع">🔍 مراجع</option>
+                        <option value="منفذ">✅ منفذ</option>
+                        <option value="سكرتارية">📝 سكرتارية</option>
+                        <option value="متابعة">📊 متابعة</option>
+                        <option value="مطلع">👁️ مطلع</option>
+                    </select>
+                    <button class="btn btn-primary btn-sm" onclick="UsersManager.applyRolePermissions()">
+                        <i class="fas fa-magic"></i> تطبيق صلاحيات الدور
+                    </button>
+                </div>
+            </div>
+            
+            <!-- الصلاحيات -->
+            <div style="margin-top:1rem;">
+                <h3 style="color:var(--text-primary);font-size:1rem;margin-bottom:0.8rem;">
+                    <i class="fas fa-lock"></i> الصلاحيات المتاحة
+                </h3>
+                <div class="permissions-grid" id="permissionsGrid">
+                    <!-- المعاملات -->
+                    <div class="permission-group">
+                        <div class="group-title"><i class="fas fa-file-alt"></i> المعاملات</div>
+                        <label class="permission-item"><input type="checkbox" checked> <span>عرض المعاملات</span></label>
+                        <label class="permission-item"><input type="checkbox" checked> <span>إنشاء معاملة</span></label>
+                        <label class="permission-item"><input type="checkbox"> <span>تعديل معاملة</span></label>
+                        <label class="permission-item"><input type="checkbox"> <span>حذف معاملة</span></label>
+                        <label class="permission-item"><input type="checkbox" checked> <span>إحالة معاملة</span></label>
+                        <label class="permission-item"><input type="checkbox"> <span>إقفال معاملة</span></label>
+                    </div>
+                    
+                    <!-- المهام -->
+                    <div class="permission-group">
+                        <div class="group-title"><i class="fas fa-tasks"></i> المهام</div>
+                        <label class="permission-item"><input type="checkbox" checked> <span>عرض المهام</span></label>
+                        <label class="permission-item"><input type="checkbox"> <span>إنشاء مهمة</span></label>
+                        <label class="permission-item"><input type="checkbox"> <span>تعيين مهمة</span></label>
+                        <label class="permission-item"><input type="checkbox" checked> <span>تنفيذ مهمة</span></label>
+                        <label class="permission-item"><input type="checkbox"> <span>إكمال مهمة</span></label>
+                    </div>
+                    
+                    <!-- التوجيهات -->
+                    <div class="permission-group">
+                        <div class="group-title"><i class="fas fa-bullhorn"></i> التوجيهات</div>
+                        <label class="permission-item"><input type="checkbox" checked> <span>عرض التوجيهات</span></label>
+                        <label class="permission-item"><input type="checkbox"> <span>إنشاء توجيه</span></label>
+                        <label class="permission-item"><input type="checkbox"> <span>تنفيذ توجيه</span></label>
+                    </div>
+                    
+                    <!-- المستخدمون -->
+                    <div class="permission-group">
+                        <div class="group-title"><i class="fas fa-users"></i> المستخدمون</div>
+                        <label class="permission-item"><input type="checkbox"> <span>عرض المستخدمين</span></label>
+                        <label class="permission-item"><input type="checkbox"> <span>إنشاء مستخدم</span></label>
+                        <label class="permission-item"><input type="checkbox"> <span>تعديل مستخدم</span></label>
+                        <label class="permission-item"><input type="checkbox"> <span>حذف مستخدم</span></label>
+                        <label class="permission-item"><input type="checkbox"> <span>إدارة الصلاحيات</span></label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- صلاحيات الأدوار المرجعية -->
+            <div style="margin-top:1rem;background:var(--bg-card);border-radius:1rem;padding:1rem;">
+                <h3 style="color:var(--text-primary);font-size:0.9rem;margin-bottom:0.5rem;">
+                    <i class="fas fa-info-circle"></i> مرجع صلاحيات الأدوار
+                </h3>
+                <div style="display:flex;flex-wrap:wrap;gap:0.5rem;font-size:0.75rem;">
+                    <span class="badge badge-danger">👑 مدير النظام: جميع الصلاحيات</span>
+                    <span class="badge badge-purple">📋 مدير المكتب: معاملات، مهام، توجيهات</span>
+                    <span class="badge badge-success">✅ منفذ: تنفيذ المهام</span>
+                    <span class="badge badge-warning">📝 سكرتارية: إنشاء معاملات</span>
+                    <span class="badge badge-secondary">👁️ مطلع: عرض فقط</span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="UsersManager.closeModal('permissionsModal')">
+                <i class="fas fa-times"></i> إلغاء
+            </button>
+            <button class="btn btn-purple" onclick="UsersManager.savePermissions()">
+                <i class="fas fa-save"></i> حفظ الصلاحيات
+            </button>
+        </div>
+    </div>
+</div>

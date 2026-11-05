@@ -1,0 +1,55 @@
+/* Equipment presentation bridge: scoped to Equipment page roots only. */
+:where(.emo-registry, .asset-create-page, .emo-detail, .assignment-workspace,
+  .emo-control-center, .inspection-page, .maintenance-page, .meters-page,
+  .movement-workspace, .operations-workspace, .emo-requests, .equipment-legacy-page) {
+  color: var(--text-primary);
+  font-family: var(--font-family);
+}
+
+:where(.emo-registry, .asset-create-page, .emo-detail, .assignment-workspace,
+  .emo-control-center, .inspection-page, .maintenance-page, .meters-page,
+  .movement-workspace, .operations-workspace, .emo-requests, .equipment-legacy-page) :is(input, select, textarea) {
+  min-height: var(--control-height, 40px);
+  background: var(--bg-input, var(--bg-secondary));
+  color: var(--text-primary);
+  border-color: var(--border-color);
+  border-radius: var(--radius-sm);
+  font: inherit;
+}
+
+:where(.emo-registry, .asset-create-page, .emo-detail, .assignment-workspace,
+  .emo-control-center, .inspection-page, .maintenance-page, .meters-page,
+  .movement-workspace, .operations-workspace, .emo-requests, .equipment-legacy-page) :is(.card, .panel, .surface, .form-panel, .table-wrap, .modal-content, .drawer, .side-panel, .summary-card, .asset-hero, .registry-hero, .emo-hero) {
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-sm, none);
+}
+
+:where(.emo-registry, .asset-create-page, .emo-detail, .assignment-workspace,
+  .emo-control-center, .inspection-page, .maintenance-page, .meters-page,
+  .movement-workspace, .operations-workspace, .emo-requests, .equipment-legacy-page) :is(table, .table) :is(th, td) {
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+:where(.emo-registry, .asset-create-page, .emo-detail, .assignment-workspace,
+  .emo-control-center, .inspection-page, .maintenance-page, .meters-page,
+  .movement-workspace, .operations-workspace, .emo-requests, .equipment-legacy-page) :is(table, .table) th {
+  background: color-mix(in srgb, var(--brand-color) 7%, var(--bg-secondary)) !important;
+}
+
+:where(.emo-registry, .asset-create-page, .emo-detail, .assignment-workspace,
+  .emo-control-center, .inspection-page, .maintenance-page, .meters-page,
+  .movement-workspace, .operations-workspace, .emo-requests, .equipment-legacy-page) :is(button, .btn, .button, .primary-button) {
+  min-height: var(--control-height, 40px);
+  border-radius: var(--radius-sm);
+  font: inherit;
+}
+
+[data-density="compact"] :where(.emo-registry, .asset-create-page, .emo-detail,
+  .assignment-workspace, .emo-control-center, .inspection-page, .maintenance-page,
+  .meters-page, .movement-workspace, .operations-workspace, .emo-requests, .equipment-legacy-page) :is(.card, .panel, .surface, .form-panel) {
+  padding: 12px !important;
+}

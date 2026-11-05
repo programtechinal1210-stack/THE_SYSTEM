@@ -1,0 +1,24 @@
+<aside class="sidebar" id="sidebar">
+ <div class="sidebar-brand-row">
+  <a class="sidebar-brand" href="/">
+   <span class="brand-mark">{% if core_branding.logo %}<img src="{{ core_branding.logo }}" alt="{{ core_branding.system_name }}">{% else %}{% include 'partials/core_icon.html' with icon='grid' %}{% endif %}</span>
+   <span class="brand-text"><span class="brand-name">{{ core_branding.system_name|default:'THE_SYSTEM' }}</span><span class="brand-sub">النواة المؤسسية</span></span>
+  </a>
+  <button type="button" class="sidebar-collapse" id="sidebarCollapse" aria-label="طي القائمة" aria-expanded="true" title="طي القائمة"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
+ </div>
+ <nav class="sidebar-nav" aria-label="التنقل الرئيسي">
+  <div class="nav-section nav-section-primary">
+   <span class="nav-section-title">مساحة العمل</span>
+   <a href="/" class="nav-item {% if request.path == '/' %}active{% endif %}" {% if request.path == '/' %}aria-current="page"{% endif %}>{% include 'partials/core_icon.html' with icon='home' %}<span class="nav-label">الرئيسية</span></a>
+   {% for group in core_nav_groups %}{% if forloop.first %}{% for module in group.items %}<a href="{{ module.href }}" class="nav-item {% if module.active %}active{% endif %}" {% if module.active %}aria-current="page"{% endif %}>{% include 'partials/core_icon.html' with icon=module.code %}<span class="nav-label">{{ module.name }}</span></a>{% endfor %}{% endif %}{% endfor %}
+  </div>
+  {% for group in core_nav_groups %}{% if not forloop.first %}
+  <div class="nav-section {% if forloop.counter == 2 %}nav-section-quick{% else %}nav-section-system{% endif %}">
+   <span class="nav-section-title">{{ group.title }}</span>
+   {% for module in group.items %}<a href="{{ module.href }}" class="nav-item {% if module.active %}active{% endif %}" {% if module.active %}aria-current="page"{% endif %}>{% include 'partials/core_icon.html' with icon=module.code %}<span class="nav-label">{{ module.name }}</span></a>{% endfor %}
+  </div>
+  {% endif %}{% endfor %}
+  <div class="nav-section nav-section-account"><span class="nav-section-title">حسابي</span><a href="/users/profile/" class="nav-item {% if request.path == '/users/profile/' %}active{% endif %}">{% include 'partials/core_icon.html' with icon='shield' %}<span class="nav-label">الملف الشخصي</span></a></div>
+ </nav>
+ <div class="core-sidebar-bottom"><a href="/users/profile/" class="core-sidebar-user"><span class="core-avatar">{{ core_identity.full_name|default:'م'|slice:':1' }}</span><span><strong>{{ core_identity.full_name|default:'مساحة العمل' }}</strong><small>{% if core_identity.is_admin %}مدير النظام{% else %}حساب مؤسسي{% endif %}</small></span></a><form method="post" action="/auth/logout/">{% csrf_token %}<button class="core-logout" title="تسجيل الخروج" aria-label="تسجيل الخروج">{% include 'partials/core_icon.html' with icon='logout' %}</button></form></div>
+</aside>

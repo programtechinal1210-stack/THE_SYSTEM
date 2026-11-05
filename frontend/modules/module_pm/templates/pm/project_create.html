@@ -1,0 +1,130 @@
+{% extends "pm/reference_base.html" %}
+{% load static %}
+{% block title %}إنشاء مشروع جديد — إدارة المشاريع{% endblock %}
+{% block extra_head %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'pm/project-create.css' %}?v=20261101-create-system-theme-v3">
+{% endblock %}
+{% block breadcrumb %}{% endblock %}
+{% block pm_content %}
+<section class="pm-project-create" aria-labelledby="project-create-title">
+    <header class="pm-create-page-heading">
+        <div class="pm-create-title">
+            <span class="pm-create-heading-icon" aria-hidden="true"><i class="fa-solid fa-folder-plus"></i></span>
+            <div>
+                <h1 id="project-create-title">إنشاء مشروع جديد</h1>
+                <p class="pm-create-lead">أدخل البيانات الأساسية لتأسيس المشروع، ويمكن استكمال بقية التفاصيل لاحقاً.</p>
+            </div>
+        </div>
+    </header>
+
+    {% if error %}<div class="pm-create-alert alert alert-danger" role="alert"><i class="alert-icon fa-solid fa-triangle-exclamation" aria-hidden="true"></i><span>{{ error }}</span></div>{% endif %}
+
+    <form method="post" class="pm-create-form">
+        <div class="pm-create-validation-summary alert alert-danger" data-validation-summary role="alert" aria-live="polite" hidden>
+            <i class="alert-icon fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+            <span></span>
+        </div>
+        {% csrf_token %}
+        <section class="pm-create-card" aria-labelledby="pm-create-basic-title">
+            <header class="pm-create-card-heading">
+                <span aria-hidden="true"><i class="fa-regular fa-rectangle-list"></i></span>
+                <h2 id="pm-create-basic-title">البيانات الأساسية للمشروع</h2>
+                <span class="pm-create-status-pill"><i aria-hidden="true"></i> الحالة عند الإنشاء: صادر التوجيه</span>
+            </header>
+            <div class="pm-create-fields">
+                <div class="pm-create-field">
+                    <label for="pm-project-name">اسم المشروع <span aria-label="مطلوب">*</span></label>
+                    <div class="pm-create-input-wrap">
+                        <i class="fa-regular fa-folder-open" aria-hidden="true"></i>
+                        <input id="pm-project-name" name="name" value="{{ values.name }}" maxlength="200" placeholder="مثال: إنشاء مبنى إداري" autocomplete="off" required>
+                    </div>
+                </div>
+                <div class="pm-create-field">
+                    <label for="pm-project-code">رمز المشروع <span aria-label="مطلوب">*</span></label>
+                    <div class="pm-create-input-wrap">
+                        <i class="fa-solid fa-hashtag" aria-hidden="true"></i>
+                        <input id="pm-project-code" name="project_code" value="{{ values.project_code }}" maxlength="80" readonly required aria-readonly="true" aria-describedby="pm-project-code-help" dir="ltr">
+                        <button type="button" class="pm-create-code-refresh" data-generate-project-code aria-label="توليد رمز مشروع آخر" title="توليد رمز آخر"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i></button>
+                    </div>
+                    <small id="pm-project-code-help">يولّد النظام رمزًا فريدًا؛ ويمكنك طلب رمز آخر قبل الحفظ.</small>
+                </div>
+                <div class="pm-create-field">
+                    <label for="pm-project-organization">الجهة / المنظمة <span aria-label="مطلوب">*</span></label>
+                    <div class="pm-create-input-wrap">
+                        <i class="fa-regular fa-building" aria-hidden="true"></i>
+                        <select id="pm-project-organization" name="organization_id" required aria-describedby="pm-project-organization-help">
+                            <option value="">اختر الجهة</option>
+                            {% for organization in organizations %}
+                            <option value="{{ organization.id }}" {% if organization.id == values.organization_id %}selected{% endif %}>{{ organization.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <small id="pm-project-organization-help">المنظمة المسؤولة عن المشروع داخل النظام.</small>
+                </div>
+                <div class="pm-create-field">
+                    <label for="pm-project-manager">مدير المشروع <span aria-label="مطلوب">*</span></label>
+                    <div class="pm-create-input-wrap">
+                        <i class="fa-regular fa-user" aria-hidden="true"></i>
+                        <select id="pm-project-manager" name="project_manager_user_id" required>
+                            <option value="">اختر مدير المشروع</option>
+                            {% for manager in managers %}
+                            <option value="{{ manager.id }}" data-organization-id="{{ manager.organization_id }}" {% if manager.id == values.project_manager_user_id %}selected{% endif %}>{{ manager.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="pm-create-field">
+                    <label for="pm-directive-date">تاريخ التوجيه <span aria-label="مطلوب">*</span></label>
+                    <div class="pm-create-input-wrap">
+                        <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                        <input id="pm-directive-date" name="directive_date" type="date" value="{{ values.directive_date }}" required aria-describedby="pm-directive-date-help">
+                    </div>
+                    <small id="pm-directive-date-help">تاريخ خطاب أو توجيه إنشاء المشروع.</small>
+                </div>
+                <div class="pm-create-field">
+                    <label for="pm-project-start-date">تاريخ البداية المتوقعة <span aria-label="مطلوب">*</span></label>
+                    <div class="pm-create-input-wrap">
+                        <i class="fa-regular fa-calendar-check" aria-hidden="true"></i>
+                        <input id="pm-project-start-date" name="start_date" type="date" value="{{ values.start_date }}" required>
+                    </div>
+                </div>
+                <div class="pm-create-field">
+                    <label for="pm-project-currency">عملة المشروع <span aria-label="مطلوب">*</span></label>
+                    <div class="pm-create-input-wrap">
+                        <i class="fa-solid fa-coins" aria-hidden="true"></i>
+                        <select id="pm-project-currency" name="currency" required aria-describedby="pm-project-currency-help">
+                            <option value="">اختر العملة</option>
+                            {% for currency in currencies %}
+                            <option value="{{ currency.id }}" {% if currency.id == values.currency %}selected{% endif %}>{{ currency.id }} — {{ currency.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <small id="pm-project-currency-help">العملة المعتمدة للمبالغ المخططة في المشروع.</small>
+                </div>
+                <div class="pm-create-field">
+                    <label for="pm-daily-hours">ساعات العمل اليومية <span aria-label="مطلوب">*</span></label>
+                    <div class="pm-create-input-wrap">
+                        <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                        <input id="pm-daily-hours" name="daily_hours" type="number" min="0.01" max="24" step="0.01" value="{{ values.daily_hours }}" required aria-describedby="pm-daily-hours-help">
+                    </div>
+                    <small id="pm-daily-hours-help">عدد ساعات العمل في اليوم المستخدم عند تقدير المدد.</small>
+                </div>
+                <div class="pm-create-field pm-create-field-wide">
+                    <label for="pm-client-name">الجهة / العميل <span class="pm-create-optional-label">(اختياري)</span></label>
+                    <div class="pm-create-input-wrap">
+                        <i class="fa-regular fa-building" aria-hidden="true"></i>
+                        <input id="pm-client-name" name="client_name" value="{{ values.client_name }}" maxlength="200" placeholder="اسم الجهة أو العميل" aria-describedby="pm-client-name-help">
+                    </div>
+                    <small id="pm-client-name-help">العميل أو الجهة المستفيدة، إن اختلفت عن المنظمة المسؤولة.</small>
+                </div>
+            </div>
+            <p class="pm-create-info"><i class="fa-regular fa-circle-info" aria-hidden="true"></i> الحقول ذات علامة النجمة مطلوبة.</p>
+            <footer class="pm-create-actions">
+                <button type="submit" class="pm-create-submit"><i class="fa-solid fa-circle-plus" aria-hidden="true"></i> إنشاء المشروع</button>
+                <a href="/pm/projects/" class="pm-create-cancel">إلغاء</a>
+            </footer>
+        </section>
+    </form>
+</section>
+{% endblock %}
+{% block extra_js %}{{ block.super }}<script src="{% static 'pm/project-create.js' %}?v=20261101-project-create-v8" defer></script>{% endblock %}

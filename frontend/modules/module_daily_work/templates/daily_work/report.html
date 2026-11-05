@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}تقرير العمل اليومي | THE_SYSTEM{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'daily_work/dashboard.css' %}?v=20261022-dw03"><link rel="stylesheet" href="{% static 'daily_work/core-token-bridge.css' %}?v=20261025-palette-bridge">{% endblock %}
+{% block module_token_bridge %}<link rel="stylesheet" href="{% static 'daily_work/core-token-bridge.css' %}?v=20261025-palette-bridge">{% endblock %}
+{% block content %}
+<main class="dw-shell" dir="rtl">
+  <header class="dw-hero"><div><span class="dw-eyebrow">مصدر بيانات Daily Work</span><h1>تقرير العمل اليومي</h1><p>التكلفة الفعلية غير المتاحة لا تُعرض كصفر، وActual الخارجي يبقى مملوكاً لمصدره.</p></div><div class="dw-hero-actions"><a class="dw-button ghost" href="/daily-work/?project_id={{ selected_project.id }}&amp;daily_date={{ work_date }}">العودة للوحة</a><a class="dw-button" href="?project_id={{ selected_project.id }}&amp;daily_date={{ work_date }}&amp;download=csv">تصدير CSV</a></div></header>
+  <section class="dw-panel"><div class="dw-panel-heading"><div><span class="dw-kicker">ملخص</span><h2>{{ selected_project.name }}</h2></div><span class="dw-count">{{ work_date }}</span></div><div class="dw-kpis"><article><span>الأعمال</span><strong>{{ summary.total|default:0 }}</strong></article><article class="positive"><span>المكتمل</span><strong>{{ summary.completed|default:0 }}</strong></article><article class="warning"><span>قيد التنفيذ</span><strong>{{ summary.in_progress|default:0 }}</strong></article><article class="metric"><span>الحجم</span><strong>{{ summary.actual|default:0 }} / {{ summary.target|default:0 }}</strong></article></div></section>
+  <section class="dw-panel"><div class="dw-panel-heading"><div><span class="dw-kicker">السجل</span><h2>الأعمال المسجلة</h2></div></div><div class="dw-work-list">{% for item in items %}<article class="dw-work-card"><div class="dw-card-head"><div><span class="dw-source">{{ item.source_label }}</span><h3>{{ item.title }}</h3></div><span class="dw-status {{ item.status }}">{{ item.status_label }}</span></div><div class="dw-triple"><div><span>المستهدف</span><strong>{{ item.target_display }}</strong></div><div><span>الفعلي</span><strong>{{ item.actual_display }}</strong></div><div><span>المتبقي</span><strong>{{ item.remaining_display }}</strong></div></div></article>{% empty %}<div class="dw-empty">لا توجد سجلات لهذا اليوم.</div>{% endfor %}</div></section>
+</main>
+{% endblock %}

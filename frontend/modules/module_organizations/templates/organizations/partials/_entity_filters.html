@@ -1,0 +1,21 @@
+﻿<!-- ═══════════════════════════════════════════════════════════════
+     🔍 شريط فلترة الجهات
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="filter-bar">
+    <div class="filter-group">
+        <label>النوع</label>
+        <select id="entityTypeFilter" class="form-select" onchange="filterEntities()">
+            <option value="">كل الأنواع</option>
+        </select>
+    </div>
+    <div class="filter-group" style="flex:1; min-width:200px;">
+        <label>بحث</label>
+        <input type="text" id="entitySearch" class="form-input" placeholder="اسم أو كود الجهة..." oninput="filterEntities()">
+    </div>
+    <button class="btn btn-secondary" onclick="resetEntityFilters()">
+        🔄 مسح
+    </button>
+    <button class="btn btn-primary" onclick="openEntityModal()">
+        ＋ جهة جديدة
+    </button>
+</div>

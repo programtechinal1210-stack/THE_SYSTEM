@@ -1,0 +1,62 @@
+﻿<div class="filter-bar">
+    <div class="filter-group">
+        <label>الوحدة</label>
+        <select id="filterModule" onchange="applyFilters()"><option value="">كل الوحدات</option></select>
+    </div>
+    <div class="filter-group">
+        <label>العملية</label>
+        <select id="filterAction" onchange="applyFilters()"><option value="">كل العمليات</option></select>
+    </div>
+    <div class="filter-group">
+        <label>الكيان</label>
+        <select id="filterEntity" onchange="applyFilters()"><option value="">كل الكيانات</option></select>
+    </div>
+    <div class="filter-group">
+        <label>المستخدم</label>
+        <select id="filterUser" onchange="applyFilters()"><option value="">كل المستخدمين</option></select>
+    </div>
+    <div class="filter-group" style="flex:2;">
+        <label>بحث</label>
+        <input type="text" id="filterSearch" placeholder="بحث..." oninput="applyFilters()">
+    </div>
+    <button class="btn btn-secondary" onclick="clearFilters()">مسح</button>
+    <button class="btn btn-primary" onclick="printTable()">🖨️ طباعة</button>
+    <button class="btn btn-success" onclick="exportTable()">📥 CSV</button>
+    <button class="btn" onclick="exportExcel()" style="background:#059669;color:white;">📊 Excel</button>
+</div>
+<div id="filterCount" style="text-align:center;padding:4px;color:var(--text-muted);font-size:12px;"></div>
+<div class="table-responsive">
+    <table class="data-table" id="auditTable">
+        <thead><tr><th>#</th><th>المستخدم</th><th>العملية</th><th>الكيان</th><th>الوحدة</th><th>IP</th><th>التاريخ</th></tr></thead>
+        <tbody>
+            {% if logs %}{% for log in logs %}
+            <tr data-module="{{ log.module }}" data-action="{{ log.action }}" data-entity="{{ log.entity_type }}" data-user="{{ log.user_name }}" data-all="{{ log.user_name }} {{ log.action }} {{ log.entity_type }} {{ log.module }}">
+                <td class="row-num">{{ forloop.counter }}</td>
+                <td><strong>{{ log.user_name|default:'النظام' }}</strong></td>
+                <td>{{ log.action }}</td>
+                <td>{{ log.entity_type }}</td>
+                <td>{{ log.module|default:'--' }}</td>
+                <td><code>{{ log.ip_address|default:'--' }}</code></td>
+                <td>{{ log.created_at|slice:':16' }}</td>
+            </tr>{% endfor %}{% else %}
+            <tr><td colspan="7" style="text-align:center;padding:40px;">لا توجد سجلات</td></tr>{% endif %}
+        </tbody>
+    </table>
+</div>
+<script>
+function printTable() {
+    var win = window.open('', '_blank');
+    win.document.write('<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>سجل التدقيق</title><style>body{font-family:Tajawal,sans-serif;padding:20px}table{width:100%;border-collapse:collapse}th,td{padding:10px;border:1px solid #ddd}th{background:#f8fafc}</style></head><body><h2>سجل التدقيق</h2>' + document.getElementById('auditTable').outerHTML + '</body></html>');
+    win.document.close();
+    setTimeout(function(){win.print()},500);
+}
+function exportTable() {
+    var rows=document.querySelectorAll('#auditTable tbody tr'),csv='\uFEFF#\tالمستخدم\tالعملية\tالكيان\tالوحدة\tIP\tالتاريخ\n';
+    rows.forEach(function(r){if(r.style.display!=='none'){var c=r.querySelectorAll('td');if(c.length>=7)csv+=c[0].textContent+'\t'+c[1].textContent+'\t'+c[2].textContent+'\t'+c[3].textContent+'\t'+c[4].textContent+'\t'+(c[5].querySelector('code')?c[5].querySelector('code').textContent:c[5].textContent)+'\t'+c[6].textContent+'\n'}});
+    var b=new Blob([csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='audit_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+}
+function exportExcel() {
+    var t=document.getElementById('auditTable').cloneNode(true);t.querySelectorAll('tr').forEach(function(tr){tr.style.display=''});
+    var b=new Blob(['<html dir="rtl"><head><meta charset="UTF-8"></head><body>'+t.outerHTML+'</body></html>'],{type:'application/vnd.ms-excel'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='audit_'+new Date().toISOString().slice(0,10)+'.xls';a.click();
+}
+</script>

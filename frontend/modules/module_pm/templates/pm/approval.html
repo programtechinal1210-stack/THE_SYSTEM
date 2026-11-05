@@ -1,0 +1,5 @@
+{% extends 'pm/reference_base.html' %}
+{% load static %}
+{% block extra_head %}{{ block.super }}<link rel="stylesheet" href="{% static 'pm/approval.css' %}?v=20261020-approval-correction-2">{% endblock %}
+{% block pm_content %}{% include 'pm/approval_content.html' with approval=approval_content error=error result=result project_url=project_url approval_post_url=approval_post_url approval_embedded=approval_embedded %}{% endblock %}
+{% block extra_js %}{{ block.super }}<script src="{% static 'pm/approval.js' %}?v=20261020-approval-correction-2" defer></script>{% endblock %}

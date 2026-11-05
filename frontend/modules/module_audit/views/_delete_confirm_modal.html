@@ -1,0 +1,12 @@
+﻿<div class="modal-overlay" id="deleteConfirmModal" style="display:none;">
+    <div class="modal-container" style="max-width:400px;text-align:center;">
+        <div style="font-size:48px;margin-bottom:12px;">⚠️</div>
+        <h3>تأكيد الحذف</h3>
+        <p style="margin:12px 0;">هل أنت متأكد من حذف <strong id="deleteItemName">هذا العنصر</strong>؟</p>
+        <p style="color:#ef4444;font-size:13px;">لا يمكن التراجع عن هذا الإجراء</p>
+        <div class="modal-footer" style="justify-content:center;">
+            <button class="btn btn-secondary" onclick="closeModal('deleteConfirmModal')">إلغاء</button>
+            <button class="btn btn-danger" id="confirmDeleteBtn">حذف</button>
+        </div>
+    </div>
+</div>

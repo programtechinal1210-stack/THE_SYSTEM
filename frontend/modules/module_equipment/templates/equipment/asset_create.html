@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% load static %}
+{% block module_token_bridge %}<link rel="stylesheet" href="{% static 'module_equipment/core-token-bridge.css' %}?v=20261024">{% endblock %}
+{% block title %}إضافة معدة | THE_SYSTEM{% endblock %}
+{% block page_title %}إضافة معدة جديدة{% endblock %}
+{% block breadcrumb_text %}إدارة وتشغيل المعدات / سجل المعدات / إضافة معدة{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'module_equipment/asset-create.css' %}">{% endblock %}
+{% block content %}
+<main class="asset-create-page" dir="rtl">
+  <header class="asset-create-heading">
+    <div>
+      <p class="asset-create-eyebrow">سجل المعدات</p>
+      <h2>إضافة معدة جديدة</h2>
+      <p>أدخل المعلومات المعروفة الآن. يمكن استكمال البيانات الاختيارية لاحقاً.</p>
+    </div>
+    <a class="asset-create-back" href="{{ cancel_url }}">{% if can_view_registry %}العودة إلى سجل المعدات{% else %}العودة إلى مركز التحكم{% endif %}</a>
+  </header>
+
+  {% if not has_categories %}
+  <div class="asset-create-alert" role="alert">
+    لا توجد تصنيفات نشطة متاحة ضمن نطاقك. لا يمكن حفظ معدة من دون تصنيف؛ اطلب من مسؤول المعدات تفعيل تصنيف مناسب.
+  </div>
+  {% endif %}
+
+  {% if form.non_field_errors %}
+  <div class="asset-create-alert" role="alert" aria-live="assertive">
+    {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+  </div>
+  {% endif %}
+
+  <form class="asset-create-form" method="post" data-has-errors="{% if form.errors %}true{% else %}false{% endif %}">
+    {% csrf_token %}
+    <section class="asset-create-section" aria-labelledby="asset-basic-title">
+      <div class="asset-create-section-title">
+        <span class="asset-create-step" aria-hidden="true">١</span>
+        <div><h3 id="asset-basic-title">البيانات الأساسية</h3><p>عرّف المعدة بالاسم والتصنيف والرمز المعتمد.</p></div>
+      </div>
+      <div class="asset-create-grid">
+        <div class="asset-create-field{% if form.asset_name.errors %} has-error{% endif %}">
+          <label for="{{ form.asset_name.id_for_label }}">{{ form.asset_name.label }}{% if form.asset_name.field.required %}<span class="required-mark" aria-hidden="true"> *</span><span class="sr-only"> (مطلوب)</span>{% endif %}</label>
+          {{ form.asset_name }}
+          {% for error in form.asset_name.errors %}<span class="asset-field-error">{{ error }}</span>{% endfor %}
+        </div>
+        <div class="asset-create-field{% if form.asset_code.errors %} has-error{% endif %}">
+          <label for="{{ form.asset_code.id_for_label }}">{{ form.asset_code.label }}{% if form.asset_code.field.required %}<span class="required-mark" aria-hidden="true"> *</span><span class="sr-only"> (مطلوب)</span>{% endif %}</label>
+          {{ form.asset_code }}
+          {% for error in form.asset_code.errors %}<span class="asset-field-error">{{ error }}</span>{% endfor %}
+        </div>
+        <div class="asset-create-field asset-category-field{% if form.category_id.errors %} has-error{% endif %}">
+          <label for="{{ form.category_id.id_for_label }}">تصنيف المعدة{% if form.category_id.field.required %}<span class="required-mark" aria-hidden="true"> *</span><span class="sr-only"> (مطلوب)</span>{% endif %}</label>
+          {% if category_count > 8 %}<input id="asset-category-search" class="asset-category-search" type="search" autocomplete="off" placeholder="ابحث بالرمز أو اسم التصنيف" aria-label="ابحث عن تصنيف">{% endif %}
+          {{ form.category_id }}
+          {% if category_count %}<span class="asset-field-help">اختر تصنيفاً فعّالاً؛ يحدد التصنيف نوع العداد ووحدته.</span>{% endif %}
+          {% for error in form.category_id.errors %}<span class="asset-field-error">{{ error }}</span>{% endfor %}
+        </div>
+        <div class="asset-create-field{% if form.manufacturer.errors %} has-error{% endif %}">
+          <label for="{{ form.manufacturer.id_for_label }}">{{ form.manufacturer.label }}</label>
+          {{ form.manufacturer }}
+          {% for error in form.manufacturer.errors %}<span class="asset-field-error">{{ error }}</span>{% endfor %}
+        </div>
+        <div class="asset-create-field{% if form.model.errors %} has-error{% endif %}">
+          <label for="{{ form.model.id_for_label }}">{{ form.model.label }}</label>
+          {{ form.model }}
+          {% for error in form.model.errors %}<span class="asset-field-error">{{ error }}</span>{% endfor %}
+        </div>
+        <div class="asset-create-field{% if form.serial_number.errors %} has-error{% endif %}">
+          <label for="{{ form.serial_number.id_for_label }}">{{ form.serial_number.label }}</label>
+          {{ form.serial_number }}
+          {% for error in form.serial_number.errors %}<span class="asset-field-error">{{ error }}</span>{% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section class="asset-create-section" aria-labelledby="asset-org-title">
+      <div class="asset-create-section-title">
+        <span class="asset-create-step" aria-hidden="true">٢</span>
+        <div><h3 id="asset-org-title">الجهة والموقع</h3><p>اختر جهة من الجهات المتاحة ضمن نطاقك، وحدد موقع المعدة الأولي.</p></div>
+      </div>
+      <div class="asset-create-grid">
+        <div class="asset-create-field{% if form.owner_entity_id.errors %} has-error{% endif %}">
+          <label for="{{ form.owner_entity_id.id_for_label }}">{{ form.owner_entity_id.label }}</label>
+          {{ form.owner_entity_id }}
+          {% for error in form.owner_entity_id.errors %}<span class="asset-field-error">{{ error }}</span>{% endfor %}
+        </div>
+        <div class="asset-create-field{% if form.responsible_entity_id.errors %} has-error{% endif %}">
+          <label for="{{ form.responsible_entity_id.id_for_label }}">{{ form.responsible_entity_id.label }}</label>
+          {{ form.responsible_entity_id }}
+          {% for error in form.responsible_entity_id.errors %}<span class="asset-field-error">{{ error }}</span>{% endfor %}
+        </div>
+        <div class="asset-create-field{% if form.current_location.errors %} has-error{% endif %}">
+          <label for="{{ form.current_location.id_for_label }}">{{ form.current_location.label }}</label>
+          {{ form.current_location }}
+          <span class="asset-field-help">يُحفظ الموقع كنص؛ لا يتوفر سجل مواقع مستقل في النظام حالياً.</span>
+          {% for error in form.current_location.errors %}<span class="asset-field-error">{{ error }}</span>{% endfor %}
+        </div>
+        <div class="asset-create-field{% if form.ownership_type.errors %} has-error{% endif %}">
+          <label for="{{ form.ownership_type.id_for_label }}">{{ form.ownership_type.label }}{% if form.ownership_type.field.required %}<span class="required-mark" aria-hidden="true"> *</span><span class="sr-only"> (مطلوب)</span>{% endif %}</label>
+          {{ form.ownership_type }}
+          {% for error in form.ownership_type.errors %}<span class="asset-field-error">{{ error }}</span>{% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section class="asset-create-section" aria-labelledby="asset-meter-title">
+      <div class="asset-create-section-title">
+        <span class="asset-create-step" aria-hidden="true">٣</span>
+        <div><h3 id="asset-meter-title">المواصفات والعداد</h3><p>نوع العداد ووحدته يحددهما التصنيف المختار تلقائياً.</p></div>
+      </div>
+      <div class="asset-create-grid asset-meter-grid">
+        <div class="asset-meter-summary" id="asset-meter-summary" aria-live="polite">
+          <div><span>نوع العداد</span><output id="asset-meter-type">يحدده التصنيف</output></div>
+          <div><span>وحدة القياس</span><output id="asset-meter-unit">—</output></div>
+          <div><span>وحدة الإنتاج</span><output id="asset-output-unit">—</output></div>
+        </div>
+        <div class="asset-create-field{% if form.meter_initial.errors %} has-error{% endif %}">
+          <label for="{{ form.meter_initial.id_for_label }}">{{ form.meter_initial.label }}</label>
+          {{ form.meter_initial }}
+          <span class="asset-field-help">أدخل رقماً صفرياً أو أكبر، واترك الحقل فارغاً عند عدم توفر قراءة.</span>
+          {% for error in form.meter_initial.errors %}<span class="asset-field-error">{{ error }}</span>{% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section class="asset-create-section" aria-labelledby="asset-additional-title">
+      <div class="asset-create-section-title">
+        <span class="asset-create-step" aria-hidden="true">٤</span>
+        <div><h3 id="asset-additional-title">معلومات إضافية</h3><p>بيانات الاقتناء والملاحظات اختيارية.</p></div>
+      </div>
+      <div class="asset-create-grid">
+        <div class="asset-create-field{% if form.acquisition_date.errors %} has-error{% endif %}">
+          <label for="{{ form.acquisition_date.id_for_label }}">{{ form.acquisition_date.label }}</label>
+          {{ form.acquisition_date }}
+          {% for error in form.acquisition_date.errors %}<span class="asset-field-error">{{ error }}</span>{% endfor %}
+        </div>
+        <div class="asset-create-field{% if form.acquisition_value.errors %} has-error{% endif %}">
+          <label for="{{ form.acquisition_value.id_for_label }}">{{ form.acquisition_value.label }}</label>
+          {{ form.acquisition_value }}
+          {% for error in form.acquisition_value.errors %}<span class="asset-field-error">{{ error }}</span>{% endfor %}
+        </div>
+        <div class="asset-create-field{% if form.currency_id.errors %} has-error{% endif %}">
+          <label for="{{ form.currency_id.id_for_label }}">{{ form.currency_id.label }}</label>
+          {{ form.currency_id }}
+          {% if not currencies_count %}<span class="asset-field-help">لا توجد عملات نشطة؛ اترك قيمة الاقتناء فارغة حالياً.</span>{% endif %}
+          {% for error in form.currency_id.errors %}<span class="asset-field-error">{{ error }}</span>{% endfor %}
+        </div>
+        <div class="asset-create-field asset-notes-field{% if form.notes.errors %} has-error{% endif %}">
+          <label for="{{ form.notes.id_for_label }}">{{ form.notes.label }}</label>
+          {{ form.notes }}
+          {% for error in form.notes.errors %}<span class="asset-field-error">{{ error }}</span>{% endfor %}
+        </div>
+      </div>
+      <p class="asset-attachment-note">رفع مرفقات غير مدعوم في نموذج المعدة الحالي.</p>
+    </section>
+
+    <footer class="asset-create-actions">
+      <div class="asset-required-note"><span class="required-mark" aria-hidden="true">*</span> حقل مطلوب</div>
+      <div class="asset-create-buttons">
+        <a class="asset-button asset-button-quiet" href="{{ cancel_url }}" data-cancel-link>إلغاء</a>
+        <button class="asset-button asset-button-secondary" type="submit" name="submit_action" value="save_add_another" {% if not has_categories %}disabled{% endif %}>حفظ وإضافة أخرى</button>
+        <button class="asset-button asset-button-primary" type="submit" name="submit_action" value="save" {% if not has_categories %}disabled{% endif %}>حفظ المعدة</button>
+      </div>
+    </footer>
+  </form>
+</main>
+{{ meter_options|json_script:"asset-meter-options" }}
+{% endblock %}
+{% block extra_js %}<script src="{% static 'module_equipment/asset-create.js' %}" defer></script>{% endblock %}

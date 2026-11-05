@@ -1,0 +1,32 @@
+﻿<div class="table-responsive">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>النوع</th>
+                <th>الملاحظات</th>
+                <th>التقدم</th>
+                <th>تصعيد</th>
+                <th>الأولوية</th>
+                <th>التاريخ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if followups %}
+                {% for f in followups %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><span class="badge badge-info">{{ f.followup_type|default:"--" }}</span></td>
+                    <td>{{ f.notes|default:"--"|truncatechars:40 }}</td>
+                    <td>{{ f.progress_percentage|default:0 }}%</td>
+                    <td>{% if f.is_escalated %}<span class="badge badge-danger">نعم</span>{% else %}<span class="badge badge-success">لا</span>{% endif %}</td>
+                    <td>{{ f.priority_score|default:0 }}</td>
+                    <td style="font-size:11px;">{{ f.created_at|slice:":19" }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td colspan="7" style="text-align:center;padding:40px;">لا توجد متابعات</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>

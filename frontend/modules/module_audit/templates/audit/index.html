@@ -1,0 +1,132 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}التدقيق والمتابعة | نظام إدارة المكتب الحكومي{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'audit/css/audit.css' %}">
+{% endblock %}
+
+{% block page_title %}التدقيق والمتابعة{% endblock %}
+{% block breadcrumb_text %}التدقيق والمتابعة{% endblock %}
+
+{% block content %}
+
+<div class="tabs-modern" id="mainTabs">
+    <button class="tab active" onclick="switchTab('dashboard')">لوحة التحكم</button>
+    <button class="tab" onclick="switchTab('logs')">سجل التدقيق</button>
+    <button class="tab" onclick="switchTab('execution')">سجل التنفيذ</button>
+    <button class="tab" onclick="switchTab('anomalies')">الحالات الشاذة</button>
+    <button class="tab" onclick="switchTab('alerts')">التنبيهات</button>
+    <button class="tab" onclick="switchTab('exports')">التصدير</button>
+</div>
+
+<div id="tabContentContainer">
+    <div class="stats-grid">
+        <div class="stat-card blue"><div class="stat-info"><div class="stat-label">إجمالي السجلات</div><div class="stat-value" id="statTotal">-</div></div></div>
+        <div class="stat-card green"><div class="stat-info"><div class="stat-label">مستخدمون نشطون</div><div class="stat-value" id="statUsers">-</div></div></div>
+        <div class="stat-card orange"><div class="stat-info"><div class="stat-label">متابعات معلقة</div><div class="stat-value" id="statFollowups">-</div></div></div>
+        <div class="stat-card red"><div class="stat-info"><div class="stat-label">حالات شاذة</div><div class="stat-value" id="statAnomalies">-</div></div></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// دوال الفلاتر - معرفة هنا لتكون متاحة بعد تحميل التبويب
+function buildFilterOptions(){
+    var m=new Set(),a=new Set(),e=new Set(),u=new Set();
+    document.querySelectorAll('#auditTable tbody tr').forEach(function(r){
+        var dm=r.dataset.module,da=r.dataset.action,de=r.dataset.entity,du=r.dataset.user;
+        if(dm&&dm!=='None')m.add(dm);
+        if(da)a.add(da);
+        if(de&&de!=='None')e.add(de);
+        if(du&&du!=='None')u.add(du);
+    });
+    var ms=document.getElementById('filterModule');
+    var as=document.getElementById('filterAction');
+    var es=document.getElementById('filterEntity');
+    var us=document.getElementById('filterUser');
+    if(!ms||!as||!es||!us)return;
+    ms.innerHTML='<option value="">كل الوحدات</option>';
+    as.innerHTML='<option value="">كل العمليات</option>';
+    es.innerHTML='<option value="">كل الكيانات</option>';
+    us.innerHTML='<option value="">كل المستخدمين</option>';
+    [...m].sort().forEach(function(v){ms.add(new Option(v,v))});
+    [...a].sort().forEach(function(v){as.add(new Option(v,v))});
+    [...e].sort().forEach(function(v){es.add(new Option(v,v))});
+    [...u].sort().forEach(function(v){us.add(new Option(v,v))});
+    updateCount();
+}
+function applyFilters(){
+    var module=document.getElementById('filterModule').value;
+    var action=document.getElementById('filterAction').value;
+    var entity=document.getElementById('filterEntity').value;
+    var user=document.getElementById('filterUser').value;
+    var search=document.getElementById('filterSearch').value.toLowerCase();
+    var rows=document.querySelectorAll('#auditTable tbody tr');
+    var count=0;
+    rows.forEach(function(r){
+        var m=r.dataset.module||'',a=r.dataset.action||'',e=r.dataset.entity||'',u=r.dataset.user||'',all=(r.dataset.all||'').toLowerCase(),show=true;
+        if(module&&m!==module)show=false;
+        if(action&&a!==action)show=false;
+        if(entity&&e!==entity)show=false;
+        if(user&&u!==user)show=false;
+        if(search&&!all.includes(search))show=false;
+        r.style.display=show?'':'none';
+        if(show){count++;r.querySelector('.row-num').textContent=count}
+    });
+    updateCount(count);
+}
+function updateCount(count){
+    var total=document.querySelectorAll('#auditTable tbody tr').length;
+    if(count===undefined)count=total;
+    var el=document.getElementById('filterCount');
+    if(el)el.textContent='عرض '+count+' من '+total+' سجل';
+}
+function clearFilters(){
+    document.getElementById('filterModule').value='';
+    document.getElementById('filterAction').value='';
+    document.getElementById('filterEntity').value='';
+    document.getElementById('filterUser').value='';
+    document.getElementById('filterSearch').value='';
+    applyFilters();
+}
+
+function switchTab(tabName) {
+    document.querySelectorAll('.tabs-modern .tab').forEach(t=>t.classList.remove('active'));
+    event.target.closest('.tab').classList.add('active');
+    var c = document.getElementById('tabContentContainer');
+    c.innerHTML = '<div style="text-align:center;padding:60px;"><div class="spinner"></div></div>';
+    fetch('/audit/'+tabName+'/',{headers:{'X-Requested-With':'XMLHttpRequest'}}).then(r=>r.text()).then(h=>{
+        c.innerHTML = h;
+        if (tabName === 'logs') setTimeout(buildFilterOptions, 500);
+    });
+}
+
+fetch('/audit/api/stats/').then(r=>r.json()).then(d=>{
+    document.getElementById('statTotal').textContent = d.total_actions||'-';
+    document.getElementById('statUsers').textContent = d.unique_users||'-';
+    document.getElementById('statFollowups').textContent = d.pending_followups||'-';
+    document.getElementById('statAnomalies').textContent = d.open_anomalies||'-';
+}).catch(()=>{});
+
+function printTable() {
+    var win = window.open("", "_blank");
+    win.document.write("<!DOCTYPE html><html dir=rtl><head><meta charset=UTF-8><title>سجل التدقيق</title><style>body{font-family:Tajawal,sans-serif;padding:20px}table{width:100%;border-collapse:collapse}th,td{padding:10px;border:1px solid #ddd}th{background:#f8fafc}</style></head><body><h2>سجل التدقيق</h2>" + document.getElementById("auditTable").outerHTML + "</body></html>");
+    win.document.close();
+    setTimeout(function(){win.print()},500);
+}
+function exportTable() {
+    var rows=document.querySelectorAll("#auditTable tbody tr"),csv="\uFEFF#\tالمستخدم\tالعملية\tالكيان\tالوحدة\tIP\tالتاريخ\n";
+    rows.forEach(function(r){if(r.style.display!=="none"){var c=r.querySelectorAll("td");if(c.length>=7)csv+=c[0].textContent+"\t"+c[1].textContent+"\t"+c[2].textContent+"\t"+c[3].textContent+"\t"+c[4].textContent+"\t"+(c[5].querySelector("code")?c[5].querySelector("code").textContent:c[5].textContent)+"\t"+c[6].textContent+"\n"}});
+    var b=new Blob([csv],{type:"text/csv;charset=utf-8"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="audit_"+new Date().toISOString().slice(0,10)+".csv";a.click();
+}
+function exportExcel() {
+    var t=document.getElementById("auditTable").cloneNode(true);t.querySelectorAll("tr").forEach(function(tr){tr.style.display=""});
+    var b=new Blob(["<html dir=rtl><head><meta charset=UTF-8></head><body>"+t.outerHTML+"</body></html>"],{type:"application/vnd.ms-excel"}),a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="audit_"+new Date().toISOString().slice(0,10)+".xls";a.click();
+}</script>
+{% endblock %}
+

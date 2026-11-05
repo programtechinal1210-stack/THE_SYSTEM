@@ -1,0 +1,1 @@
+﻿from django.shortcuts import redirect from django.http import JsonResponse def home(request): return redirect("core_home") def search(request): # Cross-module business search was removed with modules. # A generic Core search service can be added later. return JsonResponse({"items": [], "query": request.GET.get("q", "")})

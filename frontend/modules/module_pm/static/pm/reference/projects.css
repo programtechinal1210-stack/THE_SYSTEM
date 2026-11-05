@@ -1,0 +1,873 @@
+/* Source: PM/static/css/projects.css; scoped to PM only. */
+@scope (.pm-reference) {
+/* ═══════════════════════════════════════════════════════════
+   projects.css — تنسيق واجهة المشاريع
+   تصميم: Modern Executive مع تأثيرات فنية
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── المتغيرات ── */
+:scope {
+    --pj-bg: #f0f2f8;
+    --pj-card: #ffffff;
+    --pj-border: rgba(0, 0, 0, 0.06);
+    --pj-text: #1a1a2e;
+    --pj-text-light: #6b7280;
+    --pj-radius: 18px;
+
+    /* ألوان الحالات */
+    --st-directive: #f59e0b;
+    --st-directive-bg: #fffbeb;
+    --st-planning: #3b82f6;
+    --st-planning-bg: #eff6ff;
+    --st-planned: #06b6d4;
+    --st-planned-bg: #ecfeff;
+    --st-executing: #10b981;
+    --st-executing-bg: #ecfdf5;
+    --st-completed: #8b5cf6;
+    --st-completed-bg: #f5f3ff;
+
+    /* الظلال */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.12);
+    --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.15);
+}
+
+/* ═══════════ خلفية الصفحة ═══════════ */
+.projects-page-wrapper {
+    min-height: calc(100vh - 120px);
+    background:
+        radial-gradient(ellipse at 20% 50%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(236, 72, 153, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 50%),
+        var(--pj-bg);
+    padding: 24px;
+}
+
+/* ═══════════ شريط الأدوات العلوي ═══════════ */
+.projects-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding: 20px 24px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: var(--pj-radius);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: var(--shadow-md);
+}
+
+/* ── الإحصائيات ── */
+.projects-stats {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.stat-chip {
+    padding: 7px 16px;
+    border-radius: 50px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: default;
+    border: 1px solid transparent;
+}
+
+.stat-chip:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.stat-chip.total {
+    background: linear-gradient(135deg, #1e293b, #334155);
+    color: #fff;
+}
+
+.stat-chip.directive {
+    background: var(--st-directive-bg);
+    color: #b45309;
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+.stat-chip.planning {
+    background: var(--st-planning-bg);
+    color: #1d4ed8;
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.stat-chip.planned {
+    background: var(--st-planned-bg);
+    color: #0e7490;
+    border-color: rgba(6, 182, 212, 0.2);
+}
+
+.stat-chip.executing {
+    background: var(--st-executing-bg);
+    color: #047857;
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.stat-chip.completed {
+    background: var(--st-completed-bg);
+    color: #6d28d9;
+    border-color: rgba(139, 92, 246, 0.2);
+}
+
+/* ── زر الإضافة ── */
+.btn-add-project {
+    padding: 12px 28px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7);
+    background-size: 200% 200%;
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.92rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-add-project::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s;
+}
+
+.btn-add-project:hover::before {
+    left: 100%;
+}
+
+.btn-add-project:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.45);
+    background-position: right center;
+}
+
+.btn-add-project:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+.btn-add-project i {
+    font-size: 1rem;
+    transition: transform 0.3s;
+}
+
+.btn-add-project:hover i {
+    transform: rotate(90deg);
+}
+
+/* ═══════════ شبكة البطاقات ═══════════ */
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(370px, 1fr));
+    gap: 24px;
+}
+
+@media (max-width: 768px) {
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ═══════════ بطاقة المشروع ═══════════ */
+.project-card {
+    background: var(--pj-card);
+    border-radius: var(--pj-radius);
+    border: 1px solid var(--pj-border);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-sm);
+    opacity: 0;
+    animation: cardEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* تأخير متحرك لكل بطاقة */
+.project-card:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.project-card:nth-child(2) {
+    animation-delay: 0.12s;
+}
+
+.project-card:nth-child(3) {
+    animation-delay: 0.19s;
+}
+
+.project-card:nth-child(4) {
+    animation-delay: 0.26s;
+}
+
+.project-card:nth-child(5) {
+    animation-delay: 0.33s;
+}
+
+.project-card:nth-child(6) {
+    animation-delay: 0.40s;
+}
+
+.project-card:nth-child(7) {
+    animation-delay: 0.47s;
+}
+
+.project-card:nth-child(8) {
+    animation-delay: 0.54s;
+}
+
+@keyframes cardEnter {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.project-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+    border-color: rgba(99, 102, 241, 0.15);
+}
+
+/* ── الشريط المتدرج العلوي (حسب الحالة) ── */
+.card-accent {
+    height: 5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-accent::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: accentShimmer 3s infinite;
+}
+
+@keyframes accentShimmer {
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 200%;
+    }
+}
+
+.accent-directive {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24, #f59e0b);
+}
+
+.accent-planning {
+    background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
+}
+
+.accent-planned {
+    background: linear-gradient(90deg, #06b6d4, #22d3ee, #06b6d4);
+}
+
+.accent-executing {
+    background: linear-gradient(90deg, #10b981, #34d399, #10b981);
+}
+
+.accent-completed {
+    background: linear-gradient(90deg, #8b5cf6, #a78bfa, #8b5cf6);
+}
+
+/* ── عنصر زخرفي في الزاوية ── */
+.card-decor {
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    opacity: 0.06;
+    pointer-events: none;
+    transition: all 0.5s;
+}
+
+.decor-directive {
+    background: var(--st-directive);
+}
+
+.decor-planning {
+    background: var(--st-planning);
+}
+
+.decor-planned {
+    background: var(--st-planned);
+}
+
+.decor-executing {
+    background: var(--st-executing);
+}
+
+.decor-completed {
+    background: var(--st-completed);
+}
+
+.project-card:hover .card-decor {
+    transform: scale(1.8);
+    opacity: 0.1;
+}
+
+/* ═══════════ الجزء العلوي: بيانات المشروع ═══════════ */
+.project-card-top {
+    padding: 22px 22px 16px;
+    flex: 1;
+    position: relative;
+}
+
+/* ── رأس البطاقة ── */
+.project-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.project-identity {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.project-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: #fff;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s;
+}
+
+.project-card:hover .project-avatar {
+    transform: scale(1.08) rotate(-3deg);
+}
+
+.avatar-directive {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.avatar-planning {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.avatar-planned {
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+}
+
+.avatar-executing {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.avatar-completed {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.project-title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.project-name {
+    font-size: 1.02rem;
+    font-weight: 800;
+    color: var(--pj-text);
+    margin: 0;
+    line-height: 1.35;
+}
+
+.project-code {
+    font-size: 0.68rem;
+    color: var(--pj-text-light);
+    font-weight: 700;
+    direction: ltr;
+    text-align: right;
+    letter-spacing: 0.5px;
+}
+
+/* ── شارة الحالة ── */
+.status-badge {
+    padding: 5px 14px;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+}
+
+.status-badge .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+    animation: statusPulse 2s infinite;
+}
+
+@keyframes statusPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(0.8);
+    }
+}
+
+.badge-directive {
+    background: var(--st-directive-bg);
+    color: #b45309;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.badge-directive .status-dot {
+    background: var(--st-directive);
+}
+
+.badge-planning {
+    background: var(--st-planning-bg);
+    color: #1d4ed8;
+    border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+.badge-planning .status-dot {
+    background: var(--st-planning);
+}
+
+.badge-planned {
+    background: var(--st-planned-bg);
+    color: #0e7490;
+    border: 1px solid rgba(6, 182, 212, 0.25);
+}
+
+.badge-planned .status-dot {
+    background: var(--st-planned);
+}
+
+.badge-executing {
+    background: var(--st-executing-bg);
+    color: #047857;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.badge-executing .status-dot {
+    background: var(--st-executing);
+}
+
+.badge-completed {
+    background: var(--st-completed-bg);
+    color: #6d28d9;
+    border: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+.badge-completed .status-dot {
+    background: var(--st-completed);
+}
+
+/* ── شبكة البيانات ── */
+.project-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 10px 12px;
+    background: #f8f9fc;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    transition: all 0.3s;
+}
+
+.project-card:hover .info-item {
+    background: #f3f4f9;
+}
+
+.info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.info-label {
+    font-size: 0.62rem;
+    color: var(--pj-text-light);
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.info-label i {
+    font-size: 0.6rem;
+    opacity: 0.6;
+}
+
+.info-value {
+    font-size: 0.82rem;
+    color: var(--pj-text);
+    font-weight: 700;
+}
+
+/* ═══════════ شريط التقدم (مراحل المشروع) ═══════════ */
+.project-progress {
+    padding: 0 22px;
+    margin-bottom: 6px;
+}
+
+.progress-steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+}
+
+.step-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    position: relative;
+    z-index: 2;
+    transition: all 0.4s;
+}
+
+.step-dot.active {
+    width: 12px;
+    height: 12px;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+}
+
+.step-dot.done {
+    background: #6366f1;
+}
+
+.step-dot.active-directive {
+    background: var(--st-directive);
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
+}
+
+.step-dot.active-planning {
+    background: var(--st-planning);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+.step-dot.active-planned {
+    background: var(--st-planned);
+    box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.2);
+}
+
+.step-dot.active-executing {
+    background: var(--st-executing);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+}
+
+.step-dot.active-completed {
+    background: var(--st-completed);
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+}
+
+.step-line {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 2px;
+    background: #e2e8f0;
+    z-index: 1;
+    transform: translateY(-50%);
+}
+
+.step-line.done {
+    background: #6366f1;
+}
+
+.progress-step:last-child .step-line {
+    display: none;
+}
+
+.step-label {
+    font-size: 0.55rem;
+    color: var(--pj-text-light);
+    margin-top: 4px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ═══════════ الجزء السفلي: زر الإجراء ═══════════ */
+.project-card-bottom {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 14px 22px 18px;
+    border-top: 1px solid rgba(0, 0, 0, 0.04);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.01), transparent);
+}
+
+.btn-action {
+    min-width: 0;
+    width: 100%;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-action.command-center {
+    border: 1px solid rgba(24, 49, 58, 0.16);
+    background: #fff;
+    color: #18313a;
+    text-decoration: none;
+    box-shadow: none;
+}
+
+.btn-action.command-center:hover {
+    border-color: var(--secondary, #25834d);
+    background: rgba(37, 131, 77, 0.06);
+}
+
+.btn-action::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transition: left 0.5s;
+}
+
+.btn-action:hover::before {
+    left: 100%;
+}
+
+.btn-action:active {
+    transform: scale(0.97);
+}
+
+/* زر تخطيط المشروع */
+.btn-action.plan {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+}
+
+.btn-action.plan:hover {
+    box-shadow: 0 6px 24px rgba(59, 130, 246, 0.4);
+    transform: translateY(-2px);
+}
+
+/* زر متابعة التخطيط */
+.btn-action.continue-plan {
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(6, 182, 212, 0.3);
+}
+
+.btn-action.continue-plan:hover {
+    box-shadow: 0 6px 24px rgba(6, 182, 212, 0.4);
+    transform: translateY(-2px);
+}
+
+/* زر متابعة التنفيذ */
+.btn-action.continue-exec {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+}
+
+.btn-action.continue-exec:hover {
+    box-shadow: 0 6px 24px rgba(16, 185, 129, 0.4);
+    transform: translateY(-2px);
+}
+
+/* زر مكتمل (معطل) */
+.btn-action.done {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.25);
+    cursor: default;
+}
+
+/* ═══════════ حالة فارغة ═══════════ */
+.projects-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--pj-text-light);
+}
+
+.projects-empty .empty-icon {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2rem;
+    color: #6366f1;
+    animation: emptyFloat 3s ease-in-out infinite;
+}
+
+@keyframes emptyFloat {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.projects-empty h3 {
+    margin: 0 0 8px;
+    color: var(--pj-text);
+    font-size: 1.1rem;
+}
+
+.projects-empty p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* ═══════════ تأثيرات إضافية ═══════════ */
+
+/* توهج البطاقة عند التحويم */
+.project-card::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: var(--pj-radius);
+    padding: 1px;
+    background: linear-gradient(135deg, transparent 30%, rgba(99, 102, 241, 0.3), transparent 70%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s;
+    pointer-events: none;
+}
+
+.project-card:hover::before {
+    opacity: 1;
+}
+
+/* ═══════════ تجاوب ═══════════ */
+@media (max-width: 480px) {
+    .project-card-bottom {
+        grid-template-columns: 1fr;
+    }
+
+    .projects-page-wrapper {
+        padding: 12px;
+    }
+
+    .projects-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .projects-stats {
+        justify-content: center;
+    }
+
+    .btn-add-project {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .project-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ═══════════ طباعة ═══════════ */
+@media print {
+
+    .projects-toolbar,
+    .btn-action {
+        display: none !important;
+    }
+
+    .projects-page-wrapper {
+        background: #fff;
+        padding: 0;
+    }
+
+    .project-card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        break-inside: avoid;
+        opacity: 1;
+        animation: none;
+    }
+}
+}

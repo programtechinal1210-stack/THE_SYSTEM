@@ -1,0 +1,70 @@
+﻿<!-- ============================================================
+     مودال تعديل تنبيه
+     ============================================================ -->
+<div class="modal-container">
+    <div class="modal-header">
+        <h2>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            تعديل تنبيه
+        </h2>
+        <button class="close-btn" onclick="closeModal('alertEditModal')">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+    </div>
+
+    <form id="alertEditForm" 
+          hx-put="/audit/api/alerts/{{ alert.id }}/update/" 
+          hx-target="#alertList" 
+          hx-include="#alertFilterBar"
+          hx-swap="innerHTML"
+          onsubmit="closeModal('alertEditModal'); showToast('✅ تم تحديث التنبيه', 'success');">
+        
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label>اسم التنبيه <span class="required">*</span></label>
+                <input type="text" name="name" value="{{ alert.name }}" required>
+            </div>
+
+            <div class="form-group full-width">
+                <label>الوصف</label>
+                <textarea name="description" rows="2">{{ alert.description }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>الوحدة المستهدفة</label>
+                <select name="module">
+                    <option value="">الكل</option>
+                    {% for module in modules %}
+                        <option value="{{ module.code }}" {% if alert.module == module.code %}selected{% endif %}>
+                            {{ module.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>مستوى الخطورة</label>
+                <select name="severity_threshold">
+                    <option value="info" {% if alert.severity_threshold == 'info' %}selected{% endif %}>ℹ️ معلومات</option>
+                    <option value="warning" {% if alert.severity_threshold == 'warning' %}selected{% endif %}>⚠️ تحذير</option>
+                    <option value="critical" {% if alert.severity_threshold == 'critical' %}selected{% endif %}>🔴 حرج</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>فترة التبريد (دقائق)</label>
+                <input type="number" name="cooldown_minutes" value="{{ alert.cooldown_minutes }}" min="5" max="1440">
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('alertEditModal')">إلغاء</button>
+            <button type="submit" class="btn btn-primary">حفظ التعديلات</button>
+        </div>
+    </form>
+</div>

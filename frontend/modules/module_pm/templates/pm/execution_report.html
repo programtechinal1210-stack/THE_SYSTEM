@@ -1,0 +1,50 @@
+{% extends "pm/reference_base.html" %}
+{% load static %}
+{% block title %}تقرير التنفيذ والإنجاز — إدارة المشاريع{% endblock %}
+{% block extra_head %}{{ block.super }}<link rel="stylesheet" href="{% static 'pm/execution-report.css' %}?v=20261021-r06"><style>.execution-detail-drawer{top:112px;height:calc(100vh - 112px);z-index:1200}.execution-drawer-open:after{z-index:1199}</style>{% endblock %}
+{% block pm_content %}
+<section class="execution-report" data-execution-report>
+  <nav class="execution-breadcrumb" aria-label="مسار الصفحة"><a href="/">الرئيسية</a><span>‹</span><a href="/pm/reporting/">التقارير</a><span>‹</span><strong>تقرير التنفيذ والإنجاز</strong></nav>
+  <header class="execution-heading">
+    <div><p>التقارير</p><h1>تقرير التنفيذ والإنجاز</h1><small>متابعة ما تحقق فعلياً من أنشطة المشروع وأوامر تشغيله.</small></div>
+    <div class="execution-actions"><a href="/pm/reporting/">العودة إلى مركز التقارير <i class="fa-solid fa-arrow-right"></i></a><a href="?{{ export_query }}">تحديث <i class="fa-solid fa-rotate"></i></a><button type="button" data-pm-print>طباعة <i class="fa-solid fa-print"></i></button><a href="?{{ export_query }}&amp;download=json">تصدير JSON <i class="fa-solid fa-download"></i></a></div>
+  </header>
+
+  <form class="execution-filters" method="get">
+    <input type="hidden" name="report" value="execution">
+    <label class="project-filter"><span>المشروع المحدد</span><strong>{{ center.project_code }} — {{ center.name }}</strong></label>
+    <label><span>من تاريخ</span><input type="date" name="date_from" value="{{ filters.date_from|default:'' }}"></label>
+    <label><span>إلى تاريخ</span><input type="date" name="date_to" value="{{ filters.date_to|default:'' }}"></label>
+    <label><span>المرحلة</span><select name="phase_id"><option value="">جميع المراحل</option>{% for phase in options.phases %}<option value="{{ phase.id }}" {% if filters.phase_id == phase.id %}selected{% endif %}>{{ phase.name }}</option>{% endfor %}</select></label>
+    <label><span>حالة أمر التشغيل</span><select name="status"><option value="">كل الحالات</option><option value="issued" {% if work_order_status == 'issued' %}selected{% endif %}>صادر</option><option value="in_progress" {% if work_order_status == 'in_progress' %}selected{% endif %}>قيد التنفيذ</option><option value="completed" {% if work_order_status == 'completed' %}selected{% endif %}>مكتمل</option><option value="closed" {% if work_order_status == 'closed' %}selected{% endif %}>مغلق</option></select></label>
+    <button type="submit">تطبيق التصفية <i class="fa-solid fa-filter"></i></button>
+  </form>
+
+  <section class="execution-kpis" aria-label="مؤشرات التنفيذ">
+    <article class="execution-kpi blue"><i class="fa-solid fa-chart-simple"></i><div><small>نسبة الإنجاز الفعلي</small><strong>{% if summary.progress_percent is not None %}{{ summary.progress_percent }}%{% else %}غير متاح{% endif %}</strong><span>على مستوى المشروع عند توحّد الوحدات</span></div></article>
+    <article class="execution-kpi green"><i class="fa-solid fa-circle-check"></i><div><small>أنشطة مكتملة</small><strong>{{ summary.completed }}</strong><span>إنجاز فعلي ≥ 100%</span></div></article>
+    <article class="execution-kpi orange"><i class="fa-solid fa-rotate"></i><div><small>أنشطة قيد التنفيذ</small><strong>{{ summary.in_progress }}</strong><span>إنجاز فعلي بين 0% و100%</span></div></article>
+    <article class="execution-kpi red"><i class="fa-solid fa-triangle-exclamation"></i><div><small>أنشطة متأخرة</small><strong>غير متاح</strong><span>لا يوجد خط أساس زمني معتمد</span></div></article>
+  </section>
+
+  <section class="execution-panel" aria-labelledby="phase-performance-title">
+    <header><div><i class="fa-solid fa-sitemap"></i><div><h2 id="phase-performance-title">أداء مراحل المشروع</h2><p>العدّادات مبنية على حالة الإنجاز الفعلي للنشاط؛ لا يتم تجميع النسب عبر الوحدات المختلفة.</p></div></div></header>
+    <div class="table-scroll"><table class="execution-table"><thead><tr><th>#</th><th>المرحلة</th><th>عدد الأنشطة</th><th>أوامر التشغيل</th><th>مكتملة</th><th>قيد التنفيذ</th><th>نسبة الإنجاز</th><th>الحالة الزمنية</th></tr></thead><tbody>{% for row in phase_rows %}<tr><td>{{ forloop.counter }}</td><td><strong>{{ row.name }}</strong><small>{{ row.code }}</small></td><td>{{ row.activities }}</td><td>{{ row.work_orders }}</td><td><span class="count-good">{{ row.completed }}</span></td><td><span class="count-progress">{{ row.in_progress }}</span></td><td>غير متاح</td><td><span class="unavailable-badge">غير متاح</span></td></tr>{% empty %}<tr><td colspan="8" class="empty-row">لا توجد مراحل أو أنشطة ضمن نطاق التصفية.</td></tr>{% endfor %}</tbody></table></div>
+  </section>
+
+  <section class="execution-panel" aria-labelledby="activity-details-title">
+    <header class="panel-header-actions"><div><i class="fa-solid fa-clipboard-check"></i><div><h2 id="activity-details-title">تفاصيل الأنشطة</h2><p>الفعلي من أحداث تنفيذ أوامر التشغيل حسب نطاق الفترة المحددة.</p></div></div><span>{{ activity_rows|length }} نشاط</span></header>
+    <div class="table-scroll"><table class="execution-table activities-table"><thead><tr><th>#</th><th>رمز النشاط</th><th>اسم النشاط</th><th>المرحلة</th><th>المخطط</th><th>الفعلي</th><th>المتبقي الوصفي</th><th>الإنجاز</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody>{% for row in activity_rows %}<tr data-activity-row data-code="{{ row.code }}" data-name="{{ row.name }}" data-phase="{{ row.phase_code }}" data-task="{{ row.task_code }}" data-planned="{{ row.planned_quantity|default:'غير متاح' }} {{ row.unit }}" data-actual="{{ row.actual_quantity|default:'غير متاح' }} {{ row.unit }}" data-remaining="{{ row.remaining_quantity|default:'غير متاح' }} {{ row.unit }}" data-progress="{% if row.achievement_percent is not None %}{{ row.achievement_percent }}%{% else %}غير متاح{% endif %}" data-orders="{% for order in row.work_orders %}{{ order.work_order_code }}{% if not forloop.last %}، {% endif %}{% empty %}لا توجد أوامر تشغيل ضمن النطاق{% endfor %}" data-start="{{ row.planned_start_date|default:'غير متاح' }}" data-end="{{ row.planned_end_date|default:'غير متاح' }}"><td>{{ forloop.counter }}</td><td><strong>{{ row.code }}</strong></td><td>{{ row.name }}</td><td>{{ row.phase_code }}</td><td>{{ row.planned_quantity|default:'غير متاح' }} <small>{{ row.unit }}</small></td><td>{{ row.actual_quantity|default:'غير متاح' }} <small>{{ row.unit }}</small></td><td>{{ row.remaining_quantity|default:'غير متاح' }} <small>{{ row.unit }}</small></td><td><div class="activity-progress"><i style="width:{% if row.achievement_percent is not None %}{{ row.achievement_percent }}{% else %}0{% endif %}%"></i></div><small>{% if row.achievement_percent is not None %}{{ row.achievement_percent }}%{% else %}غير متاح{% endif %}</small></td><td><span class="activity-status {{ row.status }}">{{ row.status_label }}</span></td><td><button class="activity-details-button" type="button" data-open-activity>تفاصيل <i class="fa-solid fa-arrow-left"></i></button></td></tr>{% empty %}<tr><td colspan="10" class="empty-row">لا توجد أنشطة ضمن نطاق التصفية.</td></tr>{% endfor %}</tbody></table></div>
+  </section>
+
+  <section class="execution-panel exceptions-panel" aria-labelledby="exceptions-title">
+    <header><div><i class="fa-solid fa-triangle-exclamation"></i><div><h2 id="exceptions-title">الانحرافات والأعمال التي تحتاج متابعة</h2><p>يعرض المصدر الحالي مخاطر المشروع المفتوحة والاستثناءات المالية فقط؛ لا يَستنتج تأخيراً زمنياً.</p></div></div></header>
+    <div class="exceptions-grid"><div><h3>المخاطر المسجلة</h3>{% for risk in risks|slice:':4' %}<article class="exception-item"><strong>{{ risk.risk_code }} — {{ risk.name }}</strong><span>{{ risk.status }} · الأثر {{ risk.impact|default:'غير متاح' }}</span></article>{% empty %}<p class="empty-state">لا توجد مخاطر ضمن نطاق التصفية.</p>{% endfor %}</div><div><h3>استثناءات التكلفة</h3>{% for exception in exceptions|slice:':4' %}<article class="exception-item"><strong>{{ exception.code }} — تجاوز التكلفة</strong><span>المخطط {{ exception.planned_cost }} · الفعلي {{ exception.actual_cost }} {{ exception.currency }}</span></article>{% empty %}<p class="empty-state">لا توجد استثناءات تكلفة ضمن نطاق التصفية.</p>{% endfor %}</div></div>
+  </section>
+
+  <footer class="execution-footer"><i class="fa-solid fa-circle-info"></i><span>{{ data_note }}</span><small>أساس الفترة: {{ period_basis|default:'غير متاح' }}</small></footer>
+</section>
+
+<aside class="execution-detail-drawer" data-activity-drawer hidden aria-label="تفاصيل النشاط" aria-live="polite"><button type="button" class="drawer-close" data-close-activity aria-label="إغلاق"><i class="fa-solid fa-xmark"></i></button><p>تفاصيل النشاط</p><h2 data-drawer-name>—</h2><small data-drawer-code>—</small><dl><div><dt>المرحلة / المهمة</dt><dd data-drawer-hierarchy>—</dd></div><div><dt>المخطط</dt><dd data-drawer-planned>—</dd></div><div><dt>الفعلي</dt><dd data-drawer-actual>—</dd></div><div><dt>المتبقي الوصفي</dt><dd data-drawer-remaining>—</dd></div><div><dt>الإنجاز الفعلي</dt><dd data-drawer-progress>—</dd></div><div><dt>التواريخ المخططة</dt><dd data-drawer-dates>—</dd></div><div><dt>أوامر التشغيل</dt><dd data-drawer-orders>—</dd></div></dl></aside>
+{% endblock %}
+{% block extra_js %}{{ block.super }}<script src="{% static 'pm/execution-report.js' %}?v=20261021-r06" defer></script>{% endblock %}

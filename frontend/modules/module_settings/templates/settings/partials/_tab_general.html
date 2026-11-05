@@ -1,0 +1,122 @@
+﻿<!-- ═══════════════════════════════════════════════════════════════
+   ⚙️ تبويب: الإعدادات العامة
+   ═══════════════════════════════════════════════════════════════ -->
+
+<div class="settings-content active" id="tab-general">
+    
+    <!-- 📊 إحصائيات سريعة -->
+    <div class="stats-mini">
+        <div class="stat-item">
+            <span>⚙️</span>
+            <div>
+                <div class="stat-num">9</div>
+                <div class="stat-lbl">إعدادات متاحة</div>
+            </div>
+        </div>
+        <div class="stat-item">
+            <span>✅</span>
+            <div>
+                <div class="stat-num">8</div>
+                <div class="stat-lbl">مفعلة</div>
+            </div>
+        </div>
+        <div class="stat-item">
+            <span>🔄</span>
+            <div>
+                <div class="stat-num">1</div>
+                <div class="stat-lbl">معدلة حديثاً</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🃏 بطاقة: الإعدادات العامة -->
+    <div style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;">
+        <div style="font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:1.5rem;padding-bottom:0.8rem;border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:0.6rem;">
+            <span>⚙️</span> الإعدادات العامة
+            <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted);">إعدادات النظام الأساسية</span>
+        </div>
+
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            
+            <!-- اسم النظام -->
+            <div class="form-group" style="grid-column:1/-1;">
+                <label>🏛️ اسم النظام <span style="color:#ef4444;">*</span></label>
+                <input type="text" id="general_system_name" value="نظام إدارة المكتب الحكومي" placeholder="أدخل اسم النظام">
+                <div class="help-text">الاسم الذي سيظهر في شريط العنوان وشعار النظام</div>
+            </div>
+
+            <!-- اللغة -->
+            <div class="form-group">
+                <label>🌐 اللغة الافتراضية <span style="color:#ef4444;">*</span></label>
+                <select id="general_language">
+                    <option value="ar" selected>🇸🇦 العربية</option>
+                    <option value="en">🇬🇧 English</option>
+                    <option value="ur">🇵🇰 اردو</option>
+                </select>
+            </div>
+
+            <!-- المنطقة الزمنية -->
+            <div class="form-group">
+                <label>🕐 المنطقة الزمنية <span style="color:#ef4444;">*</span></label>
+                <select id="general_timezone">
+                    <option value="Asia/Riyadh" selected>🇸🇦 الرياض (UTC+3)</option>
+                    <option value="Asia/Dubai">🇦🇪 دبي (UTC+4)</option>
+                    <option value="Asia/Kuwait">🇰🇼 الكويت (UTC+3)</option>
+                    <option value="Africa/Cairo">🇪🇬 القاهرة (UTC+3)</option>
+                </select>
+            </div>
+
+            <!-- تنسيق التاريخ -->
+            <div class="form-group">
+                <label>📅 تنسيق التاريخ</label>
+                <select id="general_date_format">
+                    <option value="DD/MM/YYYY" selected>20/01/2026</option>
+                    <option value="YYYY-MM-DD">2026-01-20</option>
+                    <option value="MM/DD/YYYY">01/20/2026</option>
+                    <option value="DD-MM-YYYY">20-01-2026</option>
+                </select>
+            </div>
+
+            <!-- تنسيق الوقت -->
+            <div class="form-group">
+                <label>⏰ تنسيق الوقت</label>
+                <select id="general_time_format">
+                    <option value="24" selected>24 ساعة (14:30)</option>
+                    <option value="12">12 ساعة (02:30 م)</option>
+                </select>
+            </div>
+
+            <!-- عدد العناصر -->
+            <div class="form-group">
+                <label>📏 العناصر في الصفحة</label>
+                <select id="general_items_per_page">
+                    <option value="10">10 عناصر</option>
+                    <option value="20" selected>20 عنصر</option>
+                    <option value="50">50 عنصر</option>
+                    <option value="100">100 عنصر</option>
+                </select>
+            </div>
+
+            <!-- شعار النظام -->
+            <div class="form-group" style="grid-column:1/-1;">
+                <label>🖼️ شعار النظام</label>
+                <div style="display:flex;gap:1rem;align-items:center;flex-wrap:wrap;padding-top:0.3rem;">
+                    <div style="width:90px;height:90px;background:rgba(255,255,255,0.04);border-radius:1rem;display:flex;align-items:center;justify-content:center;font-size:2.5rem;border:2px dashed rgba(255,255,255,0.1);">🏛️</div>
+                    <div style="display:flex;flex-direction:column;gap:0.5rem;">
+                        <button class="btn btn-primary" onclick="showToast('📤 فتح نافذة التحميل...', 'info')">📤 تحميل شعار جديد</button>
+                        <button class="btn btn-secondary" onclick="showToast('🗑️ تم إزالة الشعار', 'warning')">🗑️ إزالة الشعار</button>
+                        <span class="help-text">يُفضل صورة 200×200 بكسل بصيغة PNG</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- أزرار الحفظ -->
+        <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-color);">
+            <button class="btn btn-secondary" onclick="resetTab('general')">↺ إعادة تعيين</button>
+            <button class="btn btn-primary" onclick="saveSettings('general')">💾 حفظ الإعدادات</button>
+        </div>
+    </div>
+
+</div>

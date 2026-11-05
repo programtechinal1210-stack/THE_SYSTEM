@@ -1,0 +1,89 @@
+﻿<!-- ═══════════════════════════════════════════════════════════════
+   🔐 تبويب: إعدادات الأمان
+   ═══════════════════════════════════════════════════════════════ -->
+
+<div class="settings-content" id="tab-security">
+    
+    <div class="stats-mini">
+        <div class="stat-item"><span>🔐</span><div><div class="stat-num">3</div><div class="stat-lbl">إجراءات أمان مفعلة</div></div></div>
+        <div class="stat-item"><span>🔑</span><div><div class="stat-num">1</div><div class="stat-lbl">مفتاح API نشط</div></div></div>
+    </div>
+
+    <div style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;">
+        <div style="font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:1.5rem;padding-bottom:0.8rem;border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:0.6rem;">
+            <span>🔐</span> إعدادات الأمان
+            <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted);">تأمين النظام وحماية البيانات</span>
+        </div>
+
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            
+            <!-- تغيير كلمة المرور -->
+            <div class="form-group" style="grid-column:1/-1;">
+                <label>🔑 تغيير كلمة المرور</label>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;">
+                    <input type="password" id="security_current_password" placeholder="كلمة المرور الحالية">
+                    <input type="password" id="security_new_password" placeholder="كلمة المرور الجديدة">
+                </div>
+                <div class="help-text">اترك الحقول فارغة إذا كنت لا تريد تغيير كلمة المرور</div>
+            </div>
+
+            <!-- مدة الجلسة -->
+            <div class="form-group">
+                <label>⏱️ مدة صلاحية الجلسة (دقائق)</label>
+                <input type="number" id="security_session_timeout" value="60" min="5" max="1440">
+                <div class="help-text">0 = جلسة غير محدودة</div>
+            </div>
+
+            <!-- محاولات الفشل -->
+            <div class="form-group">
+                <label>🚫 محاولات تسجيل الدخول الفاشلة</label>
+                <input type="number" id="security_max_attempts" value="5" min="1" max="10">
+                <div class="help-text">عدد المحاولات قبل قفل الحساب مؤقتاً</div>
+            </div>
+
+            <!-- المصادقة الثنائية -->
+            <div class="form-group">
+                <label>🔐 المصادقة الثنائية (2FA)</label>
+                <div style="display:flex;align-items:center;gap:0.8rem;padding-top:0.3rem;">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="security_two_factor">
+                        <span class="slider"></span>
+                    </label>
+                    <span id="security_two_factor_label" style="font-size:0.85rem;color:var(--text-muted);">معطلة</span>
+                </div>
+                <div class="help-text">تفعيل المصادقة الثنائية يزيد من أمان الحساب</div>
+            </div>
+
+            <!-- تشفير البيانات -->
+            <div class="form-group">
+                <label>🔒 تشفير البيانات</label>
+                <div style="display:flex;align-items:center;gap:0.8rem;padding-top:0.3rem;">
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked id="security_encryption">
+                        <span class="slider"></span>
+                    </label>
+                    <span id="security_encryption_label" style="font-size:0.85rem;color:#10b981;">مفعل</span>
+                </div>
+                <div class="help-text">تشفير البيانات الحساسة في قاعدة البيانات</div>
+            </div>
+
+            <!-- مفتاح API -->
+            <div class="form-group" style="grid-column:1/-1;">
+                <label>🔑 مفاتيح API</label>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                    <input type="text" value="sk_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx" readonly style="flex:1;min-width:200px;opacity:0.7;">
+                    <button class="btn btn-secondary" onclick="navigator.clipboard.writeText('sk_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx');showToast('📋 تم نسخ المفتاح','success')">📋 نسخ</button>
+                    <button class="btn btn-warning" onclick="showToast('🔄 تم تجديد المفتاح','success')">🔄 تجديد</button>
+                </div>
+                <div class="help-text">مفتاح API للاتصال بالخدمات الخارجية. حافظ على سريته</div>
+            </div>
+
+        </div>
+
+        <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-color);">
+            <button class="btn btn-secondary" onclick="resetTab('security')">↺ إعادة تعيين</button>
+            <button class="btn btn-primary" onclick="saveSettings('security')">💾 حفظ الإعدادات</button>
+        </div>
+    </div>
+
+</div>

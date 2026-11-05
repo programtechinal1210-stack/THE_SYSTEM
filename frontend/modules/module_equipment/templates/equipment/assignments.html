@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+{% block module_token_bridge %}<link rel="stylesheet" href="{% static 'module_equipment/core-token-bridge.css' %}?v=20261024">{% endblock %}
+{% block title %}توزيع وتكليف المعدات | THE_SYSTEM{% endblock %}
+{% block page_title %}توزيع وتكليف المعدات{% endblock %}
+{% block breadcrumb_text %}إدارة المعدات / التوزيع والتكليف{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'module_equipment/assignments.css' %}">{% endblock %}
+{% block content %}
+<main class="assignment-workspace" dir="rtl">
+  <header class="assignment-heading">
+    <div><p class="eyebrow">توزيع المعدات على الأعمال والجهات</p><h1>توزيع وتكليف المعدات</h1><p>اختر معدة مناسبة، ثم أنشئ تكليفاً يخضع لفحص التعارض والجاهزية عند الحفظ والاعتماد.</p></div>
+    <div class="heading-actions"><a class="assignment-button quiet" href="{% url 'equipment:home' %}">العودة لمركز المعدات</a>{% if can_create_assignments %}<a class="assignment-button primary" href="?create=1">＋ إنشاء تكليف</a>{% endif %}</div>
+  </header>
+
+  <section class="assignment-summary" aria-label="ملخص التكليفات">
+    <a class="assignment-stat blue" href="?status=active"><span>التكليفات النشطة</span><strong>{{ counts.active }}</strong><small>قيد التشغيل أو التنفيذ</small></a>
+    <a class="assignment-stat amber" href="?status=draft"><span>بانتظار الاعتماد</span><strong>{{ counts.draft }}</strong><small>مسودات تحتاج قراراً</small></a>
+    <a class="assignment-stat green" href="?planned_start_at={{ request.GET.planned_start_at|urlencode }}&planned_end_at={{ request.GET.planned_end_at|urlencode }}"><span>معدات متاحة للفترة</span><strong>{{ available_assets|length }}</strong><small>بعد فحص الحالة والحجز الحالي</small></a>
+    <a class="assignment-stat violet" href="?status=suspended"><span>تحتاج متابعة</span><strong>{{ counts.suspended }}</strong><small>تكليفات معلقة حالياً</small></a>
+  </section>
+
+  <section class="assignment-filters" aria-label="البحث والتصفية">
+    <form method="get">
+      <label><span>بحث</span><input name="search" value="{{ request.GET.search }}" placeholder="اسم المعدة أو رمزها أو الجهة"></label>
+      <label><span>حالة التكليف</span><select name="status"><option value="">كل الحالات</option>{% for value,label in status_labels.items %}<option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+      <label><span>الجهة المستفيدة</span><select name="beneficiary_entity_id"><option value="">كل الجهات</option>{% for entity in organization_units %}<option value="{{ entity.id }}" {% if request.GET.beneficiary_entity_id == entity.id|stringformat:'s' %}selected{% endif %}>{{ entity.name }}</option>{% endfor %}</select></label>
+      <label><span>بداية الفترة</span><input type="datetime-local" name="planned_start_at" value="{{ request.GET.planned_start_at }}"></label>
+      <label><span>نهاية الفترة</span><input type="datetime-local" name="planned_end_at" value="{{ request.GET.planned_end_at }}"></label>
+      <div class="filter-actions"><button class="assignment-button primary" type="submit">تطبيق</button><a class="assignment-button quiet" href="{% url 'equipment:assignments' %}">إعادة ضبط</a></div>
+    </form>
+  </section>
+
+  <div class="assignment-layout">
+    <section class="assignment-list-panel">
+      <div class="section-title"><div><h2>قائمة التكليفات</h2><p>عرض {{ assignments|length }} من أصل {{ total }} تكليف ضمن النطاق الحالي.</p></div><span class="scope-note">البيانات ضمن صلاحيات الحساب</span></div>
+      {% if assignments %}<div class="assignment-list">{% for item in assignments %}<article class="assignment-row">
+        <div class="assignment-row-main"><span class="row-index">{{ forloop.counter }}</span><div><strong>{{ item.asset_name }}</strong><small dir="ltr">{{ item.asset_code }}</small></div></div>
+        <div><span class="row-label">الجهة / المشروع</span><strong>{{ item.beneficiary_name }}</strong></div>
+        <div><span class="row-label">الفترة</span><bdi dir="ltr">{{ item.planned_start_at|slice:':16' }}<br>→ {{ item.planned_end_at|slice:':16' }}</bdi></div>
+        <div><span class="status-badge status-{{ item.status }}">{{ item.status_label }}</span><small>{{ item.purpose|truncatechars:44 }}</small></div>
+        <a class="assignment-button primary row-open" href="?assignment_id={{ item.id }}">فتح التكليف</a>
+      </article>{% endfor %}</div>{% else %}<div class="empty-state"><span>◌</span><h3>لا توجد تكليفات مطابقة</h3><p>غيّر الفلاتر أو أنشئ تكليفاً جديداً إذا كانت لديك الصلاحية.</p>{% if can_create_assignments %}<a class="assignment-button primary" href="?create=1">إنشاء أول تكليف</a>{% endif %}</div>{% endif %}
+    </section>
+
+    <aside class="available-panel" aria-label="المعدات المتاحة">
+      <div class="section-title"><div><h2>المعدات المتاحة</h2><p>{% if request.GET.planned_start_at and request.GET.planned_end_at %}للفترة المختارة{% else %}اختر فترة لفحص الحجز{% endif %}</p></div><span class="panel-icon">◇</span></div>
+      <div class="available-list">{% for asset in assets|slice:':5' %}<article class="available-card {% if not asset.available_for_period %}unavailable{% endif %}"><div><strong>{{ asset.asset_name }}</strong><small dir="ltr">{{ asset.asset_code }}</small><span>{{ asset.category_display }} · {{ asset.current_location|default:'موقع غير محدد' }}</span></div><div class="availability"><b class="dot {% if asset.available_for_period %}ok{% else %}blocked{% endif %}"></b><span>{{ asset.availability_reason }}</span>{% if asset.available_for_period and can_create_assignments %}<a href="?create=1&asset_id={{ asset.id }}">اختيار</a>{% endif %}</div></article>{% empty %}<div class="empty-inline">لا توجد معدات ضمن نطاق العرض.</div>{% endfor %}</div>
+    </aside>
+
+    <section class="timeline-panel"><details><summary><span>نظرة زمنية مبسطة للتكليفات</span><small>اختياري — افتحها عند الحاجة</small></summary><div class="timeline-content">{% for item in assignments|slice:':8' %}<div class="timeline-row"><strong>{{ item.asset_code }}</strong><span class="timeline-bar status-{{ item.status }}" style="--order:{{ forloop.counter }}">{{ item.status_label }}</span></div>{% empty %}<p class="empty-inline">لا توجد بيانات زمنية لعرضها.</p>{% endfor %}</div></details></section>
+  </div>
+
+  <aside class="assignment-drawer {% if create_mode or selected_assignment %}is-open{% endif %}" aria-label="تفاصيل التكليف"><div class="drawer-inner">
+    {% if create_mode %}<div class="drawer-heading"><div><p class="eyebrow">تكليف جديد</p><h2>إنشاء تكليف</h2><p>الحفظ ينشئ مسودة فقط؛ الاعتماد منفصل.</p></div><a href="{% url 'equipment:assignments' %}" class="drawer-close">×</a></div>
+      {% if assignment_form.non_field_errors %}<div class="form-alert">{{ assignment_form.non_field_errors }}</div>{% endif %}<form method="post" class="assignment-form" data-dirty-form>{% csrf_token %}<input type="hidden" name="action" value="create_assignment">{% for field in assignment_form %}<label class="form-field {% if field.errors %}has-error{% endif %}" for="{{ field.id_for_label }}"><span>{{ field.label }}{% if field.field.required %}<b>*</b>{% endif %}</span>{{ field }}{% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</label>{% endfor %}<div class="form-note">لا يمكن بدء التشغيل من هذه الصفحة. يبدأ التشغيل فقط بعد اعتماد التكليف واستيفاء الفحص والسلامة وتأهيل المشغل.</div><div class="form-actions"><a class="assignment-button quiet" href="{% url 'equipment:assignments' %}">إلغاء</a><button class="assignment-button primary" type="submit">حفظ التكليف</button></div></form>
+    {% elif selected_assignment %}<div class="drawer-heading"><div><p class="eyebrow">تفاصيل التكليف</p><h2>{{ selected_assignment.asset_name }}</h2><span class="status-badge status-{{ selected_assignment.status }}">{{ selected_assignment.status_label }}</span></div><a href="{% url 'equipment:assignments' %}" class="drawer-close">×</a></div><dl class="detail-facts"><div><dt>رمز المعدة</dt><dd dir="ltr">{{ selected_assignment.asset_code }}</dd></div><div><dt>الجهة المستفيدة</dt><dd>{{ selected_assignment.beneficiary_name }}</dd></div><div><dt>الفترة</dt><dd><bdi dir="ltr">{{ selected_assignment.planned_start_at|slice:':16' }} — {{ selected_assignment.planned_end_at|slice:':16' }}</bdi></dd></div><div><dt>المشغل</dt><dd>{% if selected_assignment.operator_employee_id %}مرتبط بسجل HR{% else %}غير محدد — تخطيط فقط{% endif %}</dd></div><div><dt>الغرض</dt><dd>{{ selected_assignment.purpose }}</dd></div><div><dt>مرجع الطلب</dt><dd>{% if selected_assignment.request_id %}<bdi dir="ltr">{{ selected_assignment.request_id }}</bdi>{% else %}تكليف داخلي مباشر{% endif %}</dd></div></dl><div class="next-action">{% if selected_assignment.status == 'draft' %}<strong>الإجراء التالي: اعتماد التكليف</strong><p>سيعيد الخادم فحص الحالة الفنية، الموانع، الحجز، وتعارض المشغل قبل الاعتماد.</p>{% if can_approve_assignments %}<form method="post">{% csrf_token %}<input type="hidden" name="action" value="approve_assignment"><input type="hidden" name="assignment_id" value="{{ selected_assignment.id }}"><button class="assignment-button primary" type="submit">اعتماد التكليف</button></form>{% endif %}{% elif selected_assignment.status == 'approved' %}<strong>التكليف معتمد</strong><p>لا يعني الاعتماد بدء التشغيل. انتقل إلى التشغيل اليومي بعد استيفاء الفحص والسلامة والتأهيل.</p>{% elif selected_assignment.status == 'active' %}<strong>التكليف نشط</strong><p>تتم متابعة التشغيل من واجهة التشغيل اليومية.</p>{% else %}<strong>الحالة الحالية: {{ selected_assignment.status_label }}</strong><p>لا يوجد إجراء متاح في عقد EMO الحالي لهذه الحالة.</p>{% endif %}</div>
+    {% else %}<div class="drawer-placeholder"><span>＋</span><h2>اختر تكليفاً لمراجعته</h2><p>افتح أي سجل لعرض التفاصيل والإجراء المناسب لحالته.</p></div>{% endif %}
+  </div></aside>
+</main>
+<script>document.querySelectorAll('[data-dirty-form]').forEach(function(form){var dirty=false;form.addEventListener('input',function(){dirty=true});form.addEventListener('submit',function(){dirty=false});window.addEventListener('beforeunload',function(e){if(dirty){e.preventDefault();e.returnValue='';}})});</script>
+{% endblock %}

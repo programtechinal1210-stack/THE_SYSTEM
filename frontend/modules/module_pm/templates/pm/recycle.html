@@ -1,0 +1,15 @@
+{% extends "pm/reference_base.html" %}
+{% block pm_content %}
+<section class="pm-panel" id="panel-recycle-bin">
+<h1>محذوفات إدارة المشاريع</h1>
+<p><a href="/pm/">إدارة المشاريع</a> — الاستعادة تبدأ بالمشروع ثم المرحلة ثم المهمة ثم النشاط.</p>
+<form method="get" class="sd-recycle-toolbar"><label for="pm-kind">نوع العنصر</label><select name="kind" id="pm-kind">{% for key,label in kinds %}<option value="{{ key }}" {% if key == kind %}selected{% endif %}>{{ label }}</option>{% endfor %}</select><button type="submit" class="sd-recycle-refresh">عرض</button></form>
+{% if error %}<p role="alert">{{ error }}</p>{% endif %}
+<table><thead><tr><th>العنصر</th><th>تاريخ الحذف</th><th>الاستعادة</th></tr></thead><tbody>
+{% for row in items %}<tr><td>{{ row.metadata.label }}</td><td>{{ row.deleted_at }}</td><td>{% if can_restore %}<form method="post">{% csrf_token %}<input type="hidden" name="bin_id" value="{{ row.id }}"><button type="submit">استعادة</button></form>{% endif %}</td></tr>
+{% empty %}<tr><td colspan="3">لا توجد محذوفات متاحة ضمن نطاقك.</td></tr>{% endfor %}
+</tbody></table>
+{% if previous != None %}<a href="?kind={{ kind }}&amp;skip={{ previous }}">السابق</a>{% endif %}
+{% if following != None %}<a href="?kind={{ kind }}&amp;skip={{ following }}">التالي</a>{% endif %}
+</section>
+{% endblock %}

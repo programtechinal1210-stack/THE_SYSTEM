@@ -1,0 +1,153 @@
+{% extends 'pm/reference_base.html' %}
+{% load static %}
+{% block extra_head %}{{ block.super }}<link rel="stylesheet" href="{% static 'pm/plan-print.css' %}?v=20261022-plan-document-v9">{% endblock %}
+{% block title %}وثيقة الخطة المتكاملة — {{ item.name }}{% endblock %}
+{% block pm_content %}
+<div class="print-toolbar" dir="rtl">
+  <div class="plan-document-context" role="note">
+    <strong>وثيقة تخطيط · {{ project_status }}</strong>
+    <span>تعرض البيانات المسجلة؛ ولا تثبت اعتماد الخطة أو بدء التنفيذ.</span>
+  </div>
+  <nav aria-label="إجراءات وثيقة الخطة">
+    <button type="button" onclick="window.print()">طباعة / تصدير PDF</button>
+    <a href="{{ project_url }}">العودة إلى التخطيط</a>
+    <a class="execution-return-link" href="/pm/execution/">العودة إلى مساحة التنفيذ</a>
+  </nav>
+</div>
+
+<div class="print-running-data" aria-hidden="true"><span class="running-project">{{ item.name }} · {{ item.project_code }}</span><span class="running-issue">{{ document_issue_date }}</span></div>
+<main class="official-plan" dir="rtl">
+  <section class="print-page print-cover">
+    <div class="brand-line">
+      <div class="brand-mark">▲ THE_SYSTEM</div>
+      <div class="brand-sub">نظام إدارة المشاريع المتكامل</div>
+    </div>
+    <div class="cover-center">
+      <span class="document-kicker">خطة تنفيذية مقترحة · {{ document_classification }}</span>
+      <h1>وثيقة الخطة المتكاملة</h1>
+      <p class="cover-project">{{ item.name }}</p>
+      <p class="cover-code">رمز المشروع: {{ item.project_code }}</p>
+      <div class="cover-meta">
+        <div><span>الجهة المالكة</span><strong>{{ item.client_name|default:'غير محددة' }}</strong></div>
+        <div><span>مدير المشروع</span><strong>{{ item.manager_name|default:'غير محدد' }}</strong></div>
+        <div><span>عملة المشروع</span><strong>{{ item.currency|default:'غير محددة' }}</strong></div>
+        <div><span>تاريخ إصدار الوثيقة</span><strong>{{ document_issue_date }}</strong></div>
+        <div><span>حالة المشروع</span><strong>{{ project_status }}</strong></div>
+        <div><span>حالة اعتماد الأنشطة</span><strong>{{ approval_counts.approved }} من {{ approval_counts.total }}</strong></div>
+      </div>
+      <div class="cover-kpis" aria-label="مؤشرات مختصرة للخطة">
+        <div><span>التكلفة المخططة</span><strong>{{ item.planned_cost }} {{ item.currency }}</strong></div>
+        <div><span>نطاق الجدولة المتاح</span><strong>{% if document_timeline.span_days %}{{ document_timeline.span_days }} يوم{% else %}غير متاح{% endif %}</strong></div>
+        <div><span>جهد الأنشطة</span><strong>{{ item.planned_duration }} ساعة</strong></div>
+        <div><span>هيكل الخطة</span><strong>{{ planning_tabs.0.count }} مراحل · {{ planning_tabs.1.count }} مهام</strong></div>
+        <div><span>إقرار الأنشطة</span><strong>{{ approval_percent }}%</strong></div>
+      </div>
+    </div>
+    <div class="classification">
+      وثيقة داخلية للاستخدام المؤسسي · بيانات حية غير مثبتة في نسخة اعتماد.
+      <br>لا تُعد هذه الوثيقة دليلاً على اعتماد إلكتروني ما لم يظهر قرار اعتماد مسجل في النظام.
+    </div>
+  </section>
+
+  <section class="print-page">
+    <div class="print-header"><strong>THE_SYSTEM · وثيقة الخطة المتكاملة</strong><small>{{ item.name }} · {{ item.project_code }}</small></div>
+    <h2 class="section-title">1. الملخص التنفيذي <small>مؤشرات التخطيط المسجلة</small></h2>
+    <div class="facts">
+      <div class="fact fact-cost"><span class="fact-label">التكلفة المخططة الإجمالية</span><strong class="fact-value">{{ item.planned_cost }} {{ item.currency }}</strong><small>حسب إجمالي الخطة المسجل</small></div>
+      <div class="fact fact-schedule"><span class="fact-label">نطاق الجدولة المتاح</span><strong class="fact-value">{% if document_timeline.span_days %}{{ document_timeline.span_days }} يوم تقويمي{% else %}غير متاح{% endif %}</strong><small>{% if document_timeline.span_days %}من أول بداية إلى آخر نهاية مسجلة{% else %}أدخل تواريخ بداية ونهاية للأنشطة{% endif %}</small></div>
+      <div class="fact fact-effort"><span class="fact-label">إجمالي جهد الأنشطة</span><strong class="fact-value">{{ item.planned_duration }} ساعة</strong><small>جهد مخطط، وليس مدة تقويمية</small></div>
+      <div class="fact"><span class="fact-label">مكافئ أيام الجهد</span><strong class="fact-value">{{ planned_effort_days }} يوم عمل</strong><small>الساعات المخططة ÷ {{ item.daily_hours }} ساعة يومياً</small></div>
+      <div class="fact"><span class="fact-label">المراحل / المهام / الأنشطة</span><strong class="fact-value">{{ planning_tabs.0.count }} / {{ planning_tabs.1.count }} / {{ planning_tabs.2.count }}</strong><small>عناصر الهيكل المسجلة</small></div>
+      <div class="fact"><span class="fact-label">إقرار الأنشطة</span><strong class="fact-value">{{ approval_percent }}%</strong><small>{{ approval_counts.approved }} من {{ approval_counts.total }} نشاطاً</small></div>
+      <div class="fact"><span class="fact-label">حالة المشروع</span><strong class="fact-value">{{ project_status }}</strong><small>الحالة المسجلة في النظام</small></div>
+      <div class="fact"><span class="fact-label">المخاطر النشطة</span><strong class="fact-value">{{ open_risks|length }}</strong><small>المخاطر المفتوحة المسجلة</small></div>
+    </div>
+    <p class="metric-explanation">المدة التقويمية محسوبة من أول بداية إلى آخر نهاية بين الأنشطة ذات التواريخ المكتملة، ولا تعني أن جميع الأنشطة مجدولة. مكافئ أيام الجهد تحويل لساعات العمل ولا يمثل مدة المشروع.</p>
+    {% if document_timeline.missing_count %}<p class="schedule-coverage-note">توجد تواريخ مكتملة لـ{{ document_timeline.scheduled_activity_count }} من {{ document_timeline.activity_count }} نشاطاً؛ {{ document_timeline.missing_count }} نشاطاً يحتاج إلى مراجعة جدوله.</p>{% endif %}
+
+    <h2 class="section-title">2. البيانات العامة للمشروع</h2>
+    <table class="print-table compact"><tbody>
+      <tr><th>اسم المشروع</th><td>{{ item.name }}</td><th>الرمز</th><td>{{ item.project_code }}</td><th>العملة</th><td>{{ item.currency|default:'غير محددة' }}</td></tr>
+      <tr><th>الجهة المالكة</th><td>{{ item.client_name|default:'غير محددة' }}</td><th>مدير المشروع</th><td>{{ item.manager_name|default:'غير محدد' }}</td><th>الحالة</th><td>{{ project_status }}</td></tr>
+      <tr><th>تاريخ التوجيه</th><td>{{ item.directive_date|default:'غير محدد' }}</td><th>بداية المشروع</th><td>{{ item.start_date|default:'غير محددة' }}</td><th>ساعات العمل اليومية</th><td>{{ item.daily_hours }} ساعة</td></tr>
+    </tbody></table>
+
+    <h2 class="section-title">3. الجدول الرئيسي للمراحل</h2>
+    <table class="print-table compact"><thead><tr><th>الرقم</th><th>المرحلة</th><th>المسؤول</th><th>المهام</th><th>الجهد (ساعة)</th><th>مكافئ الجهد (يوم)</th><th>التكلفة</th><th>العملة</th></tr></thead><tbody>
+      {% for phase in hierarchy %}<tr><td>{{ phase.phase_code }}</td><td>{{ phase.name }}</td><td>{{ phase.owner_name|default:'غير محدد' }}</td><td>{{ phase.children|length }}</td><td>{{ phase.planned_duration }}</td><td>{{ phase.days }}</td><td>{{ phase.planned_cost }}</td><td>{{ item.currency }}</td></tr>{% empty %}<tr><td colspan="8">لا توجد مراحل مسجلة.</td></tr>{% endfor %}
+    </tbody></table>
+    <p class="note">الاحتياجات المسجلة: {{ requirement_rows|length }}. تُعرض تكلفة الموارد منفصلة عن تكلفة النشاط، ولا يعاد جمعها داخل القالب لتجنب ازدواج الاحتساب.</p>
+  </section>
+
+  <section class="print-page">
+    <div class="print-header"><strong>THE_SYSTEM · وثيقة الخطة المتكاملة</strong><small>{{ item.name }} · {{ item.project_code }}</small></div>
+    <h2 class="section-title">4. تفاصيل المهام</h2>
+    {% for phase in hierarchy %}
+      <h3 class="phase-heading">{{ phase.phase_code }} — {{ phase.name }}</h3>
+      <table class="print-table compact"><thead><tr><th>رقم المهمة</th><th>اسم المهمة</th><th>المسؤول</th><th>الأنشطة</th><th>التكلفة</th><th>الجهد (ساعة)</th><th>مكافئ الجهد (يوم)</th></tr></thead><tbody>
+        {% for task in phase.children %}<tr><td>{{ task.task_code }}</td><td>{{ task.name }}</td><td>{{ task.owner_name|default:'غير محدد' }}</td><td>{{ task.children|length }}</td><td>{{ task.planned_cost }} {{ item.currency }}</td><td>{{ task.planned_duration }}</td><td>{{ task.days }}</td></tr>{% empty %}<tr><td colspan="7">لا توجد مهام في هذه المرحلة.</td></tr>{% endfor %}
+      </tbody></table>
+    {% empty %}<p class="note">لا توجد مراحل أو مهام مسجلة.</p>{% endfor %}
+  </section>
+
+  <section class="print-page portrait-appendix">
+    <div class="print-header"><strong>THE_SYSTEM · وثيقة الخطة المتكاملة</strong><small>{{ item.name }} · {{ item.project_code }}</small></div>
+    <h2 class="section-title">5. ملحق الأنشطة التفصيلي <small>{{ planning_tabs.2.count }} نشاطاً</small></h2>
+    {% if planning_tabs.2.count %}
+      <div class="activity-list">
+        {% for phase in hierarchy %}{% for task in phase.children %}{% for activity in task.children %}
+          <article class="activity-print-card">
+            <header><strong>{{ activity.activity_code }}</strong><span>{{ activity.name }}</span></header>
+            <dl>
+              <div class="activity-detail-wide"><dt>المرحلة / المهمة</dt><dd>{{ phase.name }} / {{ task.name }}</dd></div>
+              <div><dt>الكمية المخططة</dt><dd>{{ activity.planned_quantity }} {{ activity.unit }}</dd></div>
+              <div><dt>سعر الوحدة</dt><dd>{{ activity.unit_price|default:'غير متوفر' }} {{ activity.currency }}</dd></div>
+              <div><dt>التكلفة المخططة</dt><dd>{{ activity.planned_cost }} {{ activity.currency }}</dd></div>
+              <div><dt>الجهد المخطط</dt><dd>{{ activity.planned_duration }} ساعة</dd></div>
+              <div><dt>مكافئ أيام الجهد</dt><dd>{{ activity.days }} يوم</dd></div>
+              <div><dt>الإقرار</dt><dd>{{ activity.status_label }}</dd></div>
+            </dl>
+          </article>
+        {% endfor %}{% endfor %}{% endfor %}
+      </div>
+    {% else %}<p class="note">لا توجد أنشطة مسجلة.</p>{% endif %}
+    <p class="note">مكافئ أيام الجهد = مدة النشاط بالساعات ÷ ساعات العمل اليومية للمشروع. لا يُستخدم هذا التحويل لتمثيل المدة التقويمية أو تسلسل الأنشطة.</p>
+  </section>
+
+  <section class="print-page">
+    <div class="print-header"><strong>THE_SYSTEM · وثيقة الخطة المتكاملة</strong><small>{{ item.name }} · {{ item.project_code }}</small></div>
+    <h2 class="section-title">6. الاحتياجات والموارد</h2>
+    <table class="print-table compact"><thead><tr><th>النشاط</th><th>المورد</th><th>النوع / المصدر</th><th>الكمية</th><th>سعر الوحدة</th><th>إجمالي العملة الأصلية</th><th>المحوّل إلى عملة المشروع</th></tr></thead><tbody>
+      {% for resource in requirement_rows %}<tr><td>{{ resource.activity_code }} — {{ resource.activity_name }}</td><td>{{ resource.name }}</td><td>{{ resource.resource_type|default:'—' }} / {{ resource.source|default:'—' }}</td><td>{{ resource.quantity }} {{ resource.unit }}</td><td>{{ resource.unit_price }} {{ resource.currency }}</td><td>{{ resource.planned_cost }} {{ resource.planned_cost_currency|default:resource.currency }}</td><td>{% if resource.planned_cost_converted %}{{ resource.planned_cost_converted }} {{ item.currency }}{% else %}غير متوفر{% endif %}</td></tr>{% empty %}<tr><td colspan="7">لا توجد احتياجات أو موارد مسجلة.</td></tr>{% endfor %}
+    </tbody></table>
+
+    <h2 class="section-title">7. سجل المخاطر</h2>
+    <table class="print-table compact"><thead><tr><th>الخطر والوصف</th><th>العنصر</th><th>الاحتمال</th><th>الأثر</th><th>المستوى</th><th>المسؤول</th><th>المعالجة</th><th>الحالة</th></tr></thead><tbody>
+      {% for risk in open_risks %}<tr><td>{{ risk.risk_code|default:'—' }} — {{ risk.description }}</td><td>{{ risk.phase_id|default:risk.task_id|default:risk.activity_id|default:'—' }}</td><td>{{ risk.probability|default:'—' }}</td><td>{{ risk.impact|default:'—' }}</td><td>{{ risk.importance|default:'—' }}</td><td>{{ risk.owner_name|default:'غير محدد' }}</td><td>{{ risk.corrective_action|default:'—' }}</td><td>{{ risk.status_label|default:'نشط' }}</td></tr>{% empty %}<tr><td colspan="8">لا توجد مخاطر نشطة مسجلة.</td></tr>{% endfor %}
+    </tbody></table>
+
+    <h2 class="section-title">8. توصية مدير المشروع</h2>
+    <div class="recommendation"><strong>{{ recommendation }}</strong><p>{{ recommendation_basis }}</p><small>توصية آلية مبنية على البيانات المسجلة وليست اعتماداً إلكترونياً.</small></div>
+    <h2 class="section-title">9. الاعتمادات والتوقيعات</h2>
+    <p class="note">{{ plan_state_note }} لا يوجد قرار اعتماد إلكتروني مسجل في البيانات الحالية.</p>
+    <div class="signature-grid">
+      <div class="signature"><strong>إعداد الخطة</strong><small>{{ item.manager_name|default:'غير محدد' }} · {{ document_issue_date }}</small></div>
+      <div class="signature"><strong>المراجعة</strong><small>الاسم: __________________</small><small>التاريخ: __________________</small></div>
+      <div class="signature"><strong>الاعتماد</strong><small>الاسم: __________________</small><small>مرجع القرار: __________________</small></div>
+    </div>
+  </section>
+
+  <section class="print-page portrait-appendix timeline-appendix">
+    <div class="print-header"><strong>THE_SYSTEM · وثيقة الخطة المتكاملة</strong><small>{{ item.name }} · {{ item.project_code }}</small></div>
+    <h2 class="section-title">10. الجدول الزمني <small>عرض زمني للأنشطة ذات التواريخ المكتملة</small></h2>
+    {% if document_timeline.bars %}
+      <div class="schedule-summary"><strong>المدة التقويمية المتاحة: {{ document_timeline.span_days }} يوماً</strong><span>من {{ document_timeline.start }} إلى {{ document_timeline.end }}</span><span>أنشطة مجدولة: {{ document_timeline.scheduled_activity_count }} من {{ document_timeline.activity_count }}</span></div>
+      <table class="print-table compact schedule-table"><thead><tr><th>النشاط</th><th>البداية</th><th>النهاية</th><th>المدة التقويمية</th><th>الموقع النسبي ضمن النطاق</th></tr></thead><tbody>
+        {% for bar in document_timeline.bars %}<tr><td>{{ bar.name }}</td><td>{{ bar.start }}</td><td>{{ bar.end }}</td><td>{{ bar.duration_days }} {% if bar.duration_days == 1 %}يوم{% else %}أيام{% endif %}</td><td><div class="schedule-track" role="img" aria-label="موضع النشاط ضمن المدة التقويمية"><span style="inset-inline-start:{{ bar.left }}%;width:{{ bar.width }}%"></span></div></td></tr>{% endfor %}
+      </tbody></table>
+      {% if document_timeline.missing_count %}<p class="schedule-coverage-note">تنبيه: {{ document_timeline.missing_count }} نشاطاً لا يملك تاريخ بداية ونهاية مكتملين؛ لذلك لا يظهر ضمن المخطط.</p>{% endif %}
+    {% else %}<p class="note">لا توجد تواريخ بداية ونهاية مكتملة للأنشطة؛ لم يتم إنشاء مدة أو مخطط زمني افتراضي.</p>{% endif %}
+    <p class="note">خطة التدفقات النقدية وخطة التواصل مؤجلتان حالياً، ولا تدخلان في إصدار هذه الوثيقة.</p>
+  </section>
+</main>
+{% endblock %}

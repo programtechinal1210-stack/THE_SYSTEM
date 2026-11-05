@@ -1,0 +1,54 @@
+.pm-reference .pm-wep-panel { display: grid; gap: 16px; padding: 18px; background: #f8fbfd; border: 1px solid #d9e5ec; border-radius: 14px; }
+.pm-reference .wep-inline-header, .pm-reference .wep-inline-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.pm-reference .wep-inline-header h2, .pm-reference .wep-inline-header p { margin: 4px 0 0; }
+.pm-reference .wep-inline-header p, .pm-reference .wep-inline-source, .pm-reference .wep-inline-toolbar label, .pm-reference .wep-inline-toolbar span { color: #5d7180; font-size: .82rem; }
+.pm-reference .wep-inline-toolbar { padding: 12px; background: #fff; border: 1px solid #d9e5ec; border-radius: 10px; }
+.pm-reference .wep-inline-toolbar label { display: grid; gap: 5px; min-width: min(360px, 100%); }
+.pm-reference .wep-inline-toolbar select { min-height: 38px; padding: 7px 10px; border: 1px solid #c7d7e0; border-radius: 7px; background: #fff; font: inherit; }
+.pm-reference .wep-inline-period { display: grid; gap: 3px; }
+.pm-reference .wep-inline-period strong { color: #173f53; font-size: .86rem; }
+.pm-reference .wep-inline-status, .pm-reference .wep-inline-planned { padding: 5px 10px; border-radius: 999px; background: #e3f6ed; color: #087443; font-size: .76rem; font-weight: 700; }
+.pm-reference .wep-inline-actions { display: flex; gap: 7px; flex-wrap: wrap; }
+.pm-reference .wep-inline-actions input { width: 150px; min-height: 34px; padding: 5px 8px; border: 1px solid #c7d7e0; border-radius: 6px; font: inherit; }
+.pm-reference .wep-inline-actions button { min-height: 34px; padding: 6px 10px; border: 1px solid #b9d0dc; border-radius: 6px; background: #edf6fa; color: #15516a; font: inherit; font-size: .75rem; cursor: pointer; }
+.pm-reference .wep-inline-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.pm-reference .wep-inline-kpis article { display: grid; gap: 7px; min-width: 0; padding: 14px; background: #fff; border: 1px solid #d9e5ec; border-radius: 10px; }
+.pm-reference .wep-inline-kpis span { color: #5d7180; font-size: .75rem; }
+.pm-reference .wep-inline-kpis strong { color: #124c67; font-size: 1.35rem; }
+.pm-reference .wep-inline-source { margin: 0; padding: 10px 12px; border-inline-start: 3px solid #2b9a72; background: #eef9f4; }
+.pm-reference .wep-inline-workspace { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(340px, .8fr); gap: 14px; align-items: start; }
+.pm-reference .wep-inline-candidates, .pm-reference .wep-inline-plan { min-width: 0; padding: 14px; background: #fff; border: 1px solid #d9e5ec; border-radius: 11px; }
+.pm-reference .wep-inline-candidate-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.pm-reference .wep-inline-candidate { display: grid; gap: 8px; min-width: 0; padding: 12px; border: 1px solid #d9e5ec; border-radius: 9px; }
+.pm-reference .wep-inline-candidate.is-planned { border-color: #72c79e; background: #fbfffc; }
+.pm-reference .wep-inline-card-head { display: grid; gap: 3px; }
+.pm-reference .wep-inline-card-head span, .pm-reference .wep-inline-path, .pm-reference .wep-inline-readiness { color: #5d7180; font-size: .72rem; }
+.pm-reference .wep-inline-card-head strong { color: #173f53; font-size: .88rem; overflow-wrap: anywhere; }
+.pm-reference .wep-inline-path, .pm-reference .wep-inline-readiness { margin: 0; }
+.pm-reference .wep-inline-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.pm-reference .wep-inline-facts span { display: grid; gap: 3px; color: #6b7d88; font-size: .68rem; }
+.pm-reference .wep-inline-facts b { color: #173f53; font-size: .77rem; }
+.pm-reference .wep-inline-card-actions { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.pm-reference .wep-inline-add-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; flex: 1 1 100%; min-width: 0; }
+.pm-reference .wep-inline-add-form label { display: grid; gap: 4px; min-width: 0; color: #5d7180; font-size: .68rem; }
+.pm-reference .wep-inline-add-form input, .pm-reference .wep-inline-add-form select { box-sizing: border-box; min-width: 0; width: 100%; min-height: 34px; padding: 5px 7px; border: 1px solid #c7d7e0; border-radius: 6px; background: #fff; color: #173f53; font: inherit; }
+.pm-reference .wep-inline-add-form button { grid-column: 1 / -1; min-height: 34px; padding: 6px 9px; border: 0; border-radius: 6px; background: #0879d1; color: #fff; font: inherit; font-size: .72rem; font-weight: 700; cursor: pointer; }
+.pm-reference .wep-inline-disabled { color: #9a5b14; font-size: .74rem; }
+.pm-reference .wep-inline-detail { padding-top: 5px; border-top: 1px solid #edf2f5; color: #5d7180; font-size: .72rem; }
+.pm-reference .wep-inline-detail summary { cursor: pointer; color: #15516a; font-weight: 700; }
+.pm-reference .wep-inline-detail p { margin: 7px 0 0; }
+.pm-reference .wep-inline-table-wrap { overflow-x: auto; }
+.pm-reference .wep-inline-plan .pm-execution-table { min-width: 560px; }
+.pm-reference .wep-inline-plan .pm-execution-table small { display: block; color: #6b7d88; }
+.pm-reference .wep-inline-frozen, .pm-reference .wep-inline-empty { margin: 0; color: #657681; font-size: .8rem; }
+@media (max-width: 900px) {
+  .pm-reference .wep-inline-workspace { grid-template-columns: 1fr; }
+  .pm-reference .wep-inline-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .pm-reference .pm-wep-panel { padding: 12px; }
+  .pm-reference .wep-inline-kpis, .pm-reference .wep-inline-candidate-grid { grid-template-columns: 1fr; }
+  .pm-reference .wep-inline-facts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .pm-reference .wep-inline-toolbar label { min-width: 100%; }
+  .pm-reference .wep-inline-header .pm-execution-button { width: 100%; text-align: center; }
+}

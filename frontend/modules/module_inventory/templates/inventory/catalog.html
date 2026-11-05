@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% load static %}
+{% block module_token_bridge %}<link rel="stylesheet" href="{% static 'inventory/core-token-bridge.css' %}?v=20261024-batch04b">{% endblock %}
+{% block title %}{{ page_title }} — المخازن والمواد{% endblock %}
+{% block breadcrumb_text %}{{ page_title }}{% endblock %}
+{% block extra_head %}{% if section == 'items' or section == 'warehouses' %}<link rel="stylesheet" href="{% static 'inventory/catalog.css' %}?v=20261019-catalog">{% endif %}{% endblock %}
+{% block content %}
+{% if section == 'warehouses' %}
+<main class="inventory-catalog inventory-warehouses core-workspace" dir="rtl">
+  <section class="inventory-catalog__hero inventory-warehouses__hero" aria-labelledby="inventory-warehouses-title">
+    <div class="inventory-catalog__hero-copy">
+      <span class="inventory-catalog__eyebrow">المخازن والمواد</span>
+      <h1 id="inventory-warehouses-title">إدارة المخازن</h1>
+      <p>إدارة جميع المخازن التابعة للجهة وعرض بياناتها وحالتها وتوزيعها حسب الإدارات والأنشطة.</p>
+      {% if error %}<p class="inventory-catalog__error" role="alert">{{ error }}</p>{% endif %}
+      {% if can_manage %}<a class="inventory-catalog__primary-button" href="{{ base_url }}&amp;create=1#warehouse-form"><span aria-hidden="true">＋</span> مخزن جديد</a>{% endif %}
+    </div>
+    <div class="inventory-warehouses__hero-art" aria-hidden="true">
+      <svg viewBox="0 0 260 170" fill="none"><circle cx="130" cy="85" r="72" stroke="#8cbfff" stroke-opacity=".7"/><path d="M55 143V64l75-31 75 31v79H55Z" fill="#102f50" stroke="#82baf3" stroke-width="3"/><path d="M69 70h122v73H69z" fill="#071a2e" stroke="#376b9d" stroke-width="2"/><path d="M90 102h30v19H90zM90 124h30v19H90zM140 102h30v19h-30zM140 124h30v19h-30z" fill="#d99b57" stroke="#f0c58f" stroke-width="2"/><path d="M127 143V88h28v55" stroke="#4d8bc2" stroke-width="3"/></svg>
+    </div>
+  </section>
+  <form class="inventory-catalog__filters inventory-warehouses__filters" method="get" action="{% url 'inventory:home' %}">
+    <input type="hidden" name="section" value="warehouses"><input type="hidden" name="organization_id" value="{{ organization_id }}">
+    <label class="inventory-catalog__search"><span class="inventory-catalog__sr-only">البحث في المخازن</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input type="search" name="search" value="{{ search }}" placeholder="البحث في المخازن (الاسم، الرمز، الإدارة المشغلة)..." autocomplete="off"></label>
+    <div class="inventory-warehouses__filter-actions"><button class="inventory-catalog__apply-button" type="submit">بحث</button>{% if search %}<a class="inventory-catalog__reset-link" href="{{ reset_url }}">مسح البحث</a>{% endif %}</div>
+  </form>
+  <section class="inventory-catalog__results inventory-warehouses__results" aria-labelledby="inventory-warehouse-results-title">
+    <header class="inventory-catalog__results-heading"><div><h2 id="inventory-warehouse-results-title">قائمة المخازن</h2><p>{% if records %}{{ records|length }} من السجلات{% else %}لا توجد مخازن مطابقة{% endif %}</p></div>{% if has_previous or has_next %}<nav class="inventory-catalog__pagination" aria-label="صفحات المخازن">{% if has_previous %}<a href="{{ previous_url }}">السابق</a>{% endif %}{% if has_next %}<a href="{{ next_url }}">التالي</a>{% endif %}</nav>{% endif %}</header>
+    {% if records %}<div class="inventory-catalog__table-wrap"><table class="inventory-catalog__table inventory-warehouses__table"><thead><tr><th>رمز المخزن</th><th>اسم المخزن</th><th>النوع</th><th>الإدارة المشغلة</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody>{% for row in records %}<tr><td data-label="رمز المخزن"><span class="inventory-catalog__code">{{ row.code }}</span></td><td data-label="اسم المخزن"><div class="inventory-catalog__item-name"><span class="inventory-warehouses__warehouse-icon" aria-hidden="true">⌂</span><span><strong>{{ row.label }}</strong><small>{{ row.name|default:row.label }}</small></span></div></td><td data-label="النوع">{{ row.warehouse_type_label }}</td><td data-label="الإدارة المشغلة">{{ row.operating_department_name|default:row.operating_department|default:"—" }}</td><td data-label="الحالة"><span class="inventory-catalog__status {% if row.status == 'active' %}is-active{% else %}is-inactive{% endif %}">{% if row.status == 'active' %}نشط{% elif row.status == 'suspended' %}موقوف{% elif row.status == 'closed' %}مغلق{% else %}{{ row.status_label }}{% endif %}</span></td><td data-label="الإجراءات"><div class="inventory-catalog__row-actions"><a class="inventory-catalog__edit-link inventory-warehouses__view-link" href="{{ row.locations_url }}">عرض</a>{% if can_manage %}<a class="inventory-catalog__edit-link" href="{{ row.edit_url }}">تعديل</a>{% endif %}</div></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="inventory-catalog__empty" role="status"><span class="inventory-catalog__empty-icon" aria-hidden="true">⌕</span><h3>{% if search %}لا توجد نتائج مطابقة{% else %}لا توجد مخازن مسجلة بعد{% endif %}</h3><p>{% if search %}جرّب تغيير كلمة البحث أو مسحها.{% elif can_manage %}يمكنك إضافة أول مخزن من زر «مخزن جديد».{% else %}لا توجد مخازن متاحة ضمن نطاق صلاحيتك.{% endif %}</p></div>{% endif %}
+  </section>
+  {% if can_manage and show_item_form %}<section class="inventory-catalog__form-panel" id="warehouse-form" aria-labelledby="inventory-warehouse-form-title"><header><div><span class="inventory-catalog__eyebrow">{% if editing %}تحديث البيانات{% else %}تعريف مخزن جديد{% endif %}</span><h2 id="inventory-warehouse-form-title">{% if editing %}تعديل المخزن{% else %}إضافة مخزن جديد{% endif %}</h2></div><a href="{{ base_url }}" aria-label="إغلاق النموذج">إلغاء</a></header><form method="post" class="inventory-catalog__item-form"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}"><input type="hidden" name="action" value="save"><div class="inventory-catalog__form-grid">{% for field in form.fields %}<label class="inventory-catalog__form-field"><span>{{ field.label }}{% if field.required %}<b> *</b>{% endif %}</span>{% if field.options %}<select name="{{ field.name }}" {% if field.required %}required{% endif %}>{% for option in field.options %}<option value="{{ option.value }}" {% if option.value|stringformat:'s' == field.value|stringformat:'s' %}selected{% endif %}>{{ option.label }}</option>{% endfor %}</select>{% else %}<input name="{{ field.name }}" value="{{ field.value|default_if_none:'' }}" {% if field.required %}required{% endif %}>{% endif %}</label>{% endfor %}</div><footer><button type="submit" class="inventory-catalog__apply-button">حفظ المخزن</button><a href="{{ base_url }}">إلغاء</a></footer></form></section>{% endif %}
+</main>
+{% elif section == 'items' %}
+<main class="inventory-catalog core-workspace" dir="rtl">
+  <section class="inventory-catalog__hero" aria-labelledby="inventory-catalog-title">
+    <div class="inventory-catalog__hero-copy">
+      <span class="inventory-catalog__eyebrow">المخزون والمواد</span>
+      <h1 id="inventory-catalog-title">دليل الأصناف والمواد</h1>
+      <p>عرض وإدارة الأصناف المسجلة في المخزون، وابحث عنها أو أضف صنفاً جديداً بسهولة.</p>
+      {% if error %}<p class="inventory-catalog__error" role="alert">{{ error }}</p>{% endif %}
+      {% if can_manage %}<a class="inventory-catalog__primary-button" href="{{ base_url }}&amp;create=1#item-form">
+        <span aria-hidden="true">＋</span> صنف جديد
+      </a>{% endif %}
+    </div>
+    <div class="inventory-catalog__hero-art" aria-hidden="true">
+      <svg viewBox="0 0 280 190" fill="none">
+        <circle cx="132" cy="95" r="82" fill="#153d70" fill-opacity=".28" stroke="#6da7ed" stroke-opacity=".62"/>
+        <path d="M87 145V57l86 0v88M76 145h111M96 70h67M96 95h67M96 120h67" stroke="#8cbfff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M101 57V43h58v14M108 77h17v15h-17zM136 77h18v15h-18zM108 102h18v15h-18zM138 102h16v15h-16zM110 127h43v13h-43z" fill="#d99b57" stroke="#f0c58f" stroke-width="2"/>
+        <path d="M43 137h46v35H43z" fill="#2479f2" stroke="#8dbdff" stroke-width="3"/>
+        <path d="M54 148h24M54 158h18" stroke="#e5f1ff" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="54" cy="143" r="4" fill="#42c9bc"/>
+      </svg>
+    </div>
+  </section>
+
+  <form class="inventory-catalog__filters" method="get" action="{% url 'inventory:home' %}">
+    <input type="hidden" name="section" value="items">
+    <input type="hidden" name="organization_id" value="{{ organization_id }}">
+    <label class="inventory-catalog__search">
+      <span class="inventory-catalog__sr-only">البحث في الأصناف والمواد</span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg>
+      <input type="search" name="search" value="{{ search }}" placeholder="البحث في الأصناف والمواد..." autocomplete="off">
+    </label>
+    <div class="inventory-catalog__filter-grid">
+      <label class="inventory-catalog__filter">
+        <span>التصنيف</span>
+        <select name="category_id">
+          <option value="">جميع التصنيفات</option>
+          {% for category in categories %}
+          <option value="{{ category.id }}" {% if category.id == category_filter %}selected{% endif %}>{{ category.name_ar|default:category.name|default:category.code }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="inventory-catalog__filter">
+        <span>الحالة</span>
+        <select name="is_active">
+          <option value="">جميع الحالات</option>
+          <option value="true" {% if active_filter == 'true' %}selected{% endif %}>نشط</option>
+          <option value="false" {% if active_filter == 'false' %}selected{% endif %}>غير نشط</option>
+        </select>
+      </label>
+      <label class="inventory-catalog__filter">
+        <span>نوع الصنف</span>
+        <select name="item_type">
+          <option value="">جميع الأنواع</option>
+          {% for kind, label in item_types %}
+          <option value="{{ kind }}" {% if kind == item_type_filter %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+    <div class="inventory-catalog__filter-actions">
+      <button class="inventory-catalog__apply-button" type="submit">بحث وتصفية</button>
+      {% if search or category_filter or active_filter or item_type_filter %}
+      <a class="inventory-catalog__reset-link" href="{{ reset_url }}">إعادة ضبط الفلاتر</a>
+      {% endif %}
+    </div>
+  </form>
+
+  <section class="inventory-catalog__results" aria-labelledby="inventory-results-title">
+    <header class="inventory-catalog__results-heading">
+      <div>
+        <h2 id="inventory-results-title">الأصناف</h2>
+        <p>{% if records %}{{ records|length }} صنف في هذه الصفحة{% else %}لا توجد أصناف مطابقة{% endif %} · بطاقة التفاصيل غير متاحة حالياً.</p>
+      </div>
+      {% if has_previous or has_next %}
+      <nav class="inventory-catalog__pagination" aria-label="صفحات الأصناف">
+        {% if has_previous %}<a href="{{ previous_url }}">السابق</a>{% endif %}
+        {% if has_next %}<a href="{{ next_url }}">التالي</a>{% endif %}
+      </nav>
+      {% endif %}
+    </header>
+
+    {% if records %}
+    <div class="inventory-catalog__table-wrap">
+      <table class="inventory-catalog__table">
+        <thead>
+          <tr><th scope="col">رمز الصنف</th><th scope="col">اسم الصنف</th><th scope="col">التصنيف</th><th scope="col">الوحدة</th><th scope="col">الحالة</th><th scope="col">الإجراء</th></tr>
+        </thead>
+        <tbody>
+          {% for row in records %}
+          <tr>
+            <td data-label="رمز الصنف"><span class="inventory-catalog__code">{{ row.code }}</span></td>
+            <td data-label="اسم الصنف">
+              <div class="inventory-catalog__item-name">
+                <span class="inventory-catalog__item-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="m4.5 7.8 7.5 4.3 7.5-4.3M12 12v8.5"/></svg>
+                </span>
+                <span><strong>{{ row.label }}</strong><small>{{ row.type_label }}</small></span>
+              </div>
+            </td>
+            <td data-label="التصنيف">{{ row.category_label|default:"—" }}</td>
+            <td data-label="الوحدة">{{ row.unit_label|default:"—" }}</td>
+            <td data-label="الحالة"><span class="inventory-catalog__status {% if row.is_active %}is-active{% else %}is-inactive{% endif %}">{{ row.status_label }}</span></td>
+            <td data-label="الإجراء">
+              <div class="inventory-catalog__row-actions">
+                <span class="inventory-catalog__details-unavailable" title="صفحة بطاقة الصنف غير متاحة حالياً">التفاصيل غير متاحة</span>
+                {% if can_manage %}<a class="inventory-catalog__edit-link" href="{{ row.edit_url }}">تعديل</a>{% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="inventory-catalog__empty" role="status">
+      <span class="inventory-catalog__empty-icon" aria-hidden="true">⌕</span>
+      <h3>{% if search or category_filter or active_filter or item_type_filter %}لا توجد نتائج مطابقة{% else %}لا توجد أصناف مسجلة بعد{% endif %}</h3>
+      <p>{% if search or category_filter or active_filter or item_type_filter %}جرّب تغيير كلمات البحث أو إعادة ضبط الفلاتر.{% elif can_manage %}يمكنك إضافة أول صنف من زر «صنف جديد».{% else %}لا توجد أصناف متاحة ضمن نطاق صلاحيتك.{% endif %}</p>
+    </div>
+    {% endif %}
+  </section>
+
+  {% if can_manage and show_item_form %}
+  <section class="inventory-catalog__form-panel" id="item-form" aria-labelledby="inventory-item-form-title">
+    <header><div><span class="inventory-catalog__eyebrow">{% if editing %}تحديث البيانات{% else %}تعريف مادة جديدة{% endif %}</span>
+      <h2 id="inventory-item-form-title">{% if editing %}تعديل الصنف{% else %}إضافة صنف جديد{% endif %}</h2></div>
+      <a href="{{ base_url }}" aria-label="إغلاق النموذج">إلغاء</a>
+    </header>
+    <form method="post" class="inventory-catalog__item-form">
+      {% csrf_token %}<input type="hidden" name="action" value="save">
+      <div class="inventory-catalog__form-grid">
+        {% for field in form.fields %}
+        {% if field.name != 'attributes_json' and field.name != 'aliases_json' and field.name != 'notes' %}
+        <label class="inventory-catalog__form-field">
+          <span>{{ field.label }}{% if field.required %}<b aria-hidden="true"> *</b>{% endif %}</span>
+          {% if field.options %}
+          <select name="{{ field.name }}" {% if field.required %}required{% endif %}>
+            {% for option in field.options %}<option value="{{ option.value }}" {% if option.value|stringformat:'s' == field.value|stringformat:'s' %}selected{% endif %}>{{ option.label }}</option>{% endfor %}
+          </select>
+          {% else %}
+          <input name="{{ field.name }}" value="{{ field.value|default_if_none:'' }}" {% if field.required %}required{% endif %} {% if field.name == 'code' %}autocomplete="off"{% endif %}>
+          {% endif %}
+        </label>
+        {% endif %}
+        {% endfor %}
+      </div>
+      <details class="inventory-catalog__advanced-fields">
+        <summary>مواصفات وبيانات إضافية</summary>
+        <div class="inventory-catalog__form-grid">
+          {% for field in form.fields %}
+          {% if field.name == 'attributes_json' or field.name == 'aliases_json' or field.name == 'notes' %}
+          <label class="inventory-catalog__form-field inventory-catalog__form-field--wide">
+            <span>{{ field.label }}</span>
+            <textarea name="{{ field.name }}" rows="3">{{ field.value|default_if_none:'' }}</textarea>
+          </label>
+          {% endif %}
+          {% endfor %}
+        </div>
+      </details>
+      <footer>
+        <button type="submit" class="inventory-catalog__apply-button">حفظ الصنف</button>
+        <a href="{{ base_url }}">إلغاء</a>
+      </footer>
+    </form>
+  </section>
+  {% endif %}
+</main>
+{% else %}
+<main class="core-workspace" dir="rtl">
+  <header class="core-page-header"><h1>{{ page_title }}</h1><a class="btn" href="/inventory/requests/">طلبات المواد والحجوزات</a><p>دليل المخازن والمواد ضمن نطاق المؤسسة وصلاحيات حسابك.</p></header>
+  <a class="btn" href="{% url 'inventory:configuration' %}">الكيان القانوني وجاهزية الترحيل</a>
+  <a class="btn" href="{% url 'inventory:operations' %}">المستندات والأرصدة ودفتر الحركة</a>
+  <nav class="core-actions" aria-label="أقسام المخازن">{% for item in navigation %}<a class="btn" href="{{ item.url }}">{{ item.label }}</a>{% endfor %}</nav>
+  {% if error %}<p class="core-policy-note" role="alert">{{ error }}</p>{% endif %}
+  {% if section != 'locations' %}<form method="get" class="core-form">
+    <input type="hidden" name="section" value="{{ section }}"><input type="hidden" name="organization_id" value="{{ organization_id }}">
+    <label>بحث بالاسم أو الرمز <input name="search" value="{{ search }}"></label><button class="btn">بحث</button>
+  </form>{% endif %}
+  <section class="core-record-grid" aria-label="السجلات">
+    {% for row in records %}<article class="core-record-card"><header><h2>{{ row.label }}</h2></header>
+      <dl><div><dt>الرمز</dt><dd>{{ row.code }}</dd></div>{% if row.status %}<div><dt>الحالة</dt><dd>{{ row.status }}</dd></div>{% endif %}</dl>
+      <footer>{% if can_manage %}<a class="btn" href="{{ row.edit_url }}">تعديل</a>{% endif %}
+      {% if section == 'warehouses' %}<a class="btn" href="{{ row.locations_url }}">مواقع التخزين</a>{% endif %}</footer>
+    </article>{% empty %}<p>لا توجد سجلات ضمن النطاق المحدد.</p>{% endfor %}
+  </section>
+  <nav class="core-actions" aria-label="الصفحات">{% if has_previous %}<a class="btn" href="{{ previous_url }}">السابق</a>{% endif %}{% if has_next %}<a class="btn" href="{{ next_url }}">التالي</a>{% endif %}</nav>
+  {% if can_manage %}<section class="core-record-card"><h2>{% if editing %}تعديل البيانات{% else %}إضافة سجل{% endif %}</h2>
+    {% include 'partials/core_form.html' with form=form %}
+    {% if editing %}<a class="btn" href="{{ base_url }}">إلغاء التعديل</a><form method="post">{% csrf_token %}<input type="hidden" name="action" value="delete"><button class="btn">نقل إلى سلة المحذوفات</button></form>{% endif %}
+  </section>{% endif %}
+</main>
+{% endif %}
+{% endblock %}

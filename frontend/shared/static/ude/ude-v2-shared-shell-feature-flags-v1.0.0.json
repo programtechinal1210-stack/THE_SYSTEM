@@ -1,0 +1,11 @@
+{
+  "schema": "ude.feature-flags.v1",
+  "package": "UDE-V2-STAGE-02",
+  "scope": "shared-shell-only",
+  "enabled": false,
+  "production_load": false,
+  "pilot_usernames": ["admin"],
+  "required_permission": "core.settings.view",
+  "legacy_default": true,
+  "rollback": "disable-flag-and-remove-conditional-assets"
+}

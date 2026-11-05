@@ -1,0 +1,65 @@
+{% extends "pm/reference_base.html" %}
+{% block title %}{{ label }} — إدارة المشاريع{% endblock %}
+{% block pm_content %}
+<section class="pm-entity-page">
+  <nav class="pm-breadcrumbs" aria-label="مسار التخطيط">
+    <a href="/pm/">إدارة المشاريع</a><span aria-hidden="true">/</span>
+    <a href="/pm/projects/">المشاريع</a>
+    {% if parent %}<span aria-hidden="true">/</span><span>{{ parent.name }}</span>{% endif %}
+  </nav>
+  {% if item %}
+    <header class="pm-entity-heading">
+      <div class="pm-entity-heading-main">
+        <span class="pm-form-kicker">{{ label }}</span>
+        <h1>{{ item.name }}</h1>
+        <div class="pm-entity-identifiers"><span>الرمز</span><bdi>{{ code }}</bdi>{% if parent %}<span>ضمن</span><strong>{{ parent.name }}</strong>{% endif %}</div>
+      </div>
+      <div class="pm-entity-actions">
+        {% if edit_url %}<a class="pm-button primary" data-pm-dialog href="{{ edit_url }}">تعديل</a>{% endif %}
+        {% if delete_url %}<a class="pm-button danger" href="{{ delete_url }}">حذف إلى سلة المحذوفات</a>{% endif %}
+        <a class="pm-button" href="{{ back }}">العودة إلى القائمة</a>
+      </div>
+    </header>
+
+    {% if operation_links %}<nav class="pm-project-shortcuts" aria-label="أقسام المشروع">{% for entry in operation_links %}<a href="{{ entry.url }}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i>{{ entry.label }}</a>{% endfor %}</nav>{% endif %}
+
+    <dl class="pm-entity-facts">
+      {% if item.owner_name %}<div><dt>المسؤول</dt><dd>{{ item.owner_name }}</dd></div>{% endif %}
+      {% if item.planned_start_date %}<div><dt>البداية المخططة</dt><dd><bdi>{{ item.planned_start_date }}</bdi></dd></div>{% endif %}
+      {% if item.planned_end_date %}<div><dt>النهاية المخططة</dt><dd><bdi>{{ item.planned_end_date }}</bdi></dd></div>{% endif %}
+      {% if item.planned_quantity != None %}<div><dt>الكمية المخططة</dt><dd><bdi>{{ item.planned_quantity }}</bdi> {{ item.unit }}</dd></div>{% endif %}
+      {% if item.planned_duration != None %}<div><dt>المدة المخططة</dt><dd><bdi>{{ item.planned_duration }}</bdi> ساعة</dd></div>{% endif %}
+      {% if item.planned_cost != None %}<div><dt>التكلفة المخططة</dt><dd><bdi>{{ item.planned_cost }}</bdi>{% if item.planned_cost_currency %} {{ item.planned_cost_currency }}{% elif item.currency %} {{ item.currency }}{% endif %}</dd></div>{% endif %}
+      {% if item.currency %}<div><dt>العملة</dt><dd><bdi>{{ item.currency }}</bdi></dd></div>{% endif %}
+      {% if item.source %}<div><dt>المصدر</dt><dd>{{ item.source }}</dd></div>{% endif %}
+      {% if item.item_category %}<div><dt>البند</dt><dd>{{ item.item_category }}</dd></div>{% endif %}
+      {% if item.productivity != None %}<div><dt>معدل الإنتاجية</dt><dd><bdi>{{ item.productivity }}</bdi></dd></div>{% endif %}
+      {% if item.attachment_url %}<div><dt>المرفق</dt><dd><a href="{{ item.attachment_url }}" target="_blank" rel="noopener noreferrer">فتح المرفق</a></dd></div>{% endif %}
+    </dl>
+    {% if item.description %}<section class="pm-entity-note"><h2>الوصف</h2><p>{{ item.description|linebreaksbr }}</p></section>{% endif %}
+    {% if item.notes %}<section class="pm-entity-note"><h2>ملاحظات</h2><p>{{ item.notes|linebreaksbr }}</p></section>{% endif %}
+    {% if item.exchange_rate_snapshot %}<aside class="pm-entity-note pm-fx-snapshot"><h2>سعر الصرف المحفوظ</h2><p><bdi>{{ item.exchange_rate_snapshot.rate }}</bdi> — {{ item.exchange_rate_snapshot.date }}</p></aside>{% endif %}
+    <div class="pm-entity-related">
+      {% if child_url %}<a class="pm-button primary" href="{{ child_url }}">عرض {{ child_label }}</a>{% endif %}
+      {% if report_url %}<a class="pm-button" href="{{ report_url }}">تقارير المشروع</a>{% endif %}
+    </div>
+  {% else %}
+    <header class="pm-list-heading">
+      <div><span class="pm-form-kicker">التخطيط الهرمي</span><h1>{{ label }}</h1>{% if parent %}<p>العناصر ضمن <strong>{{ parent.name }}</strong></p>{% endif %}</div>
+      {% if create_url %}<a class="pm-button primary" data-pm-dialog href="{{ create_url }}">إضافة عنصر</a>{% endif %}
+    </header>
+    <section class="pm-list-tools" aria-label="البحث في العناصر">
+      <form method="get" class="pm-entity-search"><input type="hidden" name="parent_id" value="{{ parent_id|default:'' }}"><label for="pm-search">البحث بالرمز أو الاسم</label><div><input id="pm-search" name="q" value="{{ q }}" maxlength="200" type="search" placeholder="اكتب رمزًا أو اسمًا"><button type="submit"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>بحث</button></div></form>
+      <span class="pm-list-count">{{ total }} نتيجة</span>
+    </section>
+    <div class="pm-entity-table-wrap"><table class="wep-table pm-entity-table"><thead><tr><th>الرمز</th><th>الاسم</th><th>التكلفة المخططة</th></tr></thead><tbody>
+      {% for row in items %}<tr><td><bdi>{{ row.code }}</bdi></td><td><a href="{{ row.href }}">{{ row.name }}</a></td><td><bdi>{{ row.planned_cost }}</bdi>{% if row.planned_cost_currency %} {{ row.planned_cost_currency }}{% elif row.currency %} {{ row.currency }}{% endif %}</td></tr>
+      {% empty %}<tr><td colspan="3"><div class="pm-empty-state"><i class="fa-regular fa-folder-open" aria-hidden="true"></i><strong>لا توجد عناصر ضمن هذا النطاق</strong><span>{% if q %}جرّب تعديل عبارة البحث.{% elif create_url %}يمكنك إضافة أول عنصر من الزر أعلاه.{% else %}تحقق من النطاق أو صلاحياتك.{% endif %}</span></div></td></tr>{% endfor %}
+    </tbody></table></div>
+    {% if previous != None or following != None %}<nav class="pm-pagination" aria-label="صفحات النتائج">
+      {% if previous != None %}<a href="?skip={{ previous }}&amp;q={{ q|urlencode }}&amp;parent_id={{ parent_id|default:'' }}">السابق</a>{% endif %}
+      {% if following != None %}<a href="?skip={{ following }}&amp;q={{ q|urlencode }}&amp;parent_id={{ parent_id|default:'' }}">التالي</a>{% endif %}
+    </nav>{% endif %}
+  {% endif %}
+</section>
+{% endblock %}

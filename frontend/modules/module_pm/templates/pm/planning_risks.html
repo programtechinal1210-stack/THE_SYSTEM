@@ -1,0 +1,1 @@
+{% if risks %}<details><summary>المخاطر المرتبطة ({{ risks|length }})</summary><ul>{% for risk in risks %}<li>{{ risk.description }} — {{ risk.status }}{% if risk.corrective_action %} · الإجراء: {{ risk.corrective_action }}{% endif %}</li>{% endfor %}</ul></details>{% endif %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+{% block module_token_bridge %}<link rel="stylesheet" href="{% static 'module_equipment/core-token-bridge.css' %}?v=20261024">{% endblock %}
+{% block title %}حركات المعدات والتسليم والاستلام | THE_SYSTEM{% endblock %}
+{% block page_title %}نقل المعدات والتسليم والاستلام{% endblock %}
+{% block breadcrumb_text %}إدارة المعدات / حركات المعدات{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'module_equipment/movements.css' %}">{% endblock %}
+{% block content %}
+<main class="movement-workspace" dir="rtl">
+  <header class="movement-heading">
+    <div><p class="eyebrow">إدارة حركة المعدة بين المواقع والجهات</p><h1>نقل المعدات والتسليم والاستلام</h1><p>سجّل الحركة، ثم وثّق التسليم والاستلام كلٌّ في إجراء مستقل.</p></div>
+    <div class="heading-actions"><a class="movement-button quiet" href="{% url 'equipment:home' %}">العودة للمركز</a>{% if can_create_movements %}<a class="movement-button primary" href="?create=1">＋ تسجيل حركة جديدة</a>{% endif %}</div>
+  </header>
+
+  <section class="movement-summary" aria-label="ملخص الحركات">
+    <a class="movement-stat blue" href="?status=draft"><span>حركات جديدة</span><strong>{{ counts.draft }}</strong><small>مسودات بانتظار التسليم</small></a>
+    <a class="movement-stat amber" href="?status=draft"><span>بانتظار التسليم</span><strong>{{ counts.draft }}</strong><small>الإجراء التالي: تسليم المعدة</small></a>
+    <a class="movement-stat violet" href="?status=dispatched"><span>تم التسليم</span><strong>{{ counts.dispatched }}</strong><small>لم يثبت الاستلام بعد</small></a>
+    <a class="movement-stat green" href="?status=received"><span>تم الاستلام</span><strong>{{ counts.received }}</strong><small>تغيّر الموقع بعد الاستلام المعتمد</small></a>
+  </section>
+
+  <section class="movement-filters" aria-label="البحث والتصفية"><form method="get">
+    <label><span>بحث</span><input name="search" value="{{ request.GET.search }}" placeholder="رقم الحركة أو المعدة أو الموقع"></label>
+    <label><span>الحالة</span><select name="status"><option value="">كل الحالات</option>{% for value,label in status_labels.items %}<option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+    <label><span>من الموقع</span><input name="from_location" value="{{ request.GET.from_location }}" placeholder="الموقع المرسل"></label>
+    <label><span>إلى الموقع</span><input name="to_location" value="{{ request.GET.to_location }}" placeholder="الموقع المستهدف"></label>
+    <div class="filter-actions"><button class="movement-button primary" type="submit">تطبيق</button><a class="movement-button quiet" href="{% url 'equipment:movements' %}">إعادة ضبط</a></div>
+  </form></section>
+
+  <div class="movement-layout">
+    <section class="movement-list-panel"><div class="section-title"><div><h2>قائمة حركات المعدات</h2><p>عرض {{ movements|length }} من أصل {{ total }} حركة ضمن نطاق صلاحيات الحساب.</p></div><span class="scope-note">بيانات فعلية ومحددة النطاق</span></div>
+      {% if movements %}<div class="movement-list">{% for movement in movements %}<article class="movement-row">
+        <div class="movement-main"><span class="row-index">{{ forloop.counter }}</span><div><strong>{{ movement.movement_code }}</strong><small>{{ movement.asset_name }} · <bdi dir="ltr">{{ movement.asset_code }}</bdi></small></div></div>
+        <div><span class="row-label">المسار</span><strong>{{ movement.from_location|default:"غير محدد" }} <span class="arrow">←</span> {{ movement.to_location|default:"غير محدد" }}</strong></div>
+        <div><span class="row-label">تاريخ التسجيل</span><bdi dir="ltr">{{ movement.registered_at|slice:':16'|default:'غير محدد' }}</bdi></div>
+        <div><span class="status-badge status-{{ movement.status }}">{{ movement.status_label }}</span></div>
+        <a class="movement-button primary row-open" href="?movement_id={{ movement.id }}">فتح الحركة</a>
+      </article>{% endfor %}</div>{% else %}<div class="empty-state"><span>⇄</span><h3>لا توجد حركات مطابقة</h3><p>غيّر الفلاتر أو سجّل حركة جديدة إذا كانت لديك الصلاحية.</p>{% if can_create_movements %}<a class="movement-button primary" href="?create=1">تسجيل أول حركة</a>{% endif %}</div>{% endif %}
+      {% if page_count > 1 %}<nav class="pager" aria-label="ترقيم الصفحات">{% for number in page_count|make_list %}{% endfor %}<span>صفحة {{ page }} من {{ page_count }}</span>{% if page > 1 %}<a href="?page={{ page|add:'-1' }}&status={{ request.GET.status|urlencode }}&search={{ request.GET.search|urlencode }}">السابق</a>{% endif %}{% if page < page_count %}<a href="?page={{ page|add:'1' }}&status={{ request.GET.status|urlencode }}&search={{ request.GET.search|urlencode }}">التالي</a>{% endif %}</nav>{% endif %}
+    </section>
+  </div>
+
+  <aside class="movement-drawer {% if create_mode or selected_movement %}is-open{% endif %}" aria-label="تفاصيل الحركة"><div class="drawer-inner">
+    {% if create_mode %}<div class="drawer-heading"><div><p class="eyebrow">حركة جديدة</p><h2>تسجيل حركة معدة</h2><p>تُحفظ كمسودة أولاً ولا تغيّر الموقع الحالي.</p></div><a href="{% url 'equipment:movements' %}" class="drawer-close">×</a></div>
+      {% if movement_form.non_field_errors %}<div class="form-alert">{{ movement_form.non_field_errors }}</div>{% endif %}<form method="post" class="movement-form" data-dirty-form>{% csrf_token %}<input type="hidden" name="action" value="create_movement">{% for field in movement_form %}<label class="form-field {% if field.errors %}has-error{% endif %}" for="{{ field.id_for_label }}"><span>{{ field.label }}{% if field.field.required %}<b>*</b>{% endif %}</span>{{ field }}{% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</label>{% endfor %}<div class="form-note">لا يتغير الموقع المعتمد للمعدة إلا بعد تسجيل استلام صحيح من الإجراء التالي.</div><div class="form-actions"><a class="movement-button quiet" href="{% url 'equipment:movements' %}">إلغاء</a><button class="movement-button primary" type="submit">حفظ الحركة</button></div></form>
+    {% elif selected_movement %}<div class="drawer-heading"><div><p class="eyebrow">تفاصيل الحركة</p><h2>{{ selected_movement.movement_code }}</h2><span class="status-badge status-{{ selected_movement.status }}">{{ selected_movement.status_label }}</span></div><a href="{% url 'equipment:movements' %}" class="drawer-close">×</a></div>
+      <dl class="detail-facts"><div><dt>المعدة</dt><dd>{{ selected_movement.asset_name }} · <bdi dir="ltr">{{ selected_movement.asset_code }}</bdi></dd></div><div><dt>المسار</dt><dd>{{ selected_movement.from_location|default:'غير محدد' }} ← {{ selected_movement.to_location|default:'غير محدد' }}</dd></div><div><dt>سبب النقل</dt><dd>{{ selected_movement.movement_reason|default:'غير محدد' }}</dd></div><div><dt>التسجيل</dt><dd><bdi dir="ltr">{{ selected_movement.registered_at|slice:':16'|default:'غير محدد' }}</bdi></dd></div><div><dt>الموقع الحالي المعتمد</dt><dd>{{ selected_movement.asset_location }}</dd></div></dl>
+      <div class="next-action">{% if selected_movement.status == 'draft' %}<strong>الإجراء التالي: تسليم المعدة</strong><p>تحقق من الحركة والمعدة قبل إثبات خروجها. لا يُعد ذلك استلاماً.</p>{% if can_dispatch_movements %}<form method="post">{% csrf_token %}<input type="hidden" name="action" value="dispatch_movement"><input type="hidden" name="movement_id" value="{{ selected_movement.id }}"><button class="movement-button primary full" type="submit">تأكيد التسليم والإرسال</button></form>{% else %}<p>لا تملك صلاحية التسليم.</p>{% endif %}{% if can_cancel_movements %}<form method="post" class="secondary-action">{% csrf_token %}<input type="hidden" name="action" value="cancel_movement"><input type="hidden" name="movement_id" value="{{ selected_movement.id }}"><button class="movement-button danger full" type="submit">إلغاء المسودة</button></form>{% endif %}
+      {% elif selected_movement.status == 'dispatched' %}<strong>الإجراء التالي: استلام المعدة</strong><p>سجّل حالة المعدة عند الوصول. عند نجاح الاستلام فقط يتحدث الموقع الحالي.</p>{% if can_receive_movements %}<form method="post"><input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">{% csrf_token %}<input type="hidden" name="action" value="receive_movement"><input type="hidden" name="movement_id" value="{{ selected_movement.id }}"><label class="form-field"><span>حالة المعدة عند الاستلام<b>*</b></span><textarea name="condition_at_receipt" maxlength="2000" rows="3" required placeholder="اذكر الحالة أو أي أضرار مكتشفة"></textarea></label><button class="movement-button primary full" type="submit">تأكيد الاستلام</button></form>{% else %}<p>لا تملك صلاحية الاستلام.</p>{% endif %}
+      {% elif selected_movement.status == 'received' %}<strong>تم الاستلام بنجاح</strong><p>تم اعتماد الاستلام، ويُعرض الموقع الجديد من سجل المعدة.</p>{% else %}<strong>الحركة ملغاة</strong><p>لا توجد إجراءات متاحة لهذه الحركة.</p>{% endif %}</div>
+    {% else %}<div class="drawer-placeholder"><span>⇄</span><h2>اختر حركة لمراجعتها</h2><p>افتح أي سجل لعرض المسار والإجراء التالي المسموح حسب حالته وصلاحياتك.</p></div>{% endif %}
+  </div></aside>
+</main>
+<script>document.querySelectorAll('[data-dirty-form]').forEach(function(form){var dirty=false;form.addEventListener('input',function(){dirty=true});form.addEventListener('submit',function(){dirty=false});window.addEventListener('beforeunload',function(e){if(dirty){e.preventDefault();e.returnValue='';}})});</script>
+{% endblock %}

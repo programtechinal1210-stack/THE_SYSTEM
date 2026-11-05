@@ -1,0 +1,35 @@
+{% extends "pm/reference_base.html" %}
+{% block title %}{{ label }} — إدارة المشاريع{% endblock %}
+{% block pm_content %}
+<section class="pm-form-page">
+  <nav class="pm-breadcrumbs" aria-label="مسار المشروع"><a href="/pm/">إدارة المشاريع</a><span aria-hidden="true">/</span><a href="{{ back }}">{{ label }}</a>{% if parent %}<span aria-hidden="true">/</span><span>{{ parent.name }}</span>{% endif %}</nav>
+  <header class="pm-form-heading"><span class="pm-form-kicker">{% if action == 'delete' %}إجراء على سجل{% else %}تخطيط المشروع{% endif %}</span><h1 id="pm-form-title">{% if action == 'delete' %}حذف{% elif item %}تعديل{% else %}إضافة{% endif %} {{ item_label }}</h1><p>{% if action == 'delete' %}راجع أثر الحذف قبل التأكيد.{% elif item %}عدّل البيانات المطلوبة مع الحفاظ على ارتباطها بمشروعها.{% else %}أدخل بيانات {{ item_label }} ضمن التسلسل الصحيح للمشروع.{% endif %}</p>{% if parent %}<div class="pm-form-scope"><span>العنصر الأب</span><strong>{{ parent.name }}</strong></div>{% endif %}</header>
+  {% if error %}<p class="pm-form-alert" role="alert"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>{{ error }}</p>{% endif %}
+  <form method="post" class="pm-planning-form{% if is_requirement_form %} pm-requirements-form{% endif %}" aria-labelledby="pm-form-title"{% if is_requirement_create %} data-multi-requirements{% endif %}>{% csrf_token %}
+    {% if action == 'delete' %}
+      <div class="pm-delete-warning"><span aria-hidden="true"><i class="fa-solid fa-trash-can"></i></span><p>سيُنقل «{{ item.name }}» إلى سلة المحذوفات. يجب حذف الأبناء النشطين أولًا. يمكن الاستعادة من السلة وفق صلاحياتك.</p></div><div class="pm-form-actions pm-form-actions-danger"><button type="submit">تأكيد الحذف</button><a href="{{ back }}">إلغاء والعودة</a></div>
+    {% else %}
+      <p class="pm-form-required-note"><span class="pm-required" aria-hidden="true">*</span> الحقول المشار إليها بنجمة إلزامية.</p>
+      {% if is_requirement_create %}<p class="pm-form-hint">أضف احتياجات النشاط واحدًا تلو الآخر، ثم احفظها جميعًا من الزر أسفل النموذج.</p><div class="pm-requirement-cards" data-requirement-cards><article class="pm-requirement-card" data-requirement-card><header><div><span>الاحتياج 1</span><strong>بيانات الاحتياج</strong></div><button type="button" class="pm-card-remove" data-requirement-remove hidden>حذف</button></header>{% endif %}
+      <div class="pm-form-sections">
+        {% for section in field_sections %}
+          {% if section.collapsible %}<details class="pm-form-section pm-form-section-optional"><summary><span>{{ section.title }}</span><small>اختياري</small></summary>{% else %}<fieldset class="pm-form-section"><legend>{{ section.title }}</legend>{% endif %}
+          <div class="pm-form-fields">{% for field in section.fields %}<div class="pm-form-field{% if field.type == 'textarea' %} pm-form-field-wide{% endif %}"><label for="pm-{{ field.key }}">{% if is_requirement_form and field.key == 'quantity' %}<span data-unit-label="quantity">الكمية المطلوبة</span>{% elif is_requirement_form and field.key == 'unit_price' %}<span data-unit-label="unit_price">سعر الوحدة</span>{% else %}{{ field.label }}{% endif %}{% if field.required %}<span class="pm-required" aria-label="مطلوب">*</span>{% endif %}</label>{% if field.choices != None %}<select class="pm-form-control" id="pm-{{ field.key }}" name="{{ field.key }}" {% if field.required %}required{% endif %}><option value="">اختر</option>{% for choice in field.choices %}<option value="{{ choice.id }}" {% if choice.id == field.value %}selected{% endif %}>{{ choice.name }}</option>{% endfor %}</select>{% elif field.type == 'textarea' %}<textarea class="pm-form-control" id="pm-{{ field.key }}" name="{{ field.key }}" rows="3" maxlength="4000">{{ field.value }}</textarea>{% else %}<input class="pm-form-control" id="pm-{{ field.key }}" name="{{ field.key }}" type="{{ field.type }}" value="{{ field.value }}" {% if field.type == 'number' %}step="any" min="0"{% endif %} {% if field.required %}required{% endif %}>{% endif %}{% if field.help_text %}<small class="pm-field-help">{{ field.help_text }}</small>{% endif %}</div>{% endfor %}</div>
+          {% if section.collapsible %}</details>{% else %}</fieldset>{% endif %}
+        {% endfor %}
+      </div>
+      {% if is_requirement_create %}</article></div><button type="button" class="pm-add-requirement" data-requirement-add><i class="fa-solid fa-plus" aria-hidden="true"></i> إضافة احتياج آخر</button>{% endif %}
+    {% endif %}
+    {% if action != 'delete' and fx_destination %}
+      <aside class="pm-fx-panel pm-fx-panel-compact pm-requirement-fx" data-fx-panel aria-labelledby="pm-fx-title">
+        <div class="pm-fx-panel-heading"><span class="pm-fx-icon" aria-hidden="true"><i class="fa-solid fa-coins"></i></span><div><strong id="pm-fx-title">مراجعة التكلفة وسعر الصرف</strong><span>عملة المشروع: <b dir="ltr">{{ fx_destination }}</b></span></div></div>
+        <p>ستُحسب التكلفة المخططة بعملة المشروع وفق سعر الصرف المعتمد وتاريخه.</p>
+        {% if item.exchange_rate_snapshot %}<p class="pm-fx-snapshot">سعر الصرف المحفوظ: <b dir="ltr">1 {{ item.exchange_rate_snapshot.from }} = {{ item.exchange_rate_snapshot.rate }} {{ item.exchange_rate_snapshot.to }}</b> · {{ item.exchange_rate_snapshot.date }}</p>{% endif %}
+        <div class="pm-fx-actions"><button type="button" data-fx-preview>احسب التكلفة المتوقعة</button><p data-fx-result role="status" aria-live="polite">أدخل الكمية وسعر الوحدة ثم احسب المبلغ المتوقع حفظه.</p></div>
+        <div class="pm-fx-summary" data-fx-summary hidden aria-live="polite"><div><span>القيمة قبل التحويل</span><strong dir="ltr" data-fx-source-amount>—</strong></div><div><span>سعر الصرف المعتمد</span><strong dir="ltr" data-fx-rate>—</strong></div><div class="pm-fx-summary-total"><span>التكلفة المخططة المحفوظة</span><strong dir="ltr" data-fx-planned-cost>—</strong></div></div>
+      </aside>
+    {% endif %}
+    {% if action != 'delete' %}<div class="pm-form-actions"><button type="submit"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>{% if is_requirement_create %}حفظ الاحتياجات{% elif item %}حفظ التعديلات{% else %}إضافة {{ item_label }}{% endif %}</button><a href="{{ back }}" data-pm-dialog-cancel>إلغاء</a></div>{% endif %}
+  </form>
+</section>
+{% endblock %}

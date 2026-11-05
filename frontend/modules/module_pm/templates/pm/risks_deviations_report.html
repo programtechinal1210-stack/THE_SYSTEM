@@ -1,0 +1,65 @@
+{% extends "pm/reference_base.html" %}
+{% load static %}
+{% block title %}تقرير المخاطر والانحرافات — {{ center.name }}{% endblock %}
+{% block extra_head %}{{ block.super }}<link rel="stylesheet" href="{% static 'pm/risks-deviations-report.css' %}?v=20261021-r11">{% endblock %}
+{% block pm_content %}
+<main class="rdr" dir="rtl" aria-labelledby="rdr-title">
+  <nav class="rdr-breadcrumb" aria-label="مسار الصفحة"><a href="/">الرئيسية</a><span>‹</span><a href="/pm/reporting/">التقارير</a><span>‹</span><strong>تقرير المخاطر والانحرافات</strong></nav>
+  <header class="rdr-heading"><div class="rdr-title"><span class="rdr-title-icon" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></span><div><p>تقارير المشاريع</p><h1 id="rdr-title">تقرير المخاطر والانحرافات</h1><small>متابعة المخاطر والانحرافات والإجراءات التصحيحية</small></div></div><div class="rdr-actions"><a class="rdr-button" href="/pm/reporting/"><i class="fa-solid fa-arrow-right"></i> العودة إلى مركز التقارير</a><a class="rdr-button" href="?report=risk{% if filter_query %}&amp;{{ filter_query }}{% endif %}" title="إعادة تحميل نتائج التقرير وفق الفلاتر الحالية"><i class="fa-solid fa-rotate"></i> تحديث</a><button class="rdr-button" type="button" data-rdr-print title="طباعة التقرير"><i class="fa-solid fa-print"></i> طباعة</button><a class="rdr-button primary" href="?report=risk{% if filter_query %}&amp;{{ filter_query }}{% endif %}&amp;download=json" title="تنزيل بيانات التقارير المصرح بها بصيغة JSON"><i class="fa-solid fa-download"></i> تصدير JSON</a></div></header>
+  <form method="get" class="rdr-filters" aria-label="تصفية التقرير">
+    <input type="hidden" name="report" value="risk">
+    <label>المشروع<select data-rdr-project aria-label="المشروع"><option value="{{ selected_project_id }}" selected>{{ center.project_code }} — {{ center.name }}</option>{% for project in projects %}{% if project.project_id != selected_project_id %}<option value="{{ project.project_id }}">{{ project.project_code }} — {{ project.name }}</option>{% endif %}{% endfor %}</select></label>
+    <label>من تاريخ<input type="date" name="date_from" value="{{ filters.date_from }}" title="تاريخ اكتشاف الخطر، أو إنشائه عند غياب تاريخ الاكتشاف"></label>
+    <label>إلى تاريخ<input type="date" name="date_to" value="{{ filters.date_to }}" title="تاريخ اكتشاف الخطر، أو إنشائه عند غياب تاريخ الاكتشاف"></label>
+    <label>المرحلة<select name="phase_id"><option value="">جميع المراحل</option>{% for option in options.phases %}<option value="{{ option.id }}" {% if filters.phase_id == option.id %}selected{% endif %}>{{ option.name }}</option>{% endfor %}</select></label>
+    <label>مستوى الخطورة<select name="severity"><option value="">جميع المستويات</option><option value="high" {% if filters.severity == 'high' %}selected{% endif %}>مرتفعة</option><option value="medium" {% if filters.severity == 'medium' %}selected{% endif %}>متوسطة</option><option value="low" {% if filters.severity == 'low' %}selected{% endif %}>منخفضة</option></select></label>
+    <label>الحالة<select name="risk_status"><option value="">جميع الحالات</option><option value="active" {% if filters.risk_status == 'active' %}selected{% endif %}>نشط</option><option value="closed" {% if filters.risk_status == 'closed' %}selected{% endif %}>مغلق</option></select></label>
+    <label class="rdr-search">بحث برقم السجل أو وصفه<input type="search" name="q" value="{{ filters.q }}" placeholder="مثال: R-001" maxlength="200"></label>
+    <div class="rdr-filter-actions"><button class="rdr-button primary" type="submit">تطبيق</button><a class="rdr-button" href="?report=risk">إعادة ضبط</a></div>
+  </form>
+  <p class="rdr-scope-note"><i class="fa-solid fa-circle-info"></i> الفترة تحدد تاريخ اكتشاف الخطر، أو تاريخ إنشائه عند غياب تاريخ الاكتشاف. لا يتيح سجل النظام إعادة بناء الحالة التاريخية للمخاطر.</p>
+
+  <section class="rdr-kpis" aria-label="مؤشرات التقرير">
+    <article class="rdr-kpi blue"><span class="rdr-kpi-icon"><i class="fa-solid fa-shield"></i></span><div><small>المخاطر المفتوحة</small><strong>{{ active_count }}</strong><span>وفق حالة السجل النشطة</span></div></article>
+    <article class="rdr-kpi red"><span class="rdr-kpi-icon"><i class="fa-solid fa-triangle-exclamation"></i></span><div><small>المخاطر الحرجة</small><strong class="rdr-na">غير متاح</strong><span>لا توجد عتبة حرجة معتمدة</span></div></article>
+    <article class="rdr-kpi orange"><span class="rdr-kpi-icon"><i class="fa-solid fa-arrow-trend-up"></i></span><div><small>تجاوزات التكلفة المحسوبة</small><strong>{{ exception_count }}</strong><span>مقارنة الفعلي بالمخطط</span></div></article>
+    <article class="rdr-kpi green"><span class="rdr-kpi-icon"><i class="fa-solid fa-list-check"></i></span><div><small>حالات تحتاج إلى تدخل</small><strong class="rdr-na">غير متاح</strong><span>لا توجد قاعدة تدخل معتمدة</span></div></article>
+  </section>
+
+  <section class="rdr-analysis" aria-label="ملخصات تحليلية">
+    <article class="rdr-panel"><header><div><h2>توزيع المخاطر حسب مستوى الأهمية</h2><p>الأهمية المسجلة = الاحتمالية × الأثر وفق خدمة PM.</p></div><span class="rdr-help" tabindex="0" title="التصنيف: مرتفعة ≥ 12، متوسطة ≥ 5، منخفضة < 5. لا توجد فئة حرجة معتمدة.">؟</span></header><div class="rdr-bars">{% for row in severity_rows %}<div class="rdr-bar-row"><span>{{ row.label }}</span><div class="rdr-bar-track"><i class="{{ row.key }}" style="width:{{ row.width }}%"></i></div><strong>{{ row.count }}</strong></div>{% endfor %}</div><small class="rdr-chart-note">{{ severity_note }}</small></article>
+    <article class="rdr-panel"><header><div><h2>الانحرافات المتاحة في مصدر التقارير</h2><p>نتائج محسوبة من التكلفة فقط</p></div><span class="rdr-help" tabindex="0" title="لا تُعرض كأنها سجلات انحراف مسجلة؛ إنها تجاوزات محسوبة من تقرير التكلفة.">؟</span></header><div class="rdr-cost-summary"><strong>{{ exception_count }}</strong><span>تجاوز تكلفة محسوب</span></div><small class="rdr-chart-note">لا توجد في عقد التقرير الحالي بيانات موثقة لتوزيع زمني أو نوعي لبقية الانحرافات.</small></article>
+  </section>
+
+  <div class="rdr-layout">
+  <section class="rdr-records" aria-label="سجلات التقرير">
+    <div class="rdr-tabs" role="tablist" aria-label="نوع السجل">
+      <button type="button" role="tab" aria-selected="true" aria-controls="rdr-panel-risks" data-rdr-tab="risks">المخاطر <b>{{ risk_rows|length }}</b></button>
+      <button type="button" role="tab" aria-selected="false" aria-controls="rdr-panel-deviations" data-rdr-tab="deviations">الانحرافات <b>{{ exception_count }}</b></button>
+      <button type="button" role="tab" aria-selected="false" aria-controls="rdr-panel-actions" data-rdr-tab="actions">الإجراءات التصحيحية <b>{{ action_rows|length }}</b></button>
+    </div>
+    <section id="rdr-panel-risks" class="rdr-tab-panel" role="tabpanel" data-rdr-panel="risks">
+      <header class="rdr-table-heading"><div><h2>سجل المخاطر</h2><small>يُعرض كل خطر منفصلاً عن الانحرافات والعوائق.</small></div><label>عدد الصفوف<select data-rdr-page-size><option>10</option><option>25</option><option>50</option></select></label></header>
+      <div class="rdr-table-scroll"><table class="rdr-table"><thead><tr><th>رقم الخطر</th><th>وصف الخطر</th><th>المرحلة / العنصر</th><th>الاحتمالية</th><th>الأثر</th><th>مستوى الأهمية</th><th>الحالة</th><th>المسؤول</th><th>التاريخ</th><th>التفاصيل</th></tr></thead><tbody data-rdr-risk-body></tbody></table></div><div class="rdr-pagination" data-rdr-pagination></div>
+      {% if not risk_rows %}<p class="rdr-empty">لا توجد مخاطر مطابقة للفلاتر.</p>{% endif %}
+    </section>
+    <section id="rdr-panel-deviations" class="rdr-tab-panel" role="tabpanel" data-rdr-panel="deviations" hidden>
+      <header class="rdr-table-heading"><div><h2>تجاوزات التكلفة المحسوبة</h2><small>هذه نتائج مقارنة وليست سجلات انحراف مسجلة.</small></div></header>
+      <p class="rdr-data-note">{{ exceptions_note }}</p>
+      <div class="rdr-table-scroll"><table class="rdr-table"><thead><tr><th>النشاط</th><th>نوع النتيجة</th><th>التكلفة المخططة</th><th>التكلفة الفعلية</th><th>العملة</th><th>المصدر</th></tr></thead><tbody>{% for row in exception_rows %}<tr><td>{{ row.code|default:'—' }}</td><td><span class="rdr-pill orange">تجاوز تكلفة محسوب</span></td><td>{{ row.planned_cost }}</td><td>{{ row.actual_cost }}</td><td>{{ row.currency }}</td><td>خدمة تقرير التكلفة</td></tr>{% empty %}<tr><td colspan="6" class="rdr-empty-cell">لا توجد تجاوزات تكلفة محسوبة ضمن النطاق.</td></tr>{% endfor %}</tbody></table></div>
+    </section>
+    <section id="rdr-panel-actions" class="rdr-tab-panel" role="tabpanel" data-rdr-panel="actions" hidden>
+      <header class="rdr-table-heading"><div><h2>الإجراءات المسجلة على المخاطر النشطة</h2><small>خطة معالجة واردة من سجل الخطر؛ ليست سجلاً مستقلاً لإجراءات المتابعة.</small></div></header>
+      <p class="rdr-data-note">{{ intervention_note }} لا تتوفر مواعيد استحقاق أو حالة مستقلة للإجراء.</p>
+      <div class="rdr-table-scroll"><table class="rdr-table"><thead><tr><th>الخطر المرتبط</th><th>الإجراء المسجل</th><th>المسؤول</th><th>الحالة</th><th>الموعد</th><th>تفاصيل</th></tr></thead><tbody data-rdr-action-body></tbody></table></div>
+      {% if not action_rows %}<p class="rdr-empty">لا توجد إجراءات معالجة مسجلة على المخاطر النشطة.</p>{% endif %}
+    </section>
+  </section>
+  <aside class="rdr-details" data-rdr-details hidden aria-label="تفاصيل السجل"><button type="button" class="rdr-details-close" data-rdr-close aria-label="إغلاق التفاصيل">×</button><div data-rdr-detail-content></div></aside>
+  </div>
+  <p class="rdr-footnote">التقرير للقراءة والتحليل. لا ينشئ مخاطر أو انحرافات ولا يغير حالة أي سجل. لا تتوفر في المصادر الحالية بيانات مستقلة للعوائق أو سجل الإجراءات التصحيحية أو تقييم حرج معتمد.</p>
+  {{ risk_rows|json_script:"rdr-risk-data" }}
+  {{ action_rows|json_script:"rdr-action-data" }}
+</main>
+{% endblock %}
+{% block extra_js %}{{ block.super }}<script src="{% static 'pm/risks-deviations-report.js' %}?v=20261021-r11" defer></script>{% endblock %}

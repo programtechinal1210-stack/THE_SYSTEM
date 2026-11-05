@@ -1,0 +1,385 @@
+{% extends "pm/reference_base.html" %}
+{% load static %}
+{% block title %}{% if request.path == "/pm/planning/" %}مركز التخطيط{% else %}استعراض المشاريع{% endif %} — إدارة المشاريع{% endblock %}
+{% block extra_head %}{{ block.super }}
+    <link rel="stylesheet" href="{% static 'pm/projects-page.css' %}?v=20261102-planning-sidebar-shared-v1">
+    {% if request.path == "/pm/planning/" %}<link rel="stylesheet" href="{% static 'pm/planning-center-refine.css' %}?v=20261102-planning-cards-fix-03">{% endif %}
+{% endblock %}
+{% block pm_content %}
+<section class="pm-projects-page{% if request.path == "/pm/planning/" %} pm-projects-planning{% endif %}" aria-labelledby="projects-title">
+    <header class="pm-projects-heading">
+        <div class="pm-projects-title">
+            <span class="pm-projects-folder-icon" aria-hidden="true"><i class="fa-solid {% if request.path == "/pm/planning/" %}fa-file-lines{% else %}fa-folder-open{% endif %}"></i></span>
+            <div>
+                <h1 id="projects-title">{% if request.path == "/pm/planning/" %}مركز التخطيط{% else %}استعراض المشاريع{% endif %}</h1>
+                <p>{% if request.path == "/pm/planning/" %}ابدأ تخطيط مشروع جديد أو واصل مراجعة خطة قائمة{% else %}عرض وإدارة جميع المشاريع ومتابعة حالاتها وإجراءاتها{% endif %}</p>
+            </div>
+        </div>
+        <div class="pm-projects-heading-actions">
+        {% if request.path == "/pm/planning/" %}
+            {% if can_view_reports %}<a class="pm-project-secondary-action" href="/pm/dashboard/"><i class="fa-solid fa-chart-line" aria-hidden="true"></i> لوحة التحكم</a>{% endif %}
+        {% endif %}
+        {% if create_url %}
+        <a class="pm-project-primary-action pm-project-header-create" href="{{ create_url }}">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i> إضافة مشروع
+        </a>
+        {% endif %}
+        </div>
+    </header>
+
+    {% if request.path == "/pm/planning/" %}
+    <section class="pm-planning-status-summary" aria-label="ملخص المشاريع حسب الحالة">
+        {% for tab in project_tabs %}
+        <article class="pm-planning-summary-card {{ tab.class }}">
+            <span class="pm-planning-summary-icon" aria-hidden="true"><i class="fa-solid {% if tab.code == 'planning' %}fa-file-pen{% elif tab.code == 'issued' %}fa-circle-plus{% elif tab.code == 'planned' %}fa-clock{% elif tab.code == 'in_progress' %}fa-play{% elif tab.code == 'completed' %}fa-circle-check{% else %}fa-table-cells-large{% endif %}"></i></span>
+            <span class="pm-planning-summary-copy"><strong>{{ tab.count }}</strong><small>{{ tab.label }}</small></span>
+        </article>
+        {% endfor %}
+    </section>
+    {% endif %}
+    <nav class="pm-planning-tabs" aria-label="{% if request.path == "/pm/planning/" %}تبويبات حالة التخطيط{% else %}حالات دورة حياة المشاريع{% endif %}">
+        {% for tab in project_tabs %}
+        {% if request.path != "/pm/planning/" or tab.code == '' or tab.code == 'issued' or tab.code == 'planning' or tab.code == 'planned' %}
+        <button type="button" class="pm-planning-tab{% if forloop.first %} active{% endif %}" data-project-status-tab="{{ tab.code }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">
+            <i class="fa-solid {% if tab.code == 'planning' %}fa-file-lines{% elif tab.code == 'issued' %}fa-circle-plus{% elif tab.code == 'planned' %}fa-clock{% elif tab.code == 'in_progress' %}fa-play{% elif tab.code == 'completed' %}fa-circle-check{% else %}fa-table-cells-large{% endif %}" aria-hidden="true"></i>
+            <span>{{ tab.label }}</span><b>{{ tab.count }}</b>
+        </button>
+        {% endif %}
+        {% endfor %}
+    </nav>
+    {% if request.path == "/pm/planning/" %}
+    <p class="pm-planning-count-note">تعكس أعداد الحالات المشاريع المحمّلة في الصفحة الحالية؛ استخدم التنقل أسفل النتائج لعرض بقية المشاريع.</p>
+    {% endif %}
+
+    <section class="pm-projects-kpis" aria-label="ملخص المشاريع المعروضة">
+        <article class="pm-projects-kpi total">
+            <span class="pm-projects-kpi-icon"><i class="fa-solid fa-folder-open" aria-hidden="true"></i></span>
+            <span class="pm-projects-kpi-label">إجمالي المشاريع</span>
+            <strong>{{ total }}</strong>
+            <small>ضمن نطاق صلاحياتك</small>
+        </article>
+        {% for metric in project_metrics %}
+        <article class="pm-projects-kpi {{ metric.class }}">
+            <span class="pm-projects-kpi-icon"><i class="fa-solid {{ metric.icon }}" aria-hidden="true"></i></span>
+            <span class="pm-projects-kpi-label">{{ metric.label }}</span>
+            <strong>{{ metric.count }}</strong>
+            <small>في الصفحة الحالية</small>
+        </article>
+        {% endfor %}
+        <article class="pm-projects-kpi budget">
+            <span class="pm-projects-kpi-icon"><i class="fa-solid fa-coins" aria-hidden="true"></i></span>
+            <span class="pm-projects-kpi-label">إجمالي التكلفة المخططة</span>
+            <strong>{% for budget in budget_totals %}<bdi>{{ budget.amount }}</bdi> {{ budget.currency }}{% if not forloop.last %}<br>{% endif %}{% empty %}—{% endfor %}</strong>
+            <small>المعروض حسب عملة المشروع</small>
+        </article>
+    </section>
+
+    <div class="pm-projects-workspace">
+        <aside class="pm-projects-filters" aria-labelledby="projects-filter-title">
+            <div class="pm-projects-filter-heading">
+                <h2 id="projects-filter-title"><i class="fa-solid fa-sliders" aria-hidden="true"></i> {% if request.path == "/pm/planning/" %}تصفية مشاريع التخطيط{% else %}تصفية المشاريع{% endif %}</h2>
+                <button type="button" data-project-filter-reset>إعادة الضبط</button>
+            </div>
+            <label class="pm-project-search">
+                <span class="pm-projects-visually-hidden">ابحث عن مشروع</span>
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                <input type="search" name="q" value="{{ q }}" placeholder="بحث في المشاريع..." data-project-filter="search">
+            </label>
+            {% if request.path != "/pm/planning/" %}
+            <label class="pm-project-filter">
+                <span>حالة المشروع</span>
+                <select data-project-filter="status">
+                    <option value="">كل الحالات</option>
+                    <option value="issued">صادر التوجيه</option>
+                    <option value="planning">قيد التخطيط</option>
+                    <option value="planned">بانتظار الإقرار</option>
+                    <option value="ready">بانتظار بدء التنفيذ</option>
+                    <option value="in_progress">قيد التنفيذ</option>
+                    <option value="completed">الاكتمال</option>
+                    <option value="accepted">الاستلام</option>
+                    <option value="closed">مغلق</option>
+                </select>
+            </label>
+            {% endif %}
+            {% if request.path == "/pm/planning/" %}<details class="pm-planning-advanced-filters"><summary><i class="fa-solid fa-sliders" aria-hidden="true"></i> التصفية المتقدمة</summary><div class="pm-planning-advanced-grid">{% endif %}
+            <label class="pm-project-filter">
+                <span>{% if request.path == "/pm/planning/" %}العميل{% else %}الجهة / العميل{% endif %}</span>
+                <select data-project-filter="client"><option value="">كل العملاء</option></select>
+            </label>
+            <label class="pm-project-filter">
+                <span>مدير المشروع</span>
+                <select data-project-filter="manager"><option value="">كل المديرين</option></select>
+            </label>
+            {% if request.path != "/pm/planning/" %}
+            <label class="pm-project-filter">
+                <span>الأولوية</span>
+                <select data-project-filter="priority" aria-describedby="project-priority-note">
+                    <option value="">كل الأولويات</option>
+                </select>
+                <small id="project-priority-note" class="pm-project-filter-note">لا تتوفر أولوية على سجل المشروع الحالي</small>
+            </label>
+            {% endif %}
+            {% if request.path == "/pm/planning/" %}
+            <label class="pm-project-filter">
+                <span>مدة المشروع</span>
+                <select data-project-filter="duration">
+                    <option value="">كل المدد</option>
+                    <option value="short">أقل من 30 يومًا</option>
+                    <option value="medium">من 30 إلى 180 يومًا</option>
+                    <option value="long">أكثر من 180 يومًا</option>
+                </select>
+            </label>
+            <div class="pm-project-date-filter">
+                <span>تاريخ بداية المشروع</span>
+                <div>
+                    <label><span class="pm-projects-visually-hidden">من تاريخ</span><input type="date" aria-label="من تاريخ بداية المشروع" data-project-filter="date-from"></label>
+                    <label><span class="pm-projects-visually-hidden">إلى تاريخ</span><input type="date" aria-label="إلى تاريخ بداية المشروع" data-project-filter="date-to"></label>
+                </div>
+            </div>
+            {% endif %}
+            {% if request.path == "/pm/planning/" %}</div></details>{% endif %}
+            <button class="pm-project-apply-filters" type="button" data-project-filter-apply>
+                <i class="fa-solid fa-filter" aria-hidden="true"></i> تطبيق التصفية
+            </button>
+            <p class="pm-project-filter-count" role="status" aria-live="polite"></p>
+        </aside>
+
+        <div class="pm-projects-content">
+            <div class="pm-projects-toolbar">
+                <div class="pm-projects-toolbar-left">
+                    {% if can_view_reports %}<a class="pm-project-toolbar-action" href="/pm/reporting/">
+                        <i class="fa-solid fa-chart-pie" aria-hidden="true"></i> التقارير
+                    </a>{% endif %}
+                    {% if can_view_baselines %}<a class="pm-project-toolbar-action" href="/pm/workspace/baselines/">
+                        <i class="fa-solid fa-clipboard-check" aria-hidden="true"></i> الخطة
+                    </a>{% endif %}
+                </div>
+                <label class="pm-project-sort-control">
+                    <span>ترتيب حسب</span>
+                    <select data-project-sort>
+                        <option value="name">الاسم</option>
+                        <option value="start_date">تاريخ البداية</option>
+                        <option value="planned_cost">التكلفة المخططة</option>
+                    </select>
+                </label>
+                <div class="pm-project-view-controls" role="group" aria-label="طريقة عرض المشاريع">
+                    <button type="button" class="active" aria-pressed="true" data-project-view-choice="cards"><i class="fa-solid fa-table-cells-large" aria-hidden="true"></i><span>بطاقات</span></button>
+                    <button type="button" aria-pressed="false" data-project-view-choice="list"><i class="fa-solid fa-list" aria-hidden="true"></i><span>قائمة</span></button>
+                    <button type="button" aria-pressed="false" data-project-view-choice="table"><i class="fa-solid fa-table" aria-hidden="true"></i><span>جدول</span></button>
+                </div>
+            </div>
+
+            <div class="pm-projects-grid" id="projects-grid" data-project-view="cards">
+                {% for row in items %}
+                <article class="pm-project-card" data-project-card
+                    data-search="{{ row.name }} {{ row.code }} {{ row.client_name }} {{ row.manager_name }} {{ row.priority|default:'' }}"
+                    data-status="{{ row.status }}" data-client="{{ row.client_name }}"
+                    data-manager="{{ row.manager_name }}" data-priority="{{ row.priority|default:'' }}" data-duration="{{ row.planned_days }}"
+                    data-start-date="{{ row.start_date }}" data-name="{{ row.name }}"
+                    data-planned-cost="{{ row.planned_cost }}" data-currency="{{ row.currency }}">
+                    <div class="pm-project-card-head">
+                        <div class="pm-project-card-cover {{ row.status_class }}" aria-hidden="true">
+                            <span class="pm-project-cover-mark"><i class="fa-solid fa-building"></i></span>
+                            <span class="pm-project-cover-code">{{ row.code }}</span>
+                        </div>
+                        <div class="pm-project-card-title">
+                            <div>
+                                <span class="pm-project-status {{ row.status_class }}"><i class="pm-project-status-dot" aria-hidden="true"></i>{{ row.status_label }}</span>
+                                <h3><a href="{{ row.href }}">{{ row.name }}</a></h3>
+                                <span>{{ row.client_name }}</span>
+                            </div>
+                            {% if row.report_url %}<a class="pm-project-card-more" href="{{ row.report_url }}" aria-label="فتح مركز مشروع {{ row.name }}"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a>{% endif %}
+                        </div>
+                    </div>
+                    <div class="pm-project-card-body">
+                        <div class="pm-project-facts">
+                            <div><i class="fa-regular fa-calendar" aria-hidden="true"></i><span>تاريخ التوجيه</span><strong>{{ row.directive_date }}</strong></div>
+                            <div><i class="fa-regular fa-calendar-check" aria-hidden="true"></i><span>تاريخ البداية</span><strong>{{ row.start_date }}</strong></div>
+                            <div class="cost"><i class="fa-solid fa-coins" aria-hidden="true"></i><span>التكلفة المخططة</span><strong><bdi>{{ row.planned_cost }}</bdi> <small>{{ row.currency }}</small></strong></div>
+                            <div><i class="fa-regular fa-clock" aria-hidden="true"></i><span>المدة المخططة</span><strong>{{ row.planned_days|floatformat:0 }} يوم</strong></div>
+                        </div>
+                        <div class="pm-project-card-footer">
+                            <span class="pm-project-manager-avatar" aria-hidden="true">{{ row.manager_name|slice:":1" }}</span>
+                            <span class="pm-project-manager"><strong>{{ row.manager_name }}</strong><small>مدير المشروع</small></span>
+                        </div>
+                        <section class="pm-project-lifecycle{% if request.path == "/pm/planning/" %} pm-planning-lifecycle{% endif %}" aria-label="دورة حياة {{ row.name }}">
+                            {% if request.path == "/pm/planning/" %}
+                            <details class="pm-planning-lifecycle-details">
+                                <summary class="pm-project-lifecycle-heading">
+                                    <span class="pm-planning-stage-copy">
+                                        <strong>المرحلة {{ row.lifecycle_stage_number }} من 8</strong>
+                                        <span>{% for stage in row.lifecycle_stages %}{% if stage.state == 'current' %}{{ stage.label }}{% endif %}{% endfor %}</span>
+                                    </span>
+                                    <span class="pm-planning-stage-toggle"><i class="fa-solid fa-chevron-down" aria-hidden="true"></i> استعراض المراحل</span>
+                                </summary>
+                            {% else %}
+                            <div class="pm-project-lifecycle-heading"><strong>دورة حياة المشروع</strong><span>المرحلة {{ row.lifecycle_stage_number }} من 8</span></div>
+                            {% endif %}
+                            <ol class="pm-project-lifecycle-steps" dir="rtl">
+                            {% for stage in row.lifecycle_stages %}
+                                <li class="is-{{ stage.state }}" title="{{ stage.label }}{% if stage.state == 'current' %} — الحالة الحالية{% elif stage.state == 'complete' %} — مكتملة وفق الحالة الحالية{% else %} — مرحلة لاحقة{% endif %}">
+                                    <span class="pm-project-lifecycle-dot"><i class="fa-solid {% if stage.state == 'complete' %}fa-check{% elif stage.state == 'current' %}fa-circle{% else %}fa-circle{% endif %}" aria-hidden="true"></i></span>
+                                    <small>{{ stage.label }}</small>
+                                </li>
+                            {% endfor %}
+                            </ol>
+                            {% if request.path == "/pm/planning/" %}</details>{% endif %}
+                            <div class="pm-project-execution-progress" aria-label="{% if request.path == "/pm/planning/" %}حالة الإنجاز الفعلي{% else %}نسبة الإنجاز الفعلي{% endif %}">
+                                <span><i class="fa-solid fa-chart-line" aria-hidden="true"></i> الإنجاز الفعلي</span>
+                                <strong>{{ row.actual_progress_label }}</strong>
+                            </div>
+                        </section>
+                        {% if request.path == "/pm/planning/" %}
+                        <div class="pm-planning-card-actions" aria-label="إجراءات {{ row.name }}">
+                            {% if row.status == 'issued' %}
+                                {% if row.next_action_post_url %}
+                                <form method="post" action="{{ row.next_action_post_url }}">
+                                    {% csrf_token %}<input type="hidden" name="command" value="transition"><input type="hidden" name="status" value="planning">
+                                    <button type="submit" class="pm-project-next-action"><i class="fa-solid fa-play" aria-hidden="true"></i> بدء التخطيط</button>
+                                </form>
+                                {% else %}<span class="pm-project-next-action is-disabled" aria-disabled="true" title="{{ row.next_action_reason }}"><i class="fa-solid fa-lock" aria-hidden="true"></i> بدء التخطيط</span>{% endif %}
+                            {% elif row.status == 'planning' %}
+                                {% if row.next_action_href %}<a href="{{ row.next_action_href }}" class="pm-project-next-action"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> متابعة التخطيط</a>{% else %}<span class="pm-project-next-action is-disabled" aria-disabled="true" title="{{ row.next_action_reason }}"><i class="fa-solid fa-lock" aria-hidden="true"></i> متابعة التخطيط</span>{% endif %}
+                                {% if row.document_url %}<a href="{{ row.document_url }}" class="pm-project-secondary-action"><i class="fa-regular fa-file-lines" aria-hidden="true"></i> عرض الخطة</a>{% endif %}
+                                {% if row.slides_url %}<a href="{{ row.slides_url }}" class="pm-project-secondary-action"><i class="fa-solid fa-display" aria-hidden="true"></i> عرض الخطة كسلايدات</a>{% endif %}
+                            {% elif row.status == 'planned' %}
+                                {% if row.next_action_href %}<a href="{{ row.next_action_href }}" class="pm-project-next-action"><i class="fa-solid fa-clipboard-check" aria-hidden="true"></i> متابعة الإقرار</a>{% endif %}
+                                {% if row.document_url %}<a href="{{ row.document_url }}" class="pm-project-secondary-action"><i class="fa-regular fa-file-lines" aria-hidden="true"></i> عرض الخطة</a>{% endif %}
+                                {% if row.slides_url %}<a href="{{ row.slides_url }}" class="pm-project-secondary-action"><i class="fa-solid fa-display" aria-hidden="true"></i> عرض الخطة كسلايدات</a>{% endif %}
+                            {% endif %}
+                        </div>
+                        {% else %}
+                        <div class="pm-project-actions" data-project-actions>
+                            {% if row.next_action_post_url %}
+                            <form method="post" action="{{ row.next_action_post_url }}" class="pm-project-next-action-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="command" value="transition">
+                                <input type="hidden" name="status" value="{{ row.next_action_post_status }}">
+                                <button type="submit" class="pm-project-next-action" title="يغيّر حالة المشروع إلى قيد التخطيط ثم يفتح مساحة التخطيط">
+                                    <i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i>
+                                    {{ row.next_action_label }}
+                                </button>
+                            </form>
+                            <small class="pm-project-action-hint">{{ row.next_action_hint }}</small>
+                            {% elif row.next_action_href %}
+                            <a href="{{ row.next_action_href }}" class="pm-project-next-action">
+                                <i class="fa-solid {% if row.status == 'issued' %}fa-file-circle-plus{% elif row.status == 'planning' %}fa-pen-to-square{% elif row.status == 'planned' %}fa-circle-check{% elif row.status == 'in_progress' %}fa-play{% elif row.status == 'completed' %}fa-clipboard-check{% else %}fa-arrow-left{% endif %}" aria-hidden="true"></i>
+                                {{ row.next_action_label }}
+                            </a>
+                            <small class="pm-project-action-hint">{{ row.next_action_hint }}</small>
+                            {% else %}
+                            <span class="pm-project-next-action is-disabled" aria-disabled="true" title="{{ row.next_action_reason }}">
+                                <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                                {{ row.next_action_label }}
+                            </span>
+                            <small class="pm-project-action-hint">{{ row.next_action_reason }}</small>
+                            {% endif %}
+                            <details class="pm-project-all-actions">
+                                <summary><i class="fa-solid fa-list-check" aria-hidden="true"></i> جميع الإجراءات</summary>
+                                <div class="pm-project-lifecycle-actions" aria-label="إجراءات دورة حياة المشروع">
+                                {% for action in row.lifecycle_actions %}
+                                    <div class="pm-project-lifecycle-action is-{{ action.state }}" title="{{ action.reason|default:action.hint }}"{% if action.state != 'available' %} tabindex="0" role="button" aria-disabled="true"{% endif %}>
+                                        {% if action.href and action.state == 'available' %}<a href="{{ action.href }}">{% endif %}
+                                        <span class="pm-project-action-icon"><i class="fa-solid {% if action.state == 'complete' %}fa-check{% elif action.state == 'available' %}fa-arrow-left{% else %}fa-lock{% endif %}" aria-hidden="true"></i></span>
+                                        <span><strong>{{ action.label }}</strong><small>{{ action.reason|default:action.hint }}</small></span>
+                                        {% if action.href and action.state == 'available' %}</a>{% endif %}
+                                    </div>
+                                {% endfor %}
+                                </div>
+                            </details>
+                            <div class="pm-project-secondary-actions" aria-label="روابط المشروع">
+                                <a href="{{ row.href }}" class="pm-project-secondary-action">
+                                    <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> التفاصيل
+                                </a>
+                                {% if row.approval_url and row.approval_url != row.next_action_href %}
+                                <a href="{{ row.approval_url }}" class="pm-project-secondary-action">
+                                    <i class="fa-solid fa-clipboard-check" aria-hidden="true"></i> الإقرار
+                                </a>
+                                {% endif %}
+                                {% if row.completion_url and row.completion_url != row.next_action_href %}
+                                <a href="{{ row.completion_url }}" class="pm-project-secondary-action">
+                                    <i class="fa-solid fa-flag-checkered" aria-hidden="true"></i> الاستلام
+                                </a>
+                                {% endif %}
+                                {% if row.risks_url %}
+                                <a href="{{ row.risks_url }}" class="pm-project-secondary-action">
+                                    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> المخاطر
+                                </a>
+                                {% endif %}
+                                {% if row.report_url %}
+                                <a href="{{ row.report_url }}" class="pm-project-secondary-action">
+                                    <i class="fa-solid fa-chart-column" aria-hidden="true"></i> التقارير
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </article>
+                {% empty %}
+                <div class="pm-projects-empty">
+                    <i class="fa-regular fa-folder-open" aria-hidden="true"></i>
+                    <h3>لا توجد مشاريع مطابقة</h3>
+                    <p>غيّر معايير البحث أو أنشئ مشروعًا جديدًا إذا كانت لديك الصلاحية.</p>
+                    {% if create_url %}<a class="pm-project-primary-action" href="{{ create_url }}"><i class="fa-solid fa-plus" aria-hidden="true"></i> إضافة مشروع</a>{% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <p class="pm-project-no-filter-results" data-project-no-results hidden>لا توجد مشاريع تطابق معايير التصفية.</p>
+
+            {% if previous != None or following != None %}
+            <nav class="pm-project-pagination" aria-label="صفحات المشاريع">
+                <span>عرض {{ items|length }} من {{ total }} مشروع</span>
+                <div>
+                    {% if previous != None %}<a href="?skip={{ previous }}&amp;q={{ q|urlencode }}">السابق</a>{% endif %}
+                    {% if following != None %}<a href="?skip={{ following }}&amp;q={{ q|urlencode }}">التالي</a>{% endif %}
+                </div>
+            </nav>
+            {% endif %}
+
+            {% if request.path != "/pm/planning/" %}
+            <section class="pm-projects-analytics" aria-label="تحليلات المشاريع المعروضة">
+                <article class="pm-project-analytics-panel">
+                    <h2><i class="fa-solid fa-chart-column" aria-hidden="true"></i> حالة المشاريع المعروضة</h2>
+                    <div class="pm-project-status-chart">
+                        {% for stat in status_counts %}
+                        <div class="pm-project-status-column {{ stat.class }}" style="--status-height:{{ stat.height }}" title="{{ stat.label }}: {{ stat.count }}">
+                            <strong>{{ stat.count }}</strong><span></span><small>{{ stat.label }}</small>
+                        </div>
+                        {% empty %}
+                        <p class="pm-project-analytics-empty">لا توجد بيانات حالة للعرض الحالي.</p>
+                        {% endfor %}
+                    </div>
+                </article>
+                <article class="pm-project-analytics-panel">
+                    <h2><i class="fa-solid fa-coins" aria-hidden="true"></i> التكلفة حسب العملة</h2>
+                    {% if budget_totals %}
+                    <div class="pm-project-budget-list">
+                        {% for budget in budget_totals %}
+                        <div><span>{{ budget.currency }}</span><strong><bdi>{{ budget.amount }}</bdi></strong></div>
+                        {% endfor %}
+                    </div>
+                    <p>مجاميع منفصلة؛ لا تُجمع العملات المختلفة.</p>
+                    {% else %}
+                    <p class="pm-project-analytics-empty">لا تتوفر تكاليف مخططة للمشاريع المعروضة.</p>
+                    {% endif %}
+                </article>
+                <article class="pm-project-analytics-panel pm-project-recent-panel">
+                    <h2><i class="fa-regular fa-clock" aria-hidden="true"></i> المشاريع المعروضة</h2>
+                    <div class="pm-project-summary-table-wrap">
+                        <table class="pm-project-summary-table">
+                            <thead><tr><th>رمز المشروع</th><th>المشروع</th><th>الحالة</th><th>تاريخ البداية</th></tr></thead>
+                            <tbody>{% for row in items|slice:":5" %}
+                                <tr><td><bdi>{{ row.code }}</bdi></td><td><a href="{{ row.href }}">{{ row.name }}</a></td><td><span class="pm-project-status {{ row.status_class }}">{{ row.status_label }}</span></td><td>{{ row.start_date }}</td></tr>
+                            {% empty %}<tr><td colspan="4">لا توجد مشاريع للعرض.</td></tr>{% endfor %}</tbody>
+                        </table>
+                    </div>
+                    {% if following != None %}<a class="pm-project-see-all" href="?skip={{ following }}&amp;q={{ q|urlencode }}">المزيد من المشاريع <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>{% endif %}
+                </article>
+            </section>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block extra_js %}{{ block.super }}<script src="{% static 'pm/projects-page.js' %}?v=20261021-planning-filters-v1" defer></script>{% endblock %}

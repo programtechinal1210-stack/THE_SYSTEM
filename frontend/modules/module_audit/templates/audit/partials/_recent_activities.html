@@ -1,0 +1,55 @@
+﻿<!-- ============================================================
+     آخر النشاطات - Timeline
+     ============================================================ -->
+<div class="activity-timeline" id="activityTimeline">
+    {% if activities %}
+        {% for activity in activities %}
+        <div class="timeline-item {% if activity.severity == 'critical' %}critical{% endif %}">
+            <div class="timeline-dot 
+                {% if activity.severity == 'critical' %}red
+                {% elif activity.severity == 'warning' %}orange
+                {% elif activity.source == 'followup' %}green
+                {% else %}blue{% endif %}">
+            </div>
+            <div class="timeline-content">
+                <div class="timeline-header">
+                    <span class="user-name">{{ activity.actor_name|default:"النظام" }}</span>
+                    <span class="time-badge">{{ activity.created_at|timesince }} مضت</span>
+                </div>
+                <div class="action-text">
+                    {% if activity.verb == 'CREATE' or activity.verb == 'created' %}
+                        قام بإنشاء
+                    {% elif activity.verb == 'UPDATE' or activity.verb == 'updated' %}
+                        قام بتحديث
+                    {% elif activity.verb == 'DELETE' or activity.verb == 'deleted' %}
+                        قام بحذف
+                    {% elif activity.verb == 'followed_up' %}
+                        قام بمتابعة
+                    {% elif activity.verb == 'resolved' %}
+                        قام بحل
+                    {% elif activity.verb == 'escalated' %}
+                        قام بتصعيد
+                    {% else %}
+                        {{ activity.verb }}
+                    {% endif %}
+                    <strong>{{ activity.object_type }}</strong>
+                    {% if activity.object_name %}
+                        <span class="entity-name">{{ activity.object_name }}</span>
+                    {% endif %}
+                </div>
+                {% if activity.description_ar %}
+                <div class="action-details">{{ activity.description_ar }}</div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            <p>لا توجد نشاطات حديثة</p>
+        </div>
+    {% endif %}
+</div>

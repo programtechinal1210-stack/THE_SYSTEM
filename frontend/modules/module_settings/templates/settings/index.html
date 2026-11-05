@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}الإعدادات |{% endblock %}
+{% block page_title %}⚙️ الإعدادات{% endblock %}
+{% block breadcrumb_text %}الإعدادات{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/settings.css' %}">
+{% if ude_color_palettes_enabled %}<link rel="stylesheet" href="{% static 'ude/ude-color-palettes-v1.0.css' %}">{% endif %}
+{% endblock %}
+{% block content %}
+<div class="fade-in">
+  {% include 'settings/partials/_tabs.html' %}
+  {% include 'settings/partials/_tab_general.html' %}
+  {% include 'settings/partials/_tab_security.html' %}
+  {% include 'settings/partials/_tab_notifications.html' %}
+  {% include 'settings/partials/_tab_appearance.html' %}
+  {% include 'settings/partials/_tab_email.html' %}
+  {% include 'settings/partials/_tab_backup.html' %}
+  {% include 'settings/partials/_tab_system.html' %}
+  {% include 'settings/modals/_notification_modal.html' %}
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/settings.js' %}"></script>
+<script src="{% static 'js/notifications.js' %}"></script>
+<script src="{% static 'js/appearance.js' %}"></script>
+<script src="{% static 'js/fonts.js' %}"></script>
+<script src="{% static 'js/backup.js' %}"></script>
+<script src="{% static 'js/email.js' %}"></script>
+<script src="{% static 'js/system.js' %}"></script>
+{% if ude_color_palettes_enabled %}<script src="{% static 'ude/ude-color-palettes-v1.0.js' %}"></script><script src="{% static 'ude/ude-color-palette-settings-v1.0.js' %}"></script>{% endif %}
+{% endblock %}

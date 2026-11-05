@@ -1,0 +1,110 @@
+<!-- ═══════════════════════════════════════════════════════════════
+   💾 تبويب: النسخ الاحتياطي
+   ═══════════════════════════════════════════════════════════════ -->
+
+<div class="settings-content" id="tab-backup">
+
+    <div class="stats-mini">
+        <div class="stat-item">
+            <span>💾</span>
+            <div>
+                <div class="stat-num" id="backupCount">0</div>
+                <div class="stat-lbl">نسخة محفوظة</div>
+            </div>
+        </div>
+        <div class="stat-item">
+            <span>🕒</span>
+            <div>
+                <div class="stat-num" id="lastBackup" style="font-size:1rem;">—</div>
+                <div class="stat-lbl">آخر نسخة احتياطية</div>
+            </div>
+        </div>
+        <div class="stat-item">
+            <span>⚙️</span>
+            <div>
+                <div class="stat-num" id="autoBackupState" style="font-size:1rem;">معطّل</div>
+                <div class="stat-lbl">النسخ التلقائي</div>
+            </div>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
+
+        <!-- تصدير -->
+        <div style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;">
+            <div style="font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:1.2rem;display:flex;align-items:center;gap:0.5rem;">
+                <span>⬇️</span> تصدير نسخة احتياطية
+                <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted);">ملف JSON شامل</span>
+            </div>
+            <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.8;margin:0 0 1.2rem 0;">
+                يتم تصدير إعدادات النظام والبيانات المرجعية في ملف واحد يمكن حفظه خارج الخادم.
+            </p>
+            <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="createBackup()">⬇️ تصدير الآن</button>
+                <button class="btn btn-secondary" onclick="exportJson()">📄 تصدير JSON</button>
+            </div>
+        </div>
+
+        <!-- استعادة -->
+        <div style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;">
+            <div style="font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:1.2rem;display:flex;align-items:center;gap:0.5rem;">
+                <span>⬆️</span> استعادة نسخة
+                <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted);">استبدال الإعدادات الحالية</span>
+            </div>
+            <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.8;margin:0 0 1.2rem 0;">
+                اختر ملف نسخة سابقة لاستعادة الإعدادات. يُفضّل أخذ نسخة حالية قبل الاستعادة.
+            </p>
+            <div style="display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;">
+                <label class="btn btn-primary" style="cursor:pointer;">
+                    ⬆️ اختيار ملف
+                    <input type="file" id="backupFile" accept="application/json" onchange="restoreBackup(this)" hidden>
+                </label>
+                <button class="btn btn-secondary" onclick="downloadTemplate()">🧩 تنزيل قالب</button>
+            </div>
+            <div id="backupRestoreResult" style="margin-top:0.9rem;padding:0.7rem 0.9rem;border-radius:0.5rem;font-size:0.8rem;display:none;"></div>
+        </div>
+    </div>
+
+    <!-- النسخ التلقائي -->
+    <div style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;margin-bottom:1.5rem;">
+        <div style="font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:1.2rem;padding-bottom:0.8rem;border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:0.5rem;">
+            <span>⏱️</span> النسخ التلقائي
+            <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted);">جدولة نسخ دورية تلقائياً</span>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="form-group">
+                <label>تكرار النسخ</label>
+                <select id="backupInterval">
+                    <option value="off">معطّل</option>
+                    <option value="daily">يومياً</option>
+                    <option value="weekly">أسبوعياً</option>
+                    <option value="monthly">شهرياً</option>
+                </select>
+                <div class="help-text">تُستبدل النسخة التلقائية الأقدم تلقائياً.</div>
+            </div>
+            <div class="form-group">
+                <label>عدد النسخ المحفوظة</label>
+                <input type="number" id="backupKeep" value="10" min="1" max="100">
+                <div class="help-text">الحد الأقصى لعدد النسخ قبل الحذف التلقائي.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- سجل النسخ -->
+    <div style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;">
+        <div style="font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;">
+            <span>📜</span> سجل النسخ
+        </div>
+        <div id="backupHistory" style="display:flex;flex-direction:column;gap:0.4rem;">
+            <div style="text-align:center;padding:1.4rem;color:var(--text-muted);font-size:0.82rem;">لا توجد نسخ محفوظة بعد</div>
+        </div>
+    </div>
+
+    <!-- أزرار الحفظ -->
+    <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1.5rem;">
+        <button class="btn btn-secondary" onclick="resetTab('backup')">↺ إعادة تعيين</button>
+        <button class="btn btn-primary" onclick="saveBackupSettings()">💾 حفظ الإعدادات</button>
+    </div>
+
+</div>

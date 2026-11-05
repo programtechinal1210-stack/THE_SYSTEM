@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block module_token_bridge %}<link rel="stylesheet" href="{% static 'inventory/core-token-bridge.css' %}?v=20261024-batch04b">{% endblock %}
+{% block title %}الجرد والتسويات المخزنية — THE_SYSTEM{% endblock %}
+{% block breadcrumb_text %}الجرد والتسويات المخزنية{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'inventory/stocktakes.css' %}?v=20261020-1">{% endblock %}
+{% block content %}
+<main class="inventory-stocktakes core-workspace" dir="rtl">
+  <header class="stocktakes-hero">
+    <div>
+      <span class="stocktakes-kicker">المخزون والرقابة</span>
+      <h1>الجرد والتسويات المخزنية</h1>
+      <p>إدارة عمليات الجرد الفعلي للمخزون ومتابعة الفروقات والتسويات.</p>
+      {% if selected_warehouse_name %}<span class="stocktakes-scope">المخزن: {{ selected_warehouse_name }}</span>{% endif %}
+    </div>
+    <div class="stocktakes-hero-actions">
+      {% if can_create %}<a class="stocktakes-primary" href="{{ new_url }}">＋ جرد جديد</a>{% endif %}
+      <span class="stocktakes-unavailable" title="لا توجد خدمة استيراد معتمدة لنتائج العد">رفع نتائج العد غير متاح</span>
+    </div>
+  </header>
+
+  {% if show_create_form %}
+  <section class="stocktakes-panel stocktakes-form-panel" aria-labelledby="new-stocktake-title">
+    <div class="stocktakes-panel-heading"><h2 id="new-stocktake-title">إنشاء عملية جرد</h2><a href="{{ reset_url }}">إلغاء</a></div>
+    {% if form_error %}<p class="stocktakes-alert" role="alert">{{ form_error }}</p>{% endif %}
+    <form method="post" class="stocktakes-create-form">
+      {% csrf_token %}<input type="hidden" name="action" value="create">
+      <label>نوع الجرد<select name="count_type"><option value="FULL">شامل</option><option value="CYCLE">دوري</option><option value="SURPRISE">انتقائي</option></select></label>
+      <label class="stocktakes-form-wide">سبب الجرد<textarea name="reason" required minlength="3" placeholder="اكتب سبباً موثقاً لبدء الجرد"></textarea></label>
+      <div><button class="stocktakes-primary" type="submit">بدء الجرد</button></div>
+    </form>
+  </section>
+  {% endif %}
+
+  <section class="stocktakes-summary" aria-label="ملخص الجرد">
+    <article><span class="stocktakes-summary-icon stocktakes-summary-icon--blue">▦</span><div><small>عمليات الجرد الجارية</small><strong>{{ summary.ongoing }}</strong><span>قيد العد حالياً</span></div></article>
+    <article><span class="stocktakes-summary-icon stocktakes-summary-icon--amber">◷</span><div><small>بانتظار المراجعة</small><strong>{{ summary.review }}</strong><span>تحتاج مراجعاً مستقلاً</span></div></article>
+    <article><span class="stocktakes-summary-icon stocktakes-summary-icon--red">!</span><div><small>بنود الفروقات المكتشفة</small><strong>{{ summary.differences }}</strong><span>من النتائج الظاهرة للمخول</span></div></article>
+    <article><span class="stocktakes-summary-icon stocktakes-summary-icon--green">✓</span><div><small>التسويات المكتملة والمرحلة</small><strong>{{ summary.settled }}</strong><span>بعد الترحيل الفعلي</span></div></article>
+  </section>
+
+  <section class="stocktakes-panel">
+    <nav class="stocktakes-tabs" aria-label="أقسام الجرد">
+      <a class="{% if tab == 'active' %}is-active{% endif %}" href="?section=stocktakes&warehouse_id={{ selected_warehouse }}&tab=active">الجرد الجاري</a>
+      <a class="{% if tab == 'review' %}is-active{% endif %}" href="?section=stocktakes&warehouse_id={{ selected_warehouse }}&tab=review">مراجعة الفروقات</a>
+      <a class="{% if tab == 'settlements' %}is-active{% endif %}" href="?section=stocktakes&warehouse_id={{ selected_warehouse }}&tab=settlements">التسويات المخزنية</a>
+      <a class="{% if tab == 'history' %}is-active{% endif %}" href="?section=stocktakes&warehouse_id={{ selected_warehouse }}&tab=history">سجل الجرد</a>
+    </nav>
+    <form method="get" class="stocktakes-filters">
+      <input type="hidden" name="section" value="stocktakes"><input type="hidden" name="tab" value="{{ tab }}">
+      <label class="stocktakes-search"><span>البحث</span><input name="search" value="{{ search }}" placeholder="رقم الجرد أو المخزن أو المسؤول"></label>
+      <label><span>المخزن</span><select name="warehouse_id">{% for warehouse in warehouses %}<option value="{{ warehouse.id }}" {% if warehouse.id == selected_warehouse %}selected{% endif %}>{{ warehouse.name_ar|default:warehouse.name|default:warehouse.code }}</option>{% empty %}<option>لا يوجد مخزن متاح</option>{% endfor %}</select></label>
+      <label><span>نوع الجرد</span><select name="count_type"><option value="">كل الأنواع</option>{% for value,label in count_type_options %}<option value="{{ value }}" {% if count_type_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+      <label><span>الحالة</span><select name="status"><option value="">كل الحالات</option>{% for value,label in status_options %}<option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+      <button class="stocktakes-primary" type="submit">بحث</button><a class="stocktakes-reset" href="{{ reset_url }}">إعادة ضبط</a>
+    </form>
+  </section>
+
+  {% if detail %}
+  <section class="stocktakes-panel stocktakes-detail" aria-labelledby="detail-title">
+    <div class="stocktakes-panel-heading"><div><span class="stocktakes-kicker">تفاصيل العملية</span><h2 id="detail-title">{{ detail.count_no }}</h2></div><a href="{{ reset_url }}">إغلاق</a></div>
+    <div class="stocktakes-detail-meta"><span>الحالة: <b>{{ detail.status }}</b></span><span>البنود: <b>{{ detail.total_lines }}</b></span><span>غير المعدودة: <b>{{ detail.uncounted_lines }}</b></span></div>
+    {% if detail_actions.submit or detail_actions.approve or detail_actions.reopen or detail_actions.cancel %}<div class="stocktakes-detail-actions">
+      {% if detail_actions.submit %}<form method="post">{% csrf_token %}<input type="hidden" name="action" value="submit"><input type="hidden" name="stocktake_id" value="{{ detail.id }}"><button class="stocktakes-primary" type="submit">إرسال للمراجعة</button></form>{% endif %}
+      {% if detail_actions.approve %}<form method="post">{% csrf_token %}<input type="hidden" name="action" value="approve"><input type="hidden" name="stocktake_id" value="{{ detail.id }}"><button class="stocktakes-primary" type="submit">اعتماد المراجعة</button></form>{% endif %}
+      {% if detail_actions.reopen %}<form method="post">{% csrf_token %}<input type="hidden" name="action" value="reopen"><input type="hidden" name="stocktake_id" value="{{ detail.id }}"><button class="stocktakes-secondary" type="submit">إعادة الفتح</button></form>{% endif %}
+      {% if detail_actions.cancel %}<form method="post">{% csrf_token %}<input type="hidden" name="action" value="cancel"><input type="hidden" name="stocktake_id" value="{{ detail.id }}"><button class="stocktakes-danger" type="submit">إلغاء الجرد</button></form>{% endif %}
+    </div>{% endif %}
+    <div class="stocktakes-lines">{% for line in detail.lines %}<div><b>{{ line.item_name }}</b><span>{{ line.item_code }} · {{ line.unit_name }} · {{ line.location_name|default:'دون موقع' }}</span>{% if line.difference is not None %}<strong>الفرق: {{ line.difference }}</strong>{% endif %}</div>{% empty %}<p>لا توجد بنود ظاهرة لهذه العملية.</p>{% endfor %}</div>
+  </section>
+  {% endif %}
+
+  <section class="stocktakes-panel stocktakes-list" aria-labelledby="stocktakes-list-title">
+    <div class="stocktakes-panel-heading"><div><h2 id="stocktakes-list-title">قائمة عمليات الجرد</h2><p>{{ filtered_count }} عملية ضمن النطاق الحالي.</p></div></div>
+    {% if errors.work_context or errors.warehouses or errors.stocktakes %}<p class="stocktakes-alert" role="alert">{{ errors.stocktakes|default:errors.warehouses|default:errors.work_context }}</p>{% elif not selected_warehouse %}<p class="stocktakes-empty">{% if organization_selected %}لا يوجد مخزن متاح ضمن جهة العمل الحالية.{% else %}اختر جهة العمل والمخزن لعرض عمليات الجرد.{% endif %}</p>{% elif not rows %}<p class="stocktakes-empty">لا توجد عمليات جرد مطابقة للفلاتر الحالية.</p>{% else %}
+    <div class="stocktakes-table-wrap"><table><thead><tr><th>رقم الجرد</th><th>المخزن</th><th>النوع</th><th>المسؤول</th><th>نسبة الإنجاز</th><th>الحالة</th><th>الإجراء التالي</th><th>إجراءات</th></tr></thead><tbody>{% for row in rows %}<tr><td><a class="stocktakes-number" href="{{ row.detail_url }}">{{ row.count_no }}</a><small>{{ row.created_at }}</small></td><td>{{ row.warehouse_name }}</td><td>{{ row.count_type_label }}</td><td>{{ row.responsible_label }}</td><td>{% if row.progress is not None %}<div class="stocktakes-progress"><span style="width:{{ row.progress }}%"></span></div><b>{{ row.progress }}%</b><small>{% if row.total_lines is not None %}{{ row.total_lines }} بند{% endif %}</small>{% else %}<span>غير متاح</span>{% endif %}</td><td><span class="stocktakes-status stocktakes-status--{{ row.status|lower }}">{{ row.status_label }}</span></td><td><a class="stocktakes-action" href="{{ row.main_action_url }}">{{ row.next_action }}</a></td><td><a class="stocktakes-view" href="{{ row.detail_url }}">عرض التفاصيل</a></td></tr>{% endfor %}</tbody></table></div>
+    <div class="stocktakes-mobile-list">{% for row in rows %}<article><div><a class="stocktakes-number" href="{{ row.detail_url }}">{{ row.count_no }}</a><span class="stocktakes-status stocktakes-status--{{ row.status|lower }}">{{ row.status_label }}</span></div><p>{{ row.warehouse_name }} · {{ row.count_type_label }}</p><div class="stocktakes-mobile-progress"><span>الإنجاز</span><b>{% if row.progress is not None %}{{ row.progress }}%{% else %}غير متاح{% endif %}</b></div><a class="stocktakes-action" href="{{ row.main_action_url }}">{{ row.next_action }} ←</a></article>{% endfor %}</div>
+    <footer class="stocktakes-pagination">{% if has_previous %}<a href="{{ previous_url }}">السابق</a>{% endif %}<span>عرض {{ rows|length }} من {{ filtered_count }}</span>{% if has_next %}<a href="{{ next_url }}">التالي</a>{% endif %}</footer>
+    {% endif %}
+  </section>
+</main>
+{% endblock %}

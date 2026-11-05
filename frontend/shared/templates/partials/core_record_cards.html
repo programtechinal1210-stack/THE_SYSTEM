@@ -1,0 +1,12 @@
+<div class="core-record-grid" hidden>
+{% for record in records %}
+  <article class="core-record-card">
+    <header><span class="core-module-icon tone-{{ section }}">{% if section == 'roles' %}{% include 'partials/core_icon.html' with icon='shield' %}{% else %}{% include 'partials/core_icon.html' with icon=section %}{% endif %}</span><div><small>{{ page_title }}</small><h3>{{ record.cells.0|default_if_none:'—' }}</h3></div></header>
+    <dl>{% for label, value in record.fields %}{% if not forloop.first %}<div><dt>{{ label }}</dt><dd>{% if value == 'نشط' or value == 'نشطة' %}<span class="core-status active">{{ value }}</span>{% elif value == 'معطل' or value == 'معطلة' %}<span class="core-status inactive">{{ value }}</span>{% else %}{{ value|default_if_none:'—' }}{% endif %}</dd></div>{% endif %}{% endfor %}</dl>
+    <footer>
+      {% if section == 'users' %}<a class="btn core-button-small" href="/users/{{ record.item.id }}/">عرض الملف</a>{% endif %}
+      {% if record.edit %}<button type="button" class="btn btn-primary core-button-small" data-open-dialog="{{ record.edit }}">تعديل البيانات</button>{% elif section == 'audit' %}<a class="btn core-button-small" href="?{{ request.GET.urlencode }}&event={{ record.item.id }}">تفاصيل العملية</a>{% elif section != 'users' %}<span class="core-muted">للعرض فقط</span>{% endif %}
+    </footer>
+  </article>
+{% endfor %}
+</div>

@@ -1,0 +1,19 @@
+﻿<div class="modal-overlay" id="auditDetailModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h2>🔍 تفاصيل سجل التدقيق</h2>
+            <button class="close-btn" onclick="closeModal('auditDetailModal')">&times;</button>
+        </div>
+        <div style="display:grid;gap:10px;">
+            <p><strong>الإجراء:</strong> <span id="detailAction"></span></p>
+            <p><strong>الكيان:</strong> <span id="detailEntity"></span></p>
+            <p><strong>الخطورة:</strong> <span id="detailSeverity"></span></p>
+            <p><strong>الملخص:</strong> <span id="detailSummary"></span></p>
+            <p><strong>IP:</strong> <span id="detailIP"></span></p>
+            <p><strong>التاريخ:</strong> <span id="detailLogDate"></span></p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeModal('auditDetailModal')">إغلاق</button>
+        </div>
+    </div>
+</div>

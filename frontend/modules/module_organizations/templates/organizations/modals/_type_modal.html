@@ -1,0 +1,43 @@
+﻿<!-- ═══════════════════════════════════════════════════════════════
+     📦 مودال نوع الجهة (إضافة/تعديل)
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="typeModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="typeModalTitle">📋 نوع جهة جديد</h3>
+            <button class="modal-close" onclick="closeM('typeModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <form id="typeForm" onsubmit="event.preventDefault(); saveType();">
+                <input type="hidden" id="typeId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">الكود <span class="required">*</span></label>
+                        <input type="text" id="typeCode" class="form-input" placeholder="مثال: GOVERNMENT" required style="text-transform:uppercase;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">الاسم <span class="required">*</span></label>
+                        <input type="text" id="typeName" class="form-input" placeholder="مثال: جهة حكومية" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">الوصف</label>
+                    <textarea id="typeDescription" class="form-input form-textarea" rows="3" placeholder="وصف مختصر..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">الحالة</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="typeStatus" value="true" checked> 🟢 نشط</label>
+                        <label><input type="radio" name="typeStatus" value="false"> 🔴 غير نشط</label>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="typeDeleteBtn" class="btn btn-danger" style="display:none; margin-left:auto;" onclick="deleteType()">🗑️ حذف</button>
+            <button type="button" class="btn btn-secondary" onclick="closeM('typeModal')">إلغاء</button>
+            <button type="button" class="btn btn-primary" onclick="saveType()">💾 حفظ</button>
+        </div>
+    </div>
+</div>
+

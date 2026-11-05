@@ -1,0 +1,3 @@
+﻿.notification-unread { background-color: #eff6ff; border-right: 3px solid #3b82f6; }
+.notification-read { background-color: white; }
+.notification-item:hover { background-color: #f9fafb; }

@@ -1,0 +1,112 @@
+﻿/* ============================================================
+   audit-tables.css - أنماط الجداول
+   ============================================================ */
+
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.data-table thead th {
+    text-align: right;
+    padding: 10px 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border-color);
+    background: rgba(0,0,0,0.01);
+    white-space: nowrap;
+}
+
+.data-table tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+    vertical-align: middle;
+}
+
+.data-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.data-table tbody tr:hover {
+    background: rgba(59, 130, 246, 0.03);
+}
+
+/* صف حرج */
+.data-table tbody tr.critical {
+    background: rgba(239, 68, 68, 0.04);
+}
+
+.data-table tbody tr.critical:hover {
+    background: rgba(239, 68, 68, 0.08);
+}
+
+/* صف متأخر */
+.data-table tbody tr.delayed {
+    background: rgba(245, 158, 11, 0.04);
+}
+
+.data-table tbody tr.delayed:hover {
+    background: rgba(245, 158, 11, 0.08);
+}
+
+/* صف مصعّد */
+.data-table tbody tr.escalated {
+    background: rgba(139, 92, 246, 0.04);
+}
+
+/* خلية الكيان */
+.entity-cell {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.entity-cell svg {
+    flex-shrink: 0;
+}
+
+/* خلية الملاحظات */
+.notes-text {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* خلية التصدير */
+.export-name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* عدد السجلات */
+.record-count {
+    font-weight: 600;
+    color: var(--audit-primary-light);
+}
+
+/* حجم الملف */
+.file-size {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* مدة التنفيذ */
+.duration-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--text-muted);
+}

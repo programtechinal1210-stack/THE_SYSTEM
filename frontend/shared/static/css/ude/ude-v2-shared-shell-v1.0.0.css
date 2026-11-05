@@ -1,0 +1,100 @@
+/* UDE V2 Stage 02: Shared Shell bridge. It is loaded only when the server gate is true. */
+.ude-v2-shared-shell {
+  --ude-shell-surface: var(--ude-color-surface-raised);
+  --ude-shell-canvas: var(--ude-color-canvas);
+  --ude-shell-text: var(--ude-color-text);
+  --ude-shell-muted: var(--ude-color-text-muted);
+  --ude-shell-border: var(--ude-color-border);
+  --ude-shell-brand: var(--ude-color-brand);
+  --ude-shell-focus: var(--ude-color-focus);
+  --ude-shell-hover: color-mix(in srgb, var(--ude-color-brand) 12%, transparent);
+  --ude-shell-active: var(--ude-color-brand);
+  --bg-primary: var(--ude-shell-canvas);
+  --bg-secondary: var(--ude-shell-surface);
+  --bg-elevated: var(--ude-color-surface);
+  --text-primary: var(--ude-shell-text);
+  --text-secondary: var(--ude-color-text-secondary);
+  --text-muted: var(--ude-shell-muted);
+  --border-color: var(--ude-shell-border);
+  --accent: var(--ude-shell-brand);
+  --primary-500: var(--ude-shell-brand);
+  --primary-600: var(--ude-color-brand-strong);
+}
+
+/* Shell only: module content keeps its existing CSS contract in Stage 02. */
+.ude-v2-shared-shell .sidebar,
+.ude-v2-shared-shell .top-header,
+.ude-v2-shared-shell .footer {
+  color: var(--ude-shell-text);
+  background: var(--ude-shell-surface);
+  border-color: var(--ude-shell-border);
+}
+/* Explicitly outrank the legacy Core frame selectors while remaining Shell-scoped. */
+html[data-ude-v2-shell="true"] body.ude-v2-shared-shell .sidebar {
+  background: var(--ude-color-surface);
+  border-color: var(--ude-color-border);
+}
+html[data-ude-v2-shell="true"] body.ude-v2-shared-shell .top-header,
+html[data-ude-v2-shell="true"] body.ude-v2-shared-shell .footer {
+  background: var(--ude-color-surface-raised);
+  color: var(--ude-color-text);
+  border-color: var(--ude-color-border);
+}
+.ude-v2-shared-shell .sidebar .nav-item { color: var(--ude-color-text-secondary); }
+.ude-v2-shared-shell .sidebar .nav-item:hover,
+.ude-v2-shared-shell .sidebar .nav-item.active {
+  background: var(--ude-shell-active);
+  color: var(--ude-color-on-brand);
+}
+html[data-ude-v2-shell="true"] body.ude-v2-shared-shell .sidebar .nav-item.active,
+html[data-ude-v2-shell="true"] body.ude-v2-shared-shell .sidebar .nav-item.active:hover {
+  background: var(--ude-color-brand) !important;
+  color: var(--ude-color-on-brand) !important;
+}
+.ude-v2-shared-shell .sidebar .nav-item:focus-visible,
+.ude-v2-shared-shell .top-header :is(button, a, input):focus-visible,
+.ude-v2-shared-shell .footer a:focus-visible {
+  outline: 3px solid var(--ude-shell-focus);
+  outline-offset: 3px;
+}
+.ude-v2-shared-shell .header-page-title::after,
+.ude-v2-shared-shell .header-title-home,
+.ude-v2-shared-shell .header-icon-btn:hover,
+.ude-v2-shared-shell .footer a:hover,
+.ude-v2-shared-shell .core-footer-links a:hover { color: var(--ude-shell-brand); }
+.ude-v2-shared-shell .sidebar .core-logout:hover,
+.ude-v2-shared-shell .top-header .header-icon-btn:hover { background: var(--ude-shell-hover); }
+.ude-v2-shared-shell .top-header .btn-primary,
+.ude-v2-shared-shell .sidebar .btn-primary {
+  background: var(--ude-shell-brand);
+  border-color: var(--ude-shell-brand);
+  color: var(--ude-color-on-brand);
+}
+
+/* High Contrast is an accessibility mode, not an aesthetic palette. Keep
+   legacy shell rules from overriding its black/yellow semantic contract. */
+html[data-ude-theme="ude-high-contrast"] body.ude-v2-shared-shell .sidebar,
+html[data-ude-theme="ude-high-contrast"] body.ude-v2-shared-shell .top-header,
+html[data-ude-theme="ude-high-contrast"] body.ude-v2-shared-shell .footer {
+  background: var(--ude-color-surface) !important;
+  color: var(--ude-color-text) !important;
+  border-color: var(--ude-color-border) !important;
+}
+html[data-ude-theme="ude-high-contrast"] body.ude-v2-shared-shell .sidebar .nav-item.active,
+html[data-ude-theme="ude-high-contrast"] body.ude-v2-shared-shell .sidebar .nav-item.active:hover,
+html[data-ude-theme="ude-high-contrast"] body.ude-v2-shared-shell .top-header .btn-primary,
+html[data-ude-theme="ude-high-contrast"] body.ude-v2-shared-shell .sidebar .btn-primary {
+  background: var(--ude-color-brand) !important;
+  border-color: var(--ude-color-brand) !important;
+  color: var(--ude-color-on-brand) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ude-v2-shared-shell *,
+  .ude-v2-shared-shell *::before,
+  .ude-v2-shared-shell *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}

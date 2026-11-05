@@ -1,0 +1,34 @@
+/* Daily Work visual compatibility layer; operation states retain their semantic colours. */
+.dw-shell { color: var(--color-text); font-family: var(--font-family-base); }
+.dw-shell :is(.dw-hero, .dw-panel, .dw-work-card, .dw-kpis article, .dw-dialog form) { background: var(--color-surface); color: var(--color-text); border-color: var(--color-border); border-radius: var(--ds-radius-lg); box-shadow: var(--ds-shadow-card); }
+.dw-shell :is(input, select, textarea) { min-height: var(--control-height); color: var(--color-text); background: var(--color-surface-raised); border-color: var(--color-border); border-radius: var(--ds-radius-md); }
+.dw-shell :is(.dw-button:not(.danger):not(.success), .dw-link) { background-color: var(--color-primary); border-color: var(--color-primary); border-radius: var(--ds-radius-md); }
+.dw-shell .dw-button.ghost { color: var(--color-primary); background: transparent; border-color: var(--color-border); }
+.dw-shell :is(.dw-panel-heading, .dw-card-head, .dw-triple, .dw-facts) { color: var(--color-text); border-color: var(--color-border-subtle); }
+html[data-density="compact"] .dw-shell :is(.dw-hero, .dw-panel, .dw-work-card) { padding: var(--ds-space-3); }
+
+/* Palette propagation for legacy Daily Work surfaces. Keep status classes semantic. */
+html[data-core-palette] .dw-shell :is(.dw-hero, .dw-toolbar, .dw-panel, .dw-work-card, .dw-kpis article, .dw-dialog) {
+  background: var(--core-palette-surface);
+  color: var(--core-palette-text);
+  border-color: var(--core-palette-border);
+}
+html[data-core-palette] .dw-shell :is(.dw-dialog, .dw-dialog form) {
+  background: var(--core-palette-surface);
+  color: var(--core-palette-text);
+}
+html[data-core-palette] .dw-shell :is(.dw-toolbar select, .dw-toolbar input, .dw-form input, .dw-form select, .dw-form textarea) {
+  background: var(--core-palette-raised);
+  color: var(--core-palette-text);
+  border-color: var(--core-palette-border);
+}
+html[data-core-palette] .dw-shell :is(.dw-metrics div, .dw-status-strip, .dw-note) {
+  background: var(--core-palette-raised);
+  color: var(--core-palette-secondary);
+}
+html[data-core-palette] .dw-shell :is(.dw-hero h1, .dw-panel-heading h2, .dw-form h2, .dw-form h3) {
+  color: var(--core-palette-text);
+}
+html[data-core-palette] .dw-shell :is(.dw-kicker, .dw-eyebrow, .dw-count, .dw-hint, .dw-panel-heading small, .dw-card-foot) {
+  color: var(--core-palette-secondary);
+}

@@ -1,0 +1,334 @@
+﻿<!-- ═══════════════════════════════════════════════════════════════
+   🖥️ تبويب: معلومات النظام
+   ═══════════════════════════════════════════════════════════════ -->
+
+<div class="settings-content" id="tab-system">
+    
+    <!-- 📊 إحصائيات -->
+    <div class="stats-mini">
+        <div class="stat-item">
+            <span>📦</span>
+            <div>
+                <div class="stat-num">v2.0.1</div>
+                <div class="stat-lbl">إصدار النظام</div>
+            </div>
+        </div>
+        <div class="stat-item">
+            <span>🟢</span>
+            <div>
+                <div class="stat-num" style="color:#10b981;">يعمل</div>
+                <div class="stat-lbl">منذ 15 يوم</div>
+            </div>
+        </div>
+        <div class="stat-item">
+            <span>🗄️</span>
+            <div>
+                <div class="stat-num">PostgreSQL</div>
+                <div class="stat-lbl">قاعدة البيانات</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🃏 معلومات النظام -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
+        
+        <!-- الإصدار والترخيص -->
+        <div style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;">
+            <div style="font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:1.2rem;display:flex;align-items:center;gap:0.5rem;">
+                <span>📦</span> الإصدار والترخيص
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;">
+                <div class="form-group">
+                    <label>📦 إصدار النظام</label>
+                    <input type="text" value="v2.0.1" readonly style="width:100%;font-weight:700;color:#3b82f6;">
+                </div>
+                <div class="form-group">
+                    <label>🏗️ رقم البناء</label>
+                    <input type="text" value="build-2026-01-20-1430" readonly style="width:100%;font-size:0.8rem;">
+                </div>
+                <div class="form-group">
+                    <label>📅 تاريخ الإصدار</label>
+                    <input type="text" value="2026-01-20" readonly style="width:100%;">
+                </div>
+                <div class="form-group">
+                    <label>🔑 نوع الترخيص</label>
+                    <input type="text" value="Enterprise License" readonly style="width:100%;color:#10b981;">
+                </div>
+                <div class="form-group">
+                    <label>📅 صلاحية الترخيص</label>
+                    <input type="text" value="2026-12-31 (345 يوم متبقي)" readonly style="width:100%;">
+                </div>
+                <div class="form-group">
+                    <label>👥 الحد الأقصى للمستخدمين</label>
+                    <input type="text" value="500 مستخدم" readonly style="width:100%;">
+                </div>
+            </div>
+
+            <div style="margin-top:1rem;display:flex;gap:0.5rem;">
+                <button class="btn btn-primary btn-sm" onclick="showToast('🔍 جاري البحث عن تحديثات...', 'info')">
+                    🔍 التحقق من التحديثات
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="showToast('📋 تم نسخ معلومات النظام', 'success')">
+                    📋 نسخ المعلومات
+                </button>
+            </div>
+        </div>
+
+        <!-- حالة الخادم -->
+        <div style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;">
+            <div style="font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:1.2rem;display:flex;align-items:center;gap:0.5rem;">
+                <span>🖥️</span> حالة الخادم
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:0.6rem;">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.8rem;background:rgba(16,185,129,0.05);border-radius:0.5rem;">
+                    <div style="display:flex;align-items:center;gap:0.5rem;">
+                        <span style="width:10px;height:10px;border-radius:50%;background:#10b981;animation:pulse 2s infinite;"></span>
+                        <span style="font-size:0.85rem;color:var(--text-primary);">خادم الويب (FastAPI)</span>
+                    </div>
+                    <span style="color:#10b981;font-size:0.8rem;font-weight:600;">🟢 يعمل</span>
+                </div>
+
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.8rem;background:rgba(16,185,129,0.05);border-radius:0.5rem;">
+                    <div style="display:flex;align-items:center;gap:0.5rem;">
+                        <span style="width:10px;height:10px;border-radius:50%;background:#10b981;animation:pulse 2s infinite;"></span>
+                        <span style="font-size:0.85rem;color:var(--text-primary);">قاعدة البيانات (PostgreSQL)</span>
+                    </div>
+                    <span style="color:#10b981;font-size:0.8rem;font-weight:600;">🟢 متصلة</span>
+                </div>
+
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.8rem;background:rgba(16,185,129,0.05);border-radius:0.5rem;">
+                    <div style="display:flex;align-items:center;gap:0.5rem;">
+                        <span style="width:10px;height:10px;border-radius:50%;background:#10b981;animation:pulse 2s infinite;"></span>
+                        <span style="font-size:0.85rem;color:var(--text-primary);">Redis (الكاش)</span>
+                    </div>
+                    <span style="color:#10b981;font-size:0.8rem;font-weight:600;">🟢 متصل</span>
+                </div>
+
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.8rem;background:rgba(16,185,129,0.05);border-radius:0.5rem;">
+                    <div style="display:flex;align-items:center;gap:0.5rem;">
+                        <span style="width:10px;height:10px;border-radius:50%;background:#10b981;animation:pulse 2s infinite;"></span>
+                        <span style="font-size:0.85rem;color:var(--text-primary);">Celery (المهام الخلفية)</span>
+                    </div>
+                    <span style="color:#10b981;font-size:0.8rem;font-weight:600;">🟢 يعمل</span>
+                </div>
+
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.8rem;background:rgba(245,158,11,0.05);border-radius:0.5rem;">
+                    <div style="display:flex;align-items:center;gap:0.5rem;">
+                        <span style="width:10px;height:10px;border-radius:50%;background:#f59e0b;"></span>
+                        <span style="font-size:0.85rem;color:var(--text-primary);">استخدام الذاكرة</span>
+                    </div>
+                    <span style="color:#f59e0b;font-size:0.8rem;font-weight:600;">68% (2.1 GB / 3.1 GB)</span>
+                </div>
+            </div>
+
+            <div style="margin-top:1rem;display:flex;gap:0.5rem;">
+                <button class="btn btn-danger btn-sm" onclick="if(confirm('⚠️ هل أنت متأكد من إعادة تشغيل النظام؟\n\nسيتم إعادة تشغيل جميع الخدمات وقد يستغرق ذلك دقيقة.')) restartSystem()">
+                    🔄 إعادة تشغيل الخدمات
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 🃏 إحصائيات النظام -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
+        
+        <!-- إحصائيات -->
+        <div style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;">
+            <div style="font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;">
+                <span>📊</span> إحصائيات النظام
+            </div>
+
+            <div class="stats-row" style="margin-bottom:1rem;">
+                <div class="stat-box">
+                    <div class="num">1,284</div>
+                    <div class="lbl">📋 المعاملات</div>
+                </div>
+                <div class="stat-box">
+                    <div class="num">521</div>
+                    <div class="lbl">✅ المهام</div>
+                </div>
+                <div class="stat-box">
+                    <div class="num">48</div>
+                    <div class="lbl">📢 التوجيهات</div>
+                </div>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="num">6</div>
+                    <div class="lbl">⚡ الإجراءات</div>
+                </div>
+                <div class="stat-box">
+                    <div class="num">89</div>
+                    <div class="lbl">💬 الردود</div>
+                </div>
+                <div class="stat-box">
+                    <div class="num">35</div>
+                    <div class="lbl">👥 المستخدمين</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- استخدام الموارد -->
+        <div style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;">
+            <div style="font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem;">
+                <span>📈</span> استخدام الموارد
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:1rem;">
+                <!-- CPU -->
+                <div>
+                    <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:0.3rem;">
+                        <span style="color:var(--text-primary);">🖥️ المعالج (CPU)</span>
+                        <span style="color:var(--text-muted);">23%</span>
+                    </div>
+                    <div style="width:100%;height:8px;background:var(--border-color);border-radius:4px;overflow:hidden;">
+                        <div style="width:23%;height:100%;background:linear-gradient(90deg,#38bdf8,#a855f7);border-radius:4px;"></div>
+                    </div>
+                </div>
+
+                <!-- RAM -->
+                <div>
+                    <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:0.3rem;">
+                        <span style="color:var(--text-primary);">🧠 الذاكرة (RAM)</span>
+                        <span style="color:#f59e0b;">68%</span>
+                    </div>
+                    <div style="width:100%;height:8px;background:var(--border-color);border-radius:4px;overflow:hidden;">
+                        <div style="width:68%;height:100%;background:linear-gradient(90deg,#f59e0b,#ef4444);border-radius:4px;"></div>
+                    </div>
+                </div>
+
+                <!-- Disk -->
+                <div>
+                    <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:0.3rem;">
+                        <span style="color:var(--text-primary);">💿 القرص (Disk)</span>
+                        <span style="color:#10b981;">42%</span>
+                    </div>
+                    <div style="width:100%;height:8px;background:var(--border-color);border-radius:4px;overflow:hidden;">
+                        <div style="width:42%;height:100%;background:linear-gradient(90deg,#10b981,#06b6d4);border-radius:4px;"></div>
+                    </div>
+                </div>
+
+                <!-- Network -->
+                <div>
+                    <div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:0.3rem;">
+                        <span style="color:var(--text-primary);">🌐 الشبكة</span>
+                        <span style="color:var(--text-muted);">1.2 MB/s</span>
+                    </div>
+                    <div style="width:100%;height:8px;background:var(--border-color);border-radius:4px;overflow:hidden;">
+                        <div style="width:12%;height:100%;background:#3b82f6;border-radius:4px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 🃏 سجل النظام -->
+    <div style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;margin-bottom:1.5rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+            <div style="font-size:1rem;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:0.5rem;">
+                <span>📜</span> سجل النظام
+                <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted);">آخر 20 حدث</span>
+            </div>
+            <div style="display:flex;gap:0.5rem;">
+                <select id="logFilter" onchange="filterLogs()" style="padding:0.4rem 0.8rem;border:1px solid var(--border-color);border-radius:0.5rem;background:var(--bg-input);color:var(--text-primary);font-size:0.8rem;font-family:'Tajawal';">
+                    <option value="all">الكل</option>
+                    <option value="success">✅ ناجح</option>
+                    <option value="info">ℹ️ معلومات</option>
+                    <option value="warning">⚠️ تحذير</option>
+                    <option value="error">❌ خطأ</option>
+                </select>
+                <button class="btn btn-secondary btn-sm" onclick="showToast('📊 جاري تصدير السجل...', 'info')">📊 تصدير</button>
+                <button class="btn btn-secondary btn-sm" onclick="clearLogs()">🗑️ مسح</button>
+            </div>
+        </div>
+
+        <div class="log-box" id="systemLogs" style="max-height:300px;overflow-y:auto;background:rgba(0,0,0,0.2);border-radius:0.8rem;padding:1rem;font-size:0.8rem;font-family:'Consolas','Courier New',monospace;direction:ltr;">
+            <div class="log-line log-success">[2026-01-20 14:30:15] ✅ SYSTEM  | تم تحديث النظام إلى الإصدار v2.0.1</div>
+            <div class="log-line log-info">   [2026-01-20 14:30:10] ℹ️ BACKUP  | بدء النسخ الاحتياطي التلقائي</div>
+            <div class="log-line log-info">   [2026-01-20 10:00:00] ℹ️ SERVER  | بدء تشغيل خادم FastAPI على المنفذ 8001</div>
+            <div class="log-line log-info">   [2026-01-20 10:00:00] ℹ️ SERVER  | بدء تشغيل Django على المنفذ 8000</div>
+            <div class="log-line log-success">[2026-01-19 18:00:00] ✅ BACKUP  | اكتمل النسخ الاحتياطي - 2.4 MB</div>
+            <div class="log-line log-info">   [2026-01-19 15:22:10] ℹ️ USER    | تسجيل دخول: admin (192.168.1.100)</div>
+            <div class="log-line log-warning">[2026-01-19 12:00:00] ⚠️ TASKS   | زيادة في المهام المتأخرة: 18 مهمة</div>
+            <div class="log-line log-error">  [2026-01-19 09:15:33] ❌ EMAIL   | فشل إرسال بريد: Connection timeout</div>
+            <div class="log-line log-info">   [2026-01-19 08:30:00] ℹ️ SYSTEM  | فحص دوري: جميع الخدمات تعمل</div>
+            <div class="log-line log-success">[2026-01-18 09:00:00] ✅ SECURITY| تم تثبيت التحديثات الأمنية</div>
+            <div class="log-line log-info">   [2026-01-18 08:00:00] ℹ️ SYSTEM  | بدء تشغيل النظام</div>
+            <div class="log-line log-success">[2026-01-17 23:00:00] ✅ BACKUP  | اكتمل النسخ الاحتياطي - 2.1 MB</div>
+            <div class="log-line log-warning">[2026-01-17 16:45:00] ⚠️ STORAGE | مساحة القرص أقل من 20%</div>
+            <div class="log-line log-info">   [2026-01-17 14:20:00] ℹ️ USER    | إنشاء مستخدم جديد: noura.saeed</div>
+            <div class="log-line log-error">  [2026-01-17 11:00:00] ❌ API     | محاولة وصول غير مصرح: 192.168.1.200</div>
+        </div>
+    </div>
+
+    <!-- 🃏 أدوات النظام -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">
+        <button class="btn btn-danger" onclick="restartSystem()" style="padding:1rem;display:flex;align-items:center;justify-content:center;gap:0.5rem;font-size:0.9rem;">
+            🔄 إعادة تشغيل النظام
+        </button>
+        <button class="btn btn-warning" onclick="clearCache()" style="padding:1rem;display:flex;align-items:center;justify-content:center;gap:0.5rem;font-size:0.9rem;">
+            🧹 مسح الكاش
+        </button>
+        <button class="btn btn-secondary" onclick="showToast('📊 جاري تصدير تقرير النظام...', 'info')" style="padding:1rem;display:flex;align-items:center;justify-content:center;gap:0.5rem;font-size:0.9rem;">
+            📊 تصدير التقرير
+        </button>
+    </div>
+
+</div>
+
+<script>
+function restartSystem() {
+    if (confirm('⚠️ تحذير: إعادة تشغيل النظام ستؤدي إلى إيقاف جميع الخدمات مؤقتاً.\n\nالمدة المتوقعة: 30-60 ثانية.\n\nهل تريد المتابعة؟')) {
+        showToast('🔄 جاري إعادة تشغيل النظام... سيتم إعادة الاتصال تلقائياً', 'warning');
+        var countdown = 5;
+        var interval = setInterval(function() {
+            if (countdown <= 0) {
+                clearInterval(interval);
+                location.reload();
+            }
+            countdown--;
+        }, 1000);
+    }
+}
+
+function clearCache() {
+    if (confirm('🧹 هل تريد مسح الكاش؟\n\nسيؤدي ذلك إلى إعادة تحميل جميع البيانات من قاعدة البيانات.')) {
+        showToast('🧹 جاري مسح الكاش...', 'warning');
+        setTimeout(function() {
+            showToast('✅ تم مسح الكاش بنجاح', 'success');
+        }, 1500);
+    }
+}
+
+function clearLogs() {
+    if (confirm('🗑️ هل تريد مسح سجل النظام؟\n\nلا يمكن استعادة السجلات بعد المسح.')) {
+        document.getElementById('systemLogs').innerHTML = '<div class="log-line log-info">[2026-01-20 14:35:00] ℹ️ SYSTEM | تم مسح السجل بواسطة المسؤول</div>';
+        showToast('🗑️ تم مسح سجل النظام', 'warning');
+    }
+}
+
+function filterLogs() {
+    var filter = document.getElementById('logFilter').value;
+    var logs = document.querySelectorAll('#systemLogs .log-line');
+    logs.forEach(function(log) {
+        if (filter === 'all') {
+            log.style.display = '';
+        } else if (filter === 'success' && log.classList.contains('log-success')) {
+            log.style.display = '';
+        } else if (filter === 'info' && log.classList.contains('log-info')) {
+            log.style.display = '';
+        } else if (filter === 'warning' && log.classList.contains('log-warning')) {
+            log.style.display = '';
+        } else if (filter === 'error' && log.classList.contains('log-error')) {
+            log.style.display = '';
+        } else {
+            log.style.display = 'none';
+        }
+    });
+}
+</script>

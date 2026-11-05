@@ -1,0 +1,14 @@
+{% extends 'pm/reference_base.html' %}
+{% block pm_content %}<section class="pm-panel"><a href="{{ project_url }}">العودة إلى التخطيط</a><h1>تنظيم الهرم — {{ project.name }}</h1>
+<p>تحافظ العمليات على المعرفات والأكواد والسجلات التاريخية. ترقية المهمة تنشئ مرحلة تحتضنها، وترقية النشاط تنشئ مهمة تحتضنه.</p>
+{% if error %}<p role="alert">{{ error }}</p>{% endif %}
+{% if preview %}<h2>معاينة: {{ preview.name }} — {{ preview.code }}</h2><p>سيبقى المعرف والرمز ثابتين. النقل أو الترقية يعيدان الأنشطة المتأثرة إلى المراجعة.</p>
+<form method="post">{% csrf_token %}{% for key,value in values.items %}{% if key != 'preview_token' %}<input type="hidden" name="{{ key }}" value="{{ value|default:'' }}">{% endif %}{% endfor %}<input type="hidden" name="preview_token" value="{{ preview.preview_token }}"><button name="confirm" value="yes">تأكيد العملية</button> <a href="">إلغاء</a></form>
+{% else %}<form method="post">{% csrf_token %}
+<p><label>نوع العنصر <select name="kind"><option value="phases">مرحلة</option><option value="tasks">مهمة</option><option value="activities">نشاط</option></select></label></p>
+<p><label>العنصر <select name="entity_id" required>{% for row in choices %}<option value="{{ row.id }}">{{ row.name }}</option>{% endfor %}</select></label></p>
+<p><label>العملية <select name="operation"><option value="up">تحريك لأعلى</option><option value="down">تحريك لأسفل</option><option value="move">نقل إلى أب آخر</option><option value="promote">ترقية مهمة أو نشاط</option></select></label></p>
+<p><label>الأب الجديد للنقل <select name="target_id"><option value="">اختر عند النقل</option>{% for row in choices %}{% if row.kind != 'activities' %}<option value="{{ row.id }}">{{ row.name }}</option>{% endif %}{% endfor %}</select></label></p>
+<p><label>رمز الأب الجديد عند الترقية <input name="new_code" maxlength="80"></label></p><p><label>اسمه <input name="new_name" maxlength="200"></label></p>
+<button type="submit">معاينة الأثر</button></form>{% endif %}
+</section>{% endblock %}

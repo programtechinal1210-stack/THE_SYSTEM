@@ -1,0 +1,20 @@
+{
+  "schema": "ude.offline-manifest.v1",
+  "package": "UDE-V2-STAGE-03",
+  "offline": true,
+  "external_references": [],
+  "assets": [
+    {
+      "path": "ude/ude-v2-shared-components-feature-flags-v1.0.0.json",
+      "sha256": "518C916E829F52DD7D9C2DE73B3C04F37D72FCA7E971EDE41466E48B14AF8ED1"
+    },
+    {
+      "path": "css/ude/ude-v2-shared-components-v1.0.0.css",
+      "sha256": "61C15CEE44E975CB2F2989AFF084F200C2D7C572571BC021E9BE3D7075A34A7F"
+    },
+    {
+      "path": "js/ude-v2-shared-components-v1.0.0.js",
+      "sha256": "A0B4B4DA39F23AB1141461E764A4375DE650469588C79AFC669EA5F9BFA74F4F"
+    }
+  ]
+}

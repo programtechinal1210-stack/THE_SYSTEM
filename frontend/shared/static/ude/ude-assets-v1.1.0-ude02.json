@@ -1,0 +1,14 @@
+{
+  "schema": "ude.asset-manifest.v1",
+  "version": "1.1.0-ude-02",
+  "offline_only": true,
+  "allowed_internal_origins": ["http://127.0.0.1:8000", "http://127.0.0.1:8001"],
+  "external_origins": [],
+  "assets": [
+    {"path":"frontend/shared/static/ude/theme-resolver-v1.1.0.js","sha256":"1E482B2D76430166D0554C36B4E8B6D2E5386A3321971D795A8CA7ECA5669445","required":true},
+    {"path":"frontend/shared/static/ude/ude-02-feature-flags-v1.1.0.json","sha256":"bfe63a4062d58783a3948459d8d81d6d04aa28d78b3c9220c80d76b3beb6f980","required":true},
+    {"path":"tools/ude_02_theme_lab.html","sha256":"76066c83d45cf3c986d6f648620655499a2c1acff06b2b8830d541997662031b","required":true},
+    {"path":"frontend/shared/static/css/ude/tokens.css","sha256":"68ae35774d1a7fc12f0ece22ece97fc086aa232129e6f382f50c07e78289e3da","required":true},
+    {"path":"frontend/shared/static/css/ude/themes.css","sha256":"186e804c1f45cf6d3dc940104b9d24e6a8f2aa23b7c6dda4bb34d8f04d876c1e","required":true}
+  ]
+}

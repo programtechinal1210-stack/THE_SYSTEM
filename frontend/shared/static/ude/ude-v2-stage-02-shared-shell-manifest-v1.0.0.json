@@ -1,0 +1,13 @@
+{
+  "schema": "ude.asset-manifest.v1",
+  "package": "UDE-V2-STAGE-02",
+  "offline": true,
+  "external_references": [],
+  "assets": [
+    {"path":"frontend/shared/static/ude/ude-v2-shared-shell-feature-flags-v1.0.0.json","sha256":"72a60b192a5770a59879b7559223506998ba6491a0f544c51461c742628334ef"},
+    {"path":"frontend/shared/static/css/ude/ude-v2-shared-shell-v1.0.0.css","sha256":"c3147fc694e5ffc14245d0bb80edab5218b6a97a4284085a9cb187bd92700148"},
+    {"path":"frontend/shared/static/js/ude-v2-shared-shell-v1.0.0.js","sha256":"4fb2065ce7c69f95f312c2e26539910aaa91df4d8997d91cf4156644373773a1"},
+    {"path":"frontend/shared/static/ude/theme-resolver-v1.1.0.js","sha256":"1e482b2d76430166d0554c36b4e8b6d2e5386a3321971d795a8ca7eca5669445"},
+    {"path":"frontend/shared/static/ude/ude-color-palettes-v1.0.js","sha256":"eae7c7bb57c63fb29f21b87b809d0be6bc5bfa937948172e51668545fd889b5f"}
+  ]
+}

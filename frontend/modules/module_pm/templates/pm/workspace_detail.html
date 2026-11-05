@@ -1,0 +1,116 @@
+﻿<section class="dw-fragment" data-dw-kind="{{ kind }}">
+    <header class="dw-detail-identity">
+        <div class="dw-detail-title-row">
+            <div>
+                <span class="dw-badge">{{ label }}</span>
+                <h2>{{ item.name }}</h2>
+                <small><bdi>{{ code }}</bdi>{% if parent %} · ضمن {{ parent.name }}{% endif %}</small>
+            </div>
+            <span class="dw-detail-status">{% if kind == 'activities' %}{{ approval_label }}{% elif item.status == 'completed' %}مكتمل{% elif item.status == 'in_progress' %}قيد التنفيذ{% elif item.status == 'approved' %}معتمد{% else %}قيد التخطيط{% endif %}</span>
+        </div>
+        {% if kind == 'activities' %}
+            <p>الأولوية: <strong>{{ priority_label }}</strong> · حالة التخطيط: {{ approval_label }}</p>
+        {% endif %}
+    </header>
+
+    <dl class="dw-detail-summary" aria-label="ملخص العنصر">
+        <div><dt>المدة المخططة</dt><dd>{{ item.planned_duration|default:'—' }} <small>ساعة</small></dd></div>
+        <div><dt>التكلفة المخططة</dt><dd>{{ item.planned_cost|default:'—' }} <small>{{ item.currency|default:'' }}</small></dd></div>
+        {% if item.planned_start_date %}<div><dt>تاريخ البداية المخطط</dt><dd>{{ item.planned_start_date }}</dd></div>{% endif %}
+        {% if item.planned_end_date %}<div><dt>تاريخ النهاية المخطط</dt><dd>{{ item.planned_end_date }}</dd></div>{% endif %}
+        {% if actual %}<div class="is-actual"><dt>التكلفة الفعلية</dt><dd>{{ actual.actual_cost }} <small>{{ actual.currency }}</small></dd></div>{% endif %}
+    </dl>
+
+    <div class="dw-tabs" role="tablist" aria-label="تفاصيل العنصر">
+        <button type="button" role="tab" aria-selected="true" aria-controls="dw-tab-general" data-dw-tab="general">عام</button>
+        {% if kind == 'activities' %}<button type="button" role="tab" aria-selected="false" aria-controls="dw-tab-resources" data-dw-tab="resources">الموارد والاحتياجات</button>{% endif %}
+        {% if can_view_risks %}<button type="button" role="tab" aria-selected="false" aria-controls="dw-tab-risks" data-dw-tab="risks">المخاطر ({{ related_risks|length }})</button>{% endif %}
+        {% if kind == 'activities' %}<button type="button" role="tab" aria-selected="false" aria-controls="dw-tab-files" data-dw-tab="files">المرفقات</button>{% endif %}
+    </div>
+
+    <section id="dw-tab-general" class="dw-tabpanel" role="tabpanel" data-dw-tabpanel="general">
+        <h3>البيانات المخططة</h3>
+        <p>{{ item.description|default:'لا يوجد وصف.' }}</p>
+        <dl class="dw-facts">
+            <div><dt>الجهد المخطط</dt><dd>{{ item.planned_duration|default:'—' }} ساعة</dd></div>
+            {% if kind == 'activities' %}
+                <div><dt>الكمية المخططة</dt><dd>{{ item.planned_quantity|default:'—' }} {{ item.unit }}</dd></div>
+                <div><dt>تاريخ البداية</dt><dd>{{ item.planned_start_date|default:'غير محدد' }}</dd></div>
+                <div><dt>تاريخ النهاية</dt><dd>{{ item.planned_end_date|default:'غير محدد' }}</dd></div>
+            {% endif %}
+        </dl>
+        {% if item.owner_name %}<p>المسؤول: <strong>{{ item.owner_name }}</strong></p>{% endif %}
+        <div class="dw-action-row">
+            {% if edit_url %}<a class="dw-primary" href="{{ edit_url }}" data-pm-dialog>تعديل البيانات</a>{% endif %}
+            {% if resource_create %}<a href="{{ resource_create }}" data-pm-dialog>إضافة مورد أو احتياج</a>{% endif %}
+            {% if work_order_create_url %}<a class="dw-primary" data-dw-action="work-order" href="{{ work_order_create_url }}">إضافة أمر تشغيل</a>{% endif %}
+            {% if report_create_url %}<a data-dw-action="completion-report" href="{{ report_create_url }}">تسجيل تقرير إنجاز</a>{% endif %}
+        </div>
+    </section>
+
+    {% if kind == 'activities' %}<section id="dw-tab-resources" class="dw-tabpanel" role="tabpanel" data-dw-tabpanel="resources" hidden>
+        <header class="dw-resource-heading">
+            <div><span class="dw-eyebrow">التخطيط المالي والتشغيلي</span><h3>الموارد والاحتياجات</h3><p>الاحتياجات المرتبطة بهذا النشاط وتكلفتها المخططة.</p></div>
+            {% if resource_create %}<div class="dw-resource-actions"><a class="dw-resource-add" href="{{ resource_create }}" data-pm-dialog><span aria-hidden="true">＋</span> إضافة احتياج</a>{% if resource_edit_url %}<a class="dw-primary dw-resource-edit" href="{{ resource_edit_url }}" data-pm-dialog><span aria-hidden="true">✎</span> تعديل الاحتياج</a>{% endif %}</div>{% endif %}
+        </header>
+        {% if resources %}
+            <div class="dw-resource-cards">
+            {% for r in resources %}
+                <article class="dw-resource-card">
+                    <header><div><span class="dw-resource-type">{{ r.resource_type|default:'مورد' }}</span><h4>{{ r.name }}</h4></div><span class="dw-status-pill">مخطط</span></header>
+                    <div class="dw-resource-facts">
+                        <div><small>الكمية المطلوبة</small><strong>{{ r.quantity|default:'—' }} {{ r.unit|default:'' }}</strong></div>
+                        <div><small>سعر الوحدة</small><strong>{{ r.unit_price|default:'—' }} {{ r.currency|default:'' }}</strong></div>
+                        <div><small>المصدر</small><strong>{{ r.source|default:'غير محدد' }}</strong></div>
+                    </div>
+                    <footer class="dw-resource-card-footer"><div><span>التكلفة المخططة</span><strong>{{ r.planned_cost|default:'—' }} {{ r.planned_cost_currency|default:r.currency }}</strong></div>{% if r.edit_url %}<a class="dw-resource-card-edit" href="{{ r.edit_url }}" data-pm-dialog><span aria-hidden="true">✎</span> تعديل الاحتياج</a>{% endif %}</footer>
+                </article>
+            {% endfor %}
+            </div>
+        {% else %}
+            <p>لا توجد احتياجات مرتبطة بهذا النشاط حتى الآن.</p>
+        {% endif %}
+        <p class="dw-notice">تُحتسب التكلفة المخططة وفق الكميات والأسعار المحفوظة.</p>
+        {% if work_orders %}
+            <div class="dw-action-row">
+                {% for order in work_orders %}<a href="{{ order.href }}">عرض أمر التشغيل {{ order.work_order_code }}</a>{% endfor %}
+            </div>
+        {% endif %}
+    </section>{% endif %}
+
+    {% if can_view_risks %}
+    <section id="dw-tab-risks" class="dw-tabpanel" role="tabpanel" data-dw-tabpanel="risks" hidden>
+        <h3>المخاطر المرتبطة بهذا العنصر</h3>
+        <p>استعرض المخاطر المسجلة والإجراءات المرتبطة بها.</p>
+        {% for risk in related_risks %}
+        <article class="dw-risk-row">
+            <div><strong><bdi>{{ risk.risk_code }}</bdi> — {{ risk.description }}</strong>
+                <small>{{ risk.classification|default:'دون تصنيف' }} · {{ risk.status_label }} · الاحتمال {{ risk.probability }}% · الأثر {{ risk.impact }}/5 · الأهمية {{ risk.importance }}</small>
+                {% if risk.corrective_action %}<p>{{ risk.corrective_action }}</p>{% endif %}
+                <small>تاريخ الاكتشاف: {{ risk.discovery_date|default:'—' }}{% if risk.closure_date %} · تاريخ الإغلاق: {{ risk.closure_date }}{% endif %}</small></div>
+            <div class="dw-risk-actions">
+                <a href="{{ risk.href }}">عرض وإدارة الخطر</a>
+                {% if risk_create_url %}<a class="dw-primary" href="{{ risk.href }}edit/" data-pm-dialog>تعديل الخطر</a>{% endif %}
+            </div>
+        </article>
+        {% empty %}
+        <p class="dw-empty">لا توجد مخاطر مسجلة لهذا العنصر.</p>
+        {% endfor %}
+        <footer class="dw-risk-footer">
+            {% if risk_create_url %}<a class="dw-primary" href="{{ risk_create_url }}" data-pm-dialog>＋ إضافة خطر لهذا العنصر</a>{% endif %}
+        </footer>
+        {% if not risk_create_url %}<p class="dw-notice">لا تملك صلاحية إضافة أو تعديل المخاطر.</p>{% endif %}
+    </section>
+    {% endif %}
+
+    {% if kind == 'activities' %}<section id="dw-tab-files" class="dw-tabpanel" role="tabpanel" data-dw-tabpanel="files" hidden>
+        <h3>المرفقات</h3>
+        {% if item.attachment_url %}<p><a href="{{ item.attachment_url }}" target="_blank" rel="noopener noreferrer">فتح المرفق الرئيسي</a></p>{% endif %}
+        {% for file in attachments %}
+            <p><a href="{{ file.url }}" target="_blank" rel="noopener noreferrer">تنزيل {{ file.filename }}</a> <small>{{ file.size }} بايت</small></p>
+        {% empty %}
+            <p>لا توجد مرفقات لهذا النشاط.</p>
+        {% endfor %}
+        {% if attachment_upload %}<a class="dw-primary" href="{{ attachment_upload }}" data-pm-dialog>رفع مرفق جديد</a>{% endif %}
+    </section>{% endif %}
+</section>

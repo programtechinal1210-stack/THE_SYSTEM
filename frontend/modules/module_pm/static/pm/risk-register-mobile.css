@@ -1,0 +1,6 @@
+@media (max-width:600px){
+  .risk-toolbar-main{display:grid;grid-template-columns:1fr 1fr;width:100%;}
+  .risk-search{grid-column:1 / -1;width:100%;min-width:0;}
+  .risk-search input{min-width:0;width:100%!important;}
+  .risk-filter{width:100%!important;min-width:0!important;}
+}

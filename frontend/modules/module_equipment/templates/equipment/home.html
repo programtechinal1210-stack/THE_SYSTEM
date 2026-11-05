@@ -1,0 +1,674 @@
+{% extends "base.html" %}
+{% load static %}
+{% block module_token_bridge %}<link rel="stylesheet" href="{% static 'module_equipment/core-token-bridge.css' %}?v=20261024">{% endblock %}
+{% block title %}إدارة المعدات{% endblock %}
+{% block content %}
+<main class="container-fluid py-4 equipment-legacy-page" dir="rtl">
+  <header class="mb-4">
+    <h1>إدارة المعدات</h1>
+    <p class="text-muted">طلبات المعدات والتصنيفات والسجل. بدء التشغيل متوقف حتى إثبات تأهيل المشغل وربط عقد HR.</p>
+    <a class="btn btn-outline-secondary" href="{% url 'equipment:home' %}">العودة إلى مركز تحكم المعدات</a>
+    {% if can_view_reports %}<a class="btn btn-outline-primary" href="{% url 'equipment:reports' %}">التحليلات والتقارير</a>{% endif %}
+  </header>
+  {% if can_view_assets %}
+  <section class="row g-3 mb-4" aria-label="ملخص الأسطول">
+    <div class="col-md-4"><article class="card h-100"><div class="card-body"><h2 class="h6">إجمالي المعدات</h2><strong>{{ dashboard.assets.total|default:0 }}</strong></div></article></div>
+    <div class="col-md-4"><article class="card h-100"><div class="card-body"><h2 class="h6">ضمن الخدمة</h2><strong>{{ dashboard.assets.in_service|default:0 }}</strong></div></article></div>
+    <div class="col-md-4"><article class="card h-100"><div class="card-body"><h2 class="h6">الجاهزية</h2><strong>غير مقيّمة</strong></div></article></div>
+  </section>
+  {% endif %}
+  <section class="row g-3 mb-4">
+    {% if can_manage_assets and categories %}
+    <div class="col-xl-7" id="asset-create">
+      <article class="card h-100"><div class="card-body">
+        <h2 class="h5">تسجيل معدة</h2>
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="create_asset">
+          {{ asset_form.as_p }}
+          <button class="btn btn-primary" type="submit">حفظ المعدة</button>
+        </form>
+      </div></article>
+    </div>
+    {% endif %}
+    {% if can_manage_categories %}
+    <div class="col-xl-5">
+      <article class="card h-100"><div class="card-body">
+        <h2 class="h5">إضافة تصنيف</h2>
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="create_category">
+          {{ category_form.as_p }}
+          <button class="btn btn-outline-primary" type="submit">حفظ التصنيف</button>
+        </form>
+      </div></article>
+    </div>
+    {% endif %}
+  </section>
+  {% if can_view_assets %}
+  <section class="card mb-4" id="asset-registry">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h5 mb-0">سجل المعدات</h2>
+        <form method="get" role="search" class="d-flex gap-2">
+          <label class="visually-hidden" for="equipment-search">بحث</label>
+          <input class="form-control" id="equipment-search" name="search" value="{{ search }}" placeholder="الرمز أو الاسم أو الرقم التسلسلي">
+          <button class="btn btn-outline-primary" type="submit">بحث</button>
+        </form>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>الرمز</th><th>المعدة</th><th>التصنيف</th><th>الحالة الحياتية</th><th>القراءة</th><th>الموقع الحالي</th></tr></thead>
+          <tbody>
+          {% for asset in assets %}
+            <tr>
+              <td>{{ asset.asset_code }}</td><td>{{ asset.asset_name }}</td>
+              <td>{{ asset.category_name }}</td><td>{{ asset.lifecycle_status }}</td>
+              <td>{% if asset.meter_latest %}{{ asset.meter_latest }} {{ asset.meter_unit_locked }}{% else %}—{% endif %}</td>
+              <td>{{ asset.current_location|default:"—" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="text-center text-muted py-4">لا توجد معدات مسجلة.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+  {% if can_view_categories %}
+  <section class="card">
+    <div class="card-body">
+      <h2 class="h5">التصنيفات النشطة</h2>
+      <ul class="mb-0">
+        {% for category in categories %}<li>{{ category.category_code }} — {{ category.name_ar }} ({{ category.meter_unit }})</li>
+        {% empty %}<li class="text-muted">لا توجد تصنيفات مسجلة.</li>{% endfor %}
+      </ul>
+    </div>
+  </section>
+  {% endif %}
+  {% if can_create_requests and can_view_categories %}
+  <section class="card my-4" id="request-create">
+    <div class="card-body">
+      <h2 class="h5">طلب معدات</h2>
+      <p class="text-muted">إنشاء الطلب لا يحجز معدة. الاعتماد مطلوب قبل ربطه بتكليف.</p>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="create_request">
+        {{ request_form.as_p }}
+        <button class="btn btn-primary" type="submit">إرسال الطلب</button>
+      </form>
+    </div>
+  </section>
+  {% endif %}
+  {% if can_view_requests %}
+  <section class="card" id="equipment-requests">
+    <div class="card-body">
+      <h2 class="h5">طلبات المعدات</h2>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>الطلب</th><th>الكمية</th><th>الفترة</th><th>الغرض</th><th>الأولوية</th><th>الحالة</th><th>قرار</th></tr></thead>
+          <tbody>
+          {% for equipment_request in equipment_requests %}
+            <tr>
+              <td>{{ equipment_request.request_code }}</td>
+              <td>{{ equipment_request.required_quantity }}</td>
+              <td>{{ equipment_request.required_start }} — {{ equipment_request.required_end }}</td>
+              <td>{{ equipment_request.purpose }}</td>
+              <td>{{ equipment_request.priority }}</td>
+              <td>{{ equipment_request.status }}</td>
+              <td>
+                {% if equipment_request.status == "submitted" and can_approve_requests %}
+                <form method="post" class="mb-2">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="approve_request">
+                  <input type="hidden" name="request_id" value="{{ equipment_request.id }}">
+                  <button class="btn btn-sm btn-success" type="submit">اعتماد</button>
+                </form>
+                {% endif %}
+                {% if equipment_request.status == "submitted" and can_reject_requests %}
+                <form method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="reject_request">
+                  <input type="hidden" name="request_id" value="{{ equipment_request.id }}">
+                  <label class="visually-hidden" for="reject-reason-{{ equipment_request.id }}">سبب الرفض</label>
+                  <input class="form-control form-control-sm mb-1" id="reject-reason-{{ equipment_request.id }}" name="decision_reason" required maxlength="2000" placeholder="سبب الرفض">
+                  <button class="btn btn-sm btn-outline-danger" type="submit">رفض</button>
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="7" class="text-center text-muted py-4">لا توجد طلبات معدات.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+  {% if can_view_inspections or can_view_maintenance %}
+  <section class="row g-3 my-4" id="inspection-maintenance">
+    {% if can_record_inspections and can_view_assets %}
+    <div class="col-xl-6">
+      <article class="card h-100"><div class="card-body">
+        <h2 class="h5">تسجيل فحص</h2>
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="create_inspection">
+          {{ inspection_form.as_p }}
+          <button class="btn btn-primary" type="submit">حفظ الفحص</button>
+        </form>
+      </div></article>
+    </div>
+    {% endif %}
+    {% if can_create_maintenance and can_view_assets %}
+    <div class="col-xl-6">
+      <article class="card h-100" id="maintenance-create"><div class="card-body">
+        <h2 class="h5">فتح أمر صيانة</h2>
+        <p class="text-muted">يفتح مانع صيانة مستقل فور التسجيل.</p>
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="create_maintenance">
+          {{ maintenance_form.as_p }}
+          <button class="btn btn-outline-primary" type="submit">فتح أمر الصيانة</button>
+        </form>
+      </div></article>
+    </div>
+    {% endif %}
+  </section>
+  {% endif %}
+  {% if can_view_inspections %}
+  <section class="card mb-4">
+    <div class="card-body">
+      <h2 class="h5">الفحوص وموانع السلامة</h2>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>المعدة</th><th>النوع</th><th>النتيجة</th><th>الحالة</th><th>المانع</th><th>الإجراء</th></tr></thead>
+          <tbody>
+          {% for inspection in inspections %}
+            <tr>
+              <td>{{ inspection.asset_id }}</td><td>{{ inspection.inspection_type }}</td>
+              <td>{{ inspection.result }}</td><td>{{ inspection.status }}</td><td>{{ inspection.block_status }}</td>
+              <td>
+                {% if inspection.status == "submitted" and can_verify_inspections %}
+                <form method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="verify_inspection">
+                  <input type="hidden" name="record_id" value="{{ inspection.id }}">
+                  <button class="btn btn-sm btn-outline-primary" type="submit">تحقق مستقل</button>
+                </form>
+                {% endif %}
+                {% if inspection.block_status == "active" and can_release_safety and verified_post_repair_inspections %}
+                <form method="post" class="mt-2">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="release_inspection">
+                  <input type="hidden" name="record_id" value="{{ inspection.id }}">
+                  <label for="inspection-release-{{ inspection.id }}">إثبات ما بعد الإصلاح</label>
+                  <select class="form-select form-select-sm my-1" id="inspection-release-{{ inspection.id }}" name="inspection_id" required>
+                    <option value="">اختر فحصاً متحققاً</option>
+                    {% for followup in verified_post_repair_inspections %}
+                    <option value="{{ followup.id }}">{{ followup.id|slice:":12" }} — {{ followup.inspected_at }}</option>
+                    {% endfor %}
+                  </select>
+                  <button class="btn btn-sm btn-outline-danger" type="submit">تحرير هذا المانع</button>
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="text-center text-muted py-4">لا توجد فحوص مسجلة.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+  {% if can_view_maintenance %}
+  <section class="card mb-4">
+    <div class="card-body">
+      <h2 class="h5">خطط الصيانة الوقائية</h2>
+      {% if can_create_maintenance and can_view_assets %}
+      <form method="post" class="mb-4">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="create_maintenance_plan">
+        {{ maintenance_plan_form.as_p }}
+        <button class="btn btn-outline-primary" type="submit">حفظ خطة الصيانة</button>
+      </form>
+      {% endif %}
+      <h3 class="h6">الخطط المستحقة</h3>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>الخطة</th><th>المعدة</th><th>سبب الاستحقاق</th><th>الإجراء</th></tr></thead>
+          <tbody>
+          {% for plan in due_maintenance_plans %}
+            <tr>
+              <td>{{ plan.plan_code }} — {{ plan.description }}</td>
+              <td>{{ plan.asset_id }}</td>
+              <td>{{ plan.due_reasons|join:", " }}</td>
+              <td>
+                {% if can_create_maintenance %}
+                <form method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="generate_maintenance_order">
+                  <input type="hidden" name="plan_id" value="{{ plan.id }}">
+                  <button class="btn btn-sm btn-outline-primary" type="submit">فتح أمر وقائي</button>
+                </form>
+                {% else %}يتطلب صلاحية إنشاء الصيانة{% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="4" class="text-center text-muted py-3">لا توجد خطط مستحقة.</td></tr>
+          {% endfor %}
+          {% for plan in blocked_maintenance_plans %}
+            <tr>
+              <td>{{ plan.plan_code }} — {{ plan.description }}</td>
+              <td>{{ plan.asset_id }}</td>
+              <td class="text-warning-emphasis">مراجعة عقد العداد مطلوبة</td>
+              <td>لا يمكن إنشاء أمر اعتماداً على هذا العداد</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <h3 class="h6 mt-4">كل الخطط</h3>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>الخطة</th><th>المعدة</th><th>الفواصل</th><th>الحالة</th><th>الإجراء</th></tr></thead>
+          <tbody>
+          {% for plan in maintenance_plans %}
+            <tr>
+              <td>{{ plan.plan_code }} — {{ plan.description }}</td>
+              <td>{{ plan.asset_id }}</td>
+              <td>
+                {% if plan.interval_days %}كل {{ plan.interval_days }} يوم ({{ plan.next_due_at }}){% endif %}
+                {% if plan.interval_meter %}كل {{ plan.interval_meter }} {{ plan.meter_unit_snapshot }} ({{ plan.next_due_meter }}){% endif %}
+              </td>
+              <td>{{ plan.status }}</td>
+              <td>
+                {% if can_create_maintenance %}
+                <form method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="plan_id" value="{{ plan.id }}">
+                  {% if plan.status == "active" %}
+                  <input type="hidden" name="action" value="pause_maintenance_plan">
+                  <button class="btn btn-sm btn-outline-secondary" type="submit">إيقاف الخطة</button>
+                  {% else %}
+                  <input type="hidden" name="action" value="resume_maintenance_plan">
+                  <button class="btn btn-sm btn-outline-primary" type="submit">استئناف الخطة</button>
+                  {% endif %}
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5" class="text-center text-muted py-3">لا توجد خطط صيانة.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  <section class="card mb-4">
+    <div class="card-body">
+      <h2 class="h5">أوامر الصيانة وموانعها</h2>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>الأمر</th><th>المعدة</th><th>النوع</th><th>الحالة</th><th>المانع</th><th>الإجراء</th></tr></thead>
+          <tbody>
+          {% for order in maintenance_orders %}
+            <tr>
+              <td>{{ order.order_code }}</td><td>{{ order.asset_id }}</td><td>{{ order.maintenance_type }}</td>
+              <td>{{ order.status }}</td><td>{{ order.block_status }}</td>
+              <td>
+                {% if order.status == "open" or order.status == "in_progress" %}
+                  {% if can_execute_maintenance %}
+                  <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="complete_maintenance">
+                    <input type="hidden" name="record_id" value="{{ order.id }}">
+                    <label for="completion-notes-{{ order.id }}">ملاحظات الإكمال الفني</label>
+                    <textarea class="form-control form-control-sm my-1" id="completion-notes-{{ order.id }}" name="completion_notes" maxlength="2000" required></textarea>
+                    <button class="btn btn-sm btn-outline-primary" type="submit">تسجيل الإكمال الفني</button>
+                  </form>
+                  {% endif %}
+                {% endif %}
+                {% if order.block_status == "active" and order.status == "technically_completed" and can_release_safety and verified_post_repair_inspections %}
+                <form method="post" class="mt-2">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="release_maintenance">
+                  <input type="hidden" name="record_id" value="{{ order.id }}">
+                  <label for="maintenance-release-{{ order.id }}">فحص ما بعد الإصلاح</label>
+                  <select class="form-select form-select-sm my-1" id="maintenance-release-{{ order.id }}" name="inspection_id" required>
+                    <option value="">اختر فحصاً متحققاً</option>
+                    {% for followup in verified_post_repair_inspections %}
+                    <option value="{{ followup.id }}">{{ followup.id|slice:":12" }} — {{ followup.inspected_at }}</option>
+                    {% endfor %}
+                  </select>
+                  <button class="btn btn-sm btn-outline-danger" type="submit">إغلاق وتحرير المانع</button>
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="text-center text-muted py-4">لا توجد أوامر صيانة.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+  {% if can_create_movements and can_view_assets and assets %}
+  <section class="card my-4" id="movement-create">
+    <div class="card-body">
+      <h2 class="h5">طلب حركة معدة</h2>
+      <p class="text-muted">لا يتغير الموقع الرسمي إلا بعد الاستلام المستقل. الحركة لا تنشئ أوامر تشغيل أو نقل ملكية.</p>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="create_movement">
+        {{ movement_form.as_p }}
+        <button class="btn btn-primary" type="submit">إنشاء حركة</button>
+      </form>
+    </div>
+  </section>
+  {% endif %}
+  {% if can_view_movements %}
+  <section class="card mt-4" id="equipment-movements">
+    <div class="card-body">
+      <h2 class="h5">حركات المعدات</h2>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead><tr><th>الحركة</th><th>المعدة</th><th>المصدر</th><th>الوجهة</th><th>الحالة</th><th>الإجراء</th></tr></thead>
+          <tbody>
+          {% for movement in equipment_movements %}
+            <tr>
+              <td>{{ movement.movement_code }}</td>
+              <td>{{ movement.asset_id }}</td>
+              <td>{{ movement.from_location|default:"—" }}</td>
+              <td>{{ movement.to_location }}</td>
+              <td>{{ movement.status }}</td>
+              <td>
+                {% if movement.status == "draft" and can_dispatch_movements %}
+                <form method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="dispatch_movement">
+                  <input type="hidden" name="movement_id" value="{{ movement.id }}">
+                  <button class="btn btn-sm btn-outline-primary" type="submit">تسليم وإرسال</button>
+                </form>
+                {% endif %}
+                {% if movement.status == "draft" and can_cancel_movements %}
+                <form method="post" class="mt-1">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="cancel_movement">
+                  <input type="hidden" name="movement_id" value="{{ movement.id }}">
+                  <button class="btn btn-sm btn-outline-danger" type="submit">إلغاء المسودة</button>
+                </form>
+                {% endif %}
+                {% if movement.status == "dispatched" and can_receive_movements %}
+                <form method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="receive_movement">
+                  <input type="hidden" name="movement_id" value="{{ movement.id }}">
+                  <label class="visually-hidden" for="movement-condition-{{ movement.id }}">حالة المعدة عند الاستلام</label>
+                  <input class="form-control form-control-sm my-1" id="movement-condition-{{ movement.id }}" name="condition_at_receipt" required maxlength="2000" placeholder="حالة المعدة عند الاستلام">
+                  <button class="btn btn-sm btn-success" type="submit">تأكيد الاستلام</button>
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="text-center text-muted py-4">لا توجد حركات مسجلة.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+  {% if can_view_meters or can_record_meters or can_view_fuel or can_record_fuel or can_view_fuel_mappings or can_manage_fuel_mappings or can_view_parts or can_install_parts %}
+  <section class="card mt-4" id="meter-fuel">
+    <div class="card-body">
+      <h2 class="h5">العدادات والوقود والطاقة</h2>
+      {% if can_view_fuel_mappings or can_manage_fuel_mappings %}
+      <h3 class="h6 mt-3">ربط الوقود بمخزون الجهة</h3>
+      <p class="text-muted">اختر صنفاً ومخزناً فعليين من Inventory. يُرفض الربط إذا اختلفت الجهة أو وحدة الصنف عن وحدة الوقود المعرفة للتصنيف.</p>
+      {% if can_manage_fuel_mappings %}
+        {% if fuel_inventory_mapping_choices_available %}
+        <form method="post" class="row g-2 align-items-end mb-3">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="save_fuel_inventory_mapping">
+          {% for field in fuel_inventory_mapping_form %}
+          <div class="col-md-3"><label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{{ field.errors }}</div>
+          {% endfor %}
+          <div class="col-md-3"><button class="btn btn-outline-primary" type="submit">حفظ إعداد الربط</button></div>
+        </form>
+        {% else %}
+        <p class="text-warning">يلزم توفر صلاحية عرض تصنيفات EMO وأصناف ومخازن Inventory لإعداد الربط.</p>
+        {% endif %}
+      {% endif %}
+      {% if can_view_fuel_mappings %}
+      <div class="table-responsive mb-3">
+        <table class="table table-sm align-middle">
+          <thead><tr><th>التصنيف</th><th>الطاقة</th><th>صنف Inventory</th><th>المخزن</th><th>الحالة</th></tr></thead>
+          <tbody>
+          {% for mapping in fuel_inventory_mappings %}
+          <tr><td>{{ mapping.category_code }} — {{ mapping.category_name }}</td><td>{{ mapping.energy_type }}</td><td>{{ mapping.item_code }} — {{ mapping.item_name }}</td><td>{{ mapping.warehouse_code }} — {{ mapping.warehouse_name }}</td><td>{% if mapping.is_active %}نشط{% else %}موقوف{% endif %}</td></tr>
+          {% empty %}
+          <tr><td colspan="5" class="text-center text-muted">لا توجد إعدادات ربط.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+      {% endif %}
+      {% if can_view_assets %}
+      <form method="get" class="row g-2 align-items-end mb-4">
+        <div class="col-md-8">
+          <label class="form-label" for="meter-fuel-asset">المعدة</label>
+          <select class="form-select" id="meter-fuel-asset" name="asset_id" required>
+            <option value="">اختر المعدة لعرض سجلها</option>
+            {% for asset in assets %}
+            <option value="{{ asset.id }}" {% if selected_asset.id == asset.id %}selected{% endif %}>
+              {{ asset.asset_code }} — {{ asset.asset_name }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4"><button class="btn btn-outline-primary" type="submit">عرض السجلات</button></div>
+      </form>
+      {% endif %}
+      {% if selected_asset %}
+        <p class="text-muted">
+          المعدة المحددة: {{ selected_asset.asset_code }} — {{ selected_asset.asset_name }}
+          {% if selected_asset.meter_latest %}؛ آخر قراءة {{ selected_asset.meter_latest }} {{ selected_asset.meter_unit_locked }}، الجيل {{ selected_asset.meter_generation }}{% endif %}
+        </p>
+        {% if can_view_meters or can_record_meters %}
+        <h3 class="h6 mt-4">أحداث العداد</h3>
+        {% if can_record_meters and selected_asset.meter_type_locked != "none" %}
+        <form method="post" class="mb-3">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="create_meter_event">
+          {{ meter_event_form.as_p }}
+          <button class="btn btn-primary" type="submit">إرسال حدث العداد للمراجعة</button>
+        </form>
+        {% elif can_record_meters %}
+        <p class="text-muted">لا يوجد عداد قابل للقراءة على هذا الأصل.</p>
+        {% endif %}
+        {% if can_view_meters %}
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead><tr><th>الحدث</th><th>النوع</th><th>القراءة/الاستبدال</th><th>الوحدة والجيل</th><th>الحالة</th><th>المراجعة</th></tr></thead>
+            <tbody>
+            {% for event in meter_events %}
+              <tr>
+                <td>{{ event.event_code }}</td><td>{{ event.event_type }}</td>
+                <td>{{ event.reading_value|default:"—" }}
+                  {% if event.corrected_reading %}{{ event.corrected_reading }}{% endif %}
+                  {% if event.old_final_reading %}{{ event.old_final_reading }} ← {{ event.new_initial_reading }}{% endif %}
+                </td>
+                <td>{{ event.meter_unit_snapshot }} — {{ event.generation_before }}{% if event.generation_after %} → {{ event.generation_after }}{% endif %}</td>
+                <td>{{ event.status }}</td>
+                <td>
+                  {% if event.can_approve %}
+                  <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="approve_meter_event">
+                    <input type="hidden" name="event_id" value="{{ event.id }}">
+                    <input type="hidden" name="asset_id" value="{{ selected_asset.id }}">
+                    <button class="btn btn-sm btn-outline-primary" type="submit">اعتماد مستقل</button>
+                  </form>
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="6" class="text-center text-muted py-3">لا توجد أحداث عداد.</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% endif %}
+        {% endif %}
+        {% if can_view_fuel or can_record_fuel %}
+        <h3 class="h6 mt-4">الوقود والطاقة</h3>
+        <p class="text-muted">التسليم للمعدة ليس سند صرف مخزنياً؛ الرصيد التشغيلي لا يغيّر أرصدة Inventory.</p>
+        {% if can_record_fuel %}
+        <p class="small text-muted">لتهيئة مرتجع قابل للمطابقة المخزنية، اربطه بسند الصرف التشغيلي الأصلي؛ الربط لا ينشئ حركة في Inventory.</p>
+        <form method="post" class="mb-3">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="create_fuel_event">
+          {{ fuel_event_form.as_p }}
+          <button class="btn btn-primary" type="submit">إرسال حركة الوقود للمراجعة</button>
+        </form>
+        {% endif %}
+        {% if can_view_fuel %}
+        <h4 class="h6">الرصيد التشغيلي المنشور</h4>
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead><tr><th>الطاقة</th><th>الوحدة</th><th>افتتاحي</th><th>تسليم</th><th>مستهلك</th><th>إرجاع</th><th>الرصيد</th></tr></thead>
+            <tbody>
+            {% for balance in fuel_balance %}
+              <tr><td>{{ balance.energy_type }}</td><td>{{ balance.unit }}</td><td>{{ balance.opening }}</td><td>{{ balance.issued }}</td><td>{{ balance.consumed }}</td><td>{{ balance.returned }}</td><td>{{ balance.balance }}</td></tr>
+            {% empty %}
+              <tr><td colspan="7" class="text-center text-muted py-3">لا يوجد رصيد منشور.</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead><tr><th>الحدث</th><th>النوع</th><th>الكمية</th><th>الطاقة</th><th>التكلفة المحفوظة</th><th>الحالة</th><th>المراجعة</th></tr></thead>
+            <tbody>
+            {% for event in fuel_events %}
+              <tr>
+                <td>{{ event.fuel_event_code }}</td><td>{{ event.event_type }}</td>
+                <td>{{ event.quantity }}</td><td>{{ event.energy_type }} / {{ event.unit }}</td>
+                <td>{% if event.cost_amount %}{{ event.cost_amount }} ({{ event.currency_id }}){% else %}غير مسجلة{% endif %}</td>
+                <td>{{ event.status }}</td>
+                <td>
+                  {% if event.can_review %}
+                  <form method="post" class="d-flex flex-column gap-1">
+                    {% csrf_token %}
+                    <input type="hidden" name="event_id" value="{{ event.id }}">
+                    <input type="hidden" name="asset_id" value="{{ selected_asset.id }}">
+                    <button class="btn btn-sm btn-outline-primary" type="submit" name="action" value="approve_fuel_event">اعتماد</button>
+                    <label class="visually-hidden" for="fuel-rejection-{{ event.id }}">سبب الرفض</label>
+                    <input class="form-control form-control-sm" id="fuel-rejection-{{ event.id }}" name="decision_reason" maxlength="2000" placeholder="سبب الرفض">
+                    <button class="btn btn-sm btn-outline-danger" type="submit" name="action" value="reject_fuel_event">رفض مع سبب</button>
+                  </form>
+                  {% endif %}
+                  {% if event.can_create_inventory_issue %}
+                  <form method="post" class="mt-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="event_id" value="{{ event.id }}">
+                    <input type="hidden" name="asset_id" value="{{ selected_asset.id }}">
+                    <button class="btn btn-sm btn-outline-secondary" type="submit" name="action" value="create_fuel_inventory_issue">إنشاء مسودة سند صرف في Inventory</button>
+                    <small class="text-muted">لا يرحّل هذا الإجراء المخزون؛ يلزم استكمال دورة الاعتماد والترحيل في Inventory.</small>
+                  </form>
+                  {% endif %}
+                  {% if event.can_create_inventory_return %}
+                  <form method="post" class="mt-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="event_id" value="{{ event.id }}">
+                    <input type="hidden" name="asset_id" value="{{ selected_asset.id }}">
+                    <button class="btn btn-sm btn-outline-secondary" type="submit" name="action" value="create_fuel_inventory_return">إنشاء مسودة مرتجع في Inventory</button>
+                    <small class="text-muted">تُشتق القيمة من تكلفة الصرف المرحّل؛ الاعتماد والترحيل في Inventory فقط.</small>
+                  </form>
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="7" class="text-center text-muted py-3">لا توجد حركات وقود.</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% endif %}
+        {% endif %}
+        {% if can_view_parts or can_install_parts %}
+        <h3 class="h6 mt-4" id="parts-lifecycle">دورة حياة قطع الغيار</h3>
+        <p class="small text-muted">تُحتسب مدة العمر من العداد المطبع وقت التركيب والإزالة. يجب أن تكون مستندات الصرف والإرجاع مرحّلة في Inventory؛ لا تغيّر EMO الأرصدة أو التقييم.</p>
+        {% if can_install_parts %}
+        <form method="post" class="row g-2 mb-3">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="install_part">
+          <div class="col-12">{{ part_install_form.as_p }}</div>
+          <div class="col-12"><button class="btn btn-primary" type="submit">تسجيل تركيب قطعة من سند Inventory</button></div>
+        </form>
+        {% endif %}
+        {% if can_view_parts %}
+        <div class="table-responsive">
+          <table class="table table-sm align-middle">
+            <thead><tr><th>الصنف</th><th>الموضع</th><th>التسلسلي / الدفعة</th><th>التركيب</th><th>العداد عند التركيب</th><th>الحالة / العمر</th><th>الإزالة</th></tr></thead>
+            <tbody>
+            {% for part in part_lifecycles %}
+              <tr>
+                <td>{{ part.inventory_item_code }} — {{ part.inventory_item_name }}</td>
+                <td>{{ part.mount_position }}</td>
+                <td>{{ part.part_serial_number|default:"—" }} / {{ part.lot_number|default:"—" }}</td>
+                <td>{{ part.installed_at }}</td>
+                <td>{{ part.installed_meter_value|default:"غير مقاس" }} {{ part.installed_meter_unit|default:"" }}</td>
+                <td>{{ part.lifecycle_status }}{% if part.actual_life_value != None %} / {{ part.actual_life_value }} {{ part.removed_meter_unit }}{% endif %}</td>
+                <td>
+                  {% if can_remove_parts and part.lifecycle_status == "installed" %}
+                  <form method="post" class="d-grid gap-1">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="remove_part">
+                    {{ part.removal_form.lifecycle_id }}
+                    {{ part.removal_form.removed_at }}
+                    {{ part.removal_form.reason_code }}
+                    {{ part.removal_form.removal_inventory_document_id }}
+                    {{ part.removal_form.idempotency_key }}
+                    <button class="btn btn-sm btn-outline-danger" type="submit">إزالة بعد إرجاع القطعة إلى Inventory</button>
+                  </form>
+                  {% if can_replace_parts %}
+                  <details class="mt-2">
+                    <summary>استبدال ذري</summary>
+                    <form method="post" class="d-grid gap-1 mt-2">
+                      {% csrf_token %}
+                      <input type="hidden" name="action" value="replace_part">
+                      {{ part.replacement_form.as_p }}
+                      <button class="btn btn-sm btn-outline-primary" type="submit">استبدال بعد ترحيل سندي Inventory</button>
+                    </form>
+                  </details>
+                  {% endif %}
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="7" class="text-center text-muted py-3">لا توجد سجلات دورة حياة.</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% endif %}
+        {% endif %}
+      {% else %}
+        <p class="text-muted">اختر معدة لعرض أحداث العداد والوقود.</p>
+      {% endif %}
+    </div>
+  </section>
+  {% endif %}
+</main>
+{% endblock %}

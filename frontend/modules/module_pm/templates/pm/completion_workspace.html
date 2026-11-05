@@ -1,0 +1,215 @@
+{% extends "pm/reference_base.html" %}
+{% load static %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block extra_head %}{{ block.super }}<link rel="stylesheet" href="{% static 'pm/completion.css' %}?v=20261018-v1">{% endblock %}
+{% block pm_content %}
+<main class="pm-completion" aria-labelledby="completion-workspace-title">
+    <nav class="completion-breadcrumb" aria-label="مسار التنقل">
+        <a href="/pm/">إدارة المشاريع</a><span>/</span><a href="{% url 'pm:completion-center' %}">مركز الاكتمال</a><span>/</span><strong>{{ project.name }}</strong>
+    </nav>
+    <header class="completion-workspace-head">
+        <div>
+            <span class="completion-code">{{ project.project_code }} · {{ project.status }}</span>
+            <h1 id="completion-workspace-title">{{ project.name }}</h1>
+            <p>مساحة المشروع الواحد. لا يحوّل الإنجاز الكمي وحده العمل إلى مستلم أو مغلق.</p>
+        </div>
+        {% if project_closed %}<span class="completion-badge is-green">مغلق رسمياً</span>{% else %}<span class="completion-badge is-neutral">قيد دورة الاكتمال</span>{% endif %}
+    </header>
+
+    {% if error %}<div class="completion-alert is-error" role="alert">{{ error }}</div>{% endif %}
+    {% if saved %}<div class="completion-alert is-success" role="status">تم حفظ القرار وتحديث سجل المشروع.</div>{% endif %}
+    {% if project_closed %}<div class="completion-alert is-success" role="status">أُغلق المشروع رسمياً. السجل والقرارات للقراءة فقط.</div>{% endif %}
+
+    <section class="completion-kpis completion-project-kpis" aria-label="ملخص المشروع">
+        <article><span>مكتمل تنفيذياً</span><strong>{{ counts.eligible }}</strong></article>
+        <article><span>قيد المراجعة أو المعالجة</span><strong>{{ counts.review }}</strong></article>
+        <article><span>ملاحظات غير متحقق منها</span><strong>{{ counts.issues }}</strong></article>
+        <article><span>تم الاستلام</span><strong>{{ counts.accepted }}</strong></article>
+    </section>
+
+    <ol class="completion-flow" aria-label="دورة الاكتمال الرسمية">
+        <li class="{% if project_execution_complete %}is-done{% endif %}"><b>1</b><span>مكتمل تنفيذياً</span></li>
+        <li class="{% if counts.eligible and counts.accepted == counts.eligible %}is-done{% endif %}"><b>2</b><span>المراجعة والتحقق</span></li>
+        <li class="{% if counts.accepted %}is-done{% endif %}"><b>3</b><span>الاستلام</span></li>
+        <li class="{% if project_closed %}is-done{% endif %}"><b>4</b><span>الإغلاق الرسمي</span></li>
+    </ol>
+
+    <nav class="completion-tabs" aria-label="أقسام مساحة الاكتمال">
+        <a href="?tab=completed" class="{% if active_tab == 'completed' %}is-active{% endif %}" {% if active_tab == 'completed' %}aria-current="page"{% endif %}>الأعمال المكتملة</a>
+        <a href="?tab=review" class="{% if active_tab == 'review' %}is-active{% endif %}" {% if active_tab == 'review' %}aria-current="page"{% endif %}>المراجعة والتحقق</a>
+        <a href="?tab=acceptance" class="{% if active_tab == 'acceptance' %}is-active{% endif %}" {% if active_tab == 'acceptance' %}aria-current="page"{% endif %}>الاستلام والإغلاق</a>
+        <a href="?tab=history" class="{% if active_tab == 'history' %}is-active{% endif %}" {% if active_tab == 'history' %}aria-current="page"{% endif %}>السجل والوثائق</a>
+    </nav>
+
+    {% if active_tab == 'completed' %}
+    <section class="completion-tab-panel" aria-labelledby="completed-heading">
+        <div class="completion-section-head"><div><h2 id="completed-heading">الأعمال المكتملة تنفيذياً</h2><p>تعرض حالة الإنجاز المحسوبة من أوامر التشغيل والكميات المعتمدة؛ لا يحرر هذا القسم بيانات التنفيذ.</p></div></div>
+        {% for phase in project.phases %}
+        <section class="completion-phase">
+            <header><div><span class="completion-code">{{ phase.phase_code }}</span><h3>{{ phase.name }}</h3></div><span class="completion-badge {% if phase.execution_complete %}is-green{% else %}is-neutral{% endif %}">{{ phase.execution_label }}</span></header>
+            {% for task in phase.tasks %}
+            <section class="completion-task">
+                <header><div><span class="completion-code">{{ task.task_code }}</span><h4>{{ task.name }}</h4></div><span class="completion-badge {% if task.execution_complete %}is-green{% else %}is-neutral{% endif %}">{{ task.execution_label }}</span></header>
+                {% for activity in task.activities %}
+                <article class="completion-activity">
+                    <div class="completion-activity-head">
+                        <div><span class="completion-code">{{ activity.activity_code }}</span><h5>{{ activity.name }}</h5></div>
+                        <span class="completion-badge {% if activity.execution_complete %}is-green{% else %}is-neutral{% endif %}">{{ activity.completion_label }}</span>
+                    </div>
+                    <dl class="completion-facts">
+                        <div><dt>المخطط</dt><dd>{{ activity.planned_quantity }} {{ activity.unit }}</dd></div>
+                        <div><dt>الفعلي</dt><dd>{{ activity.actual_quantity }} {{ activity.unit }}</dd></div>
+                        <div><dt>أوامر التشغيل</dt><dd>{{ activity.work_orders|length }}</dd></div>
+                    </dl>
+                    {% if activity.work_orders %}
+                    <div class="completion-order-list">
+                        {% for order in activity.work_orders %}
+                        <div><span>{{ order.work_order_code }}</span><span>{{ order.status }}</span><strong>{{ order.actual_quantity_snapshot }} {{ activity.unit }}</strong></div>
+                        {% endfor %}
+                    </div>
+                    {% else %}<p class="completion-muted">لا توجد أوامر تشغيل مكتملة لهذا النشاط.</p>{% endif %}
+                </article>
+                {% empty %}<p class="completion-empty-inline">لا توجد أنشطة مسجلة ضمن هذه المهمة.</p>{% endfor %}
+            </section>
+            {% empty %}<p class="completion-empty-inline">لا توجد مهام مسجلة ضمن هذه المرحلة.</p>{% endfor %}
+        </section>
+        {% empty %}
+        <div class="completion-empty"><h2>لا توجد مراحل نشطة</h2><p>أضف بيانات التخطيط من واجهته المعتمدة؛ لا يمكن بدء الاكتمال بلا عناصر WBS.</p></div>
+        {% endfor %}
+    </section>
+    {% elif active_tab == 'review' %}
+    <section class="completion-tab-panel" aria-labelledby="review-heading">
+        <div class="completion-section-head"><div><h2 id="review-heading">المراجعة والتحقق</h2><p>ابدأ مراجعة العنصر بعد اكتماله التنفيذي، ثم سجّل قرار المراجع والملاحظات والإجراءات المطلوبة.</p></div></div>
+        {% for phase in project.phases %}{% for task in phase.tasks %}{% for activity in task.activities %}
+        <article class="completion-work-item">
+            <div class="completion-activity-head"><div><span class="completion-code">{{ activity.activity_code }} · {{ phase.name }} / {{ task.name }}</span><h3>{{ activity.name }}</h3></div><span class="completion-badge {% if activity.execution_complete %}is-green{% else %}is-neutral{% endif %}">{{ activity.completion_label }}</span></div>
+            <p class="completion-muted">الإنجاز الفعلي {{ activity.actual_quantity }} من {{ activity.planned_quantity }} {{ activity.unit }} · {{ activity.work_orders|length }} أمر تشغيل</p>
+            {% if activity.can_start_review %}
+            <form method="post" class="completion-inline-form">{% csrf_token %}<input type="hidden" name="action" value="start_review"><input type="hidden" name="activity_id" value="{{ activity.id }}"><input type="hidden" name="tab" value="review"><button class="completion-button completion-button-primary" type="submit">بدء مراجعة الاكتمال</button></form>
+            {% elif activity.can_submit_review %}
+            <form method="post" class="completion-form-grid">{% csrf_token %}
+                <input type="hidden" name="action" value="review"><input type="hidden" name="activity_id" value="{{ activity.id }}"><input type="hidden" name="tab" value="review">
+                <label>نتيجة المراجعة<select name="result" required><option value="passed">ناجح — جاهز للاستلام</option><option value="requires_treatment">يتطلب معالجة</option></select></label>
+                <label class="completion-field-wide">ملاحظات المراجع<textarea name="notes" rows="3" maxlength="4000"></textarea></label>
+                <label>المتطلب الناقص عند الإرجاع<textarea name="missing_requirement" rows="2" maxlength="4000"></textarea></label>
+                <label>الإجراء التصحيحي المطلوب<textarea name="corrective_action" rows="2" maxlength="4000"></textarea></label>
+                <label>المسؤول عن المعالجة<select name="owner_user_id"><option value="">غير محدد</option>{% for user in references.users %}<option value="{{ user.id }}">{{ user.name }}</option>{% endfor %}</select></label>
+                <label>الموعد المستهدف<input type="date" name="target_date"></label>
+                <div class="completion-field-wide"><button class="completion-button completion-button-primary" type="submit">حفظ قرار المراجعة</button></div>
+            </form>
+            {% elif activity.case %}
+            <p class="completion-inline-status">الحالة الحالية: <strong>{{ activity.completion_label }}</strong></p>
+            {% else %}<p class="completion-muted">لا يبدأ التحقق قبل اكتمال جميع أوامر التشغيل والكمية المخططة.</p>{% endif %}
+            {% if can_create_issue and activity.case and activity.case.status != 'closed' %}
+            <details class="completion-details"><summary>إضافة ملاحظة أو إجراء تصحيحي</summary>
+                <form method="post" class="completion-form-grid">{% csrf_token %}
+                    <input type="hidden" name="action" value="create_issue"><input type="hidden" name="case_id" value="{{ activity.case.id }}"><input type="hidden" name="tab" value="review">
+                    <label class="completion-field-wide">وصف الملاحظة<input name="description" required maxlength="4000"></label>
+                    <label>النوع<input name="issue_type" required maxlength="100" placeholder="مثال: وثيقة ناقصة"></label>
+                    <label>الأهمية<select name="severity"><option value="low">منخفضة</option><option value="medium" selected>متوسطة</option><option value="high">عالية</option><option value="critical">حرجة</option></select></label>
+                    <label>المسؤول<select name="owner_user_id"><option value="">غير محدد</option>{% for user in references.users %}<option value="{{ user.id }}">{{ user.name }}</option>{% endfor %}</select></label>
+                    <label>الموعد المستهدف<input type="date" name="target_date"></label>
+                    <label class="completion-check"><input type="checkbox" name="blocking" checked> تمنع الاستلام أو الإغلاق</label>
+                    <div class="completion-field-wide"><button class="completion-button" type="submit">تسجيل الملاحظة</button></div>
+                </form>
+            </details>
+            {% endif %}
+            {% if activity.issues %}
+            <div class="completion-issue-list"><h4>الملاحظات والإجراءات</h4>
+                {% for issue in activity.issues %}
+                <article class="completion-issue">
+                    <div class="completion-issue-head"><strong>{{ issue.description }}</strong><span class="completion-badge {% if issue.blocking %}is-amber{% else %}is-neutral{% endif %}">{% if issue.blocking %}مانعة{% else %}غير مانعة{% endif %} · {{ issue.status_label }}</span></div>
+                    <p>{{ issue.issue_type }} · {{ issue.severity }}{% if issue.owner_name %} · المسؤول: {{ issue.owner_name }}{% endif %}{% if issue.target_date %} · الموعد: {{ issue.target_date }}{% endif %}</p>
+                    {% if issue.status == 'open' and issue.can_manage %}<form method="post" class="completion-inline-form">{% csrf_token %}<input type="hidden" name="action" value="issue_transition"><input type="hidden" name="issue_id" value="{{ issue.id }}"><input type="hidden" name="target" value="in_progress"><input type="hidden" name="tab" value="review"><input type="hidden" name="notes" value="بدأت المعالجة"><button class="completion-button" type="submit">بدء المعالجة</button></form>
+                    {% elif issue.status == 'in_progress' and issue.can_manage %}<p class="completion-muted">أرفق دليل المعالجة من قسم السجل والوثائق، ثم سجّل الحل.</p><form method="post" class="completion-inline-form">{% csrf_token %}<input type="hidden" name="action" value="issue_transition"><input type="hidden" name="issue_id" value="{{ issue.id }}"><input type="hidden" name="target" value="resolved"><input type="hidden" name="tab" value="review"><input type="hidden" name="notes" value="{{ issue.resolution_notes|default:'تمت المعالجة' }}"><button class="completion-button" type="submit">تسجيل المعالجة</button></form>
+                    {% elif issue.status == 'resolved' and issue.can_verify %}<form method="post" class="completion-inline-form">{% csrf_token %}<input type="hidden" name="action" value="issue_transition"><input type="hidden" name="issue_id" value="{{ issue.id }}"><input type="hidden" name="target" value="verified"><input type="hidden" name="tab" value="review"><label>ملاحظة التحقق<input name="notes" required maxlength="4000"></label><button class="completion-button" type="submit">اعتماد التحقق</button></form>{% endif %}
+                </article>
+                {% endfor %}
+            </div>{% endif %}
+        </article>
+        {% endfor %}{% endfor %}{% empty %}
+        <div class="completion-empty"><h2>لا توجد أنشطة للمراجعة</h2><p>أنشئ المراحل والمهام والأنشطة من واجهة التخطيط الحالية.</p></div>
+        {% endfor %}
+    </section>
+    {% elif active_tab == 'acceptance' %}
+    <section class="completion-tab-panel" aria-labelledby="acceptance-heading">
+        <div class="completion-section-head"><div><h2 id="acceptance-heading">الاستلام والإغلاق</h2><p>لا يمكن الاستلام قبل نجاح المراجعة. لا يمكن إغلاق المشروع قبل اكتمال الاستلام ومعالجة الملاحظات المانعة.</p></div></div>
+        {% for phase in project.phases %}{% for task in phase.tasks %}{% for activity in task.activities %}
+        <article class="completion-work-item">
+            <div class="completion-activity-head"><div><span class="completion-code">{{ activity.activity_code }} · {{ phase.name }} / {{ task.name }}</span><h3>{{ activity.name }}</h3></div><span class="completion-badge {% if activity.case.status == 'accepted' or activity.case.status == 'closed' %}is-green{% elif activity.case.status == 'ready_for_acceptance' %}is-blue{% else %}is-neutral{% endif %}">{{ activity.completion_label }}</span></div>
+            <p class="completion-muted">الكمية الفعلية {{ activity.actual_quantity }} {{ activity.unit }} · الاستلام لا يغير بيانات أمر التشغيل.</p>
+            {% if activity.can_accept %}
+            <form method="post" class="completion-form-grid">{% csrf_token %}
+                <input type="hidden" name="action" value="acceptance"><input type="hidden" name="activity_id" value="{{ activity.id }}"><input type="hidden" name="tab" value="acceptance">
+                <label>نتيجة الاستلام<select name="result" required><option value="accepted">قبول الاستلام</option><option value="rejected">رفض الاستلام</option></select></label>
+                <label>نوع الاستلام<input name="acceptance_type" required maxlength="100" placeholder="حسب سياسة المشروع"></label>
+                <label>مرجع المحضر<input name="reference" maxlength="4000"></label>
+                <label class="completion-field-wide">الملاحظات أو سبب الرفض<textarea name="notes" rows="3" maxlength="4000"></textarea></label>
+                <div class="completion-field-wide"><button class="completion-button completion-button-primary" type="submit">تسجيل قرار الاستلام</button></div>
+            </form>
+            {% elif activity.case and activity.case.status == 'accepted' or activity.case and activity.case.status == 'closed' %}
+            <p class="completion-inline-status">تم تسجيل قرار الاستلام. محضر القرار قابل للطباعة من السجل.</p>
+            {% elif not activity.case %}<p class="completion-muted">الاستلام محجوب حتى اجتياز المراجعة بنجاح.</p>
+            {% else %}<p class="completion-muted">لا يوجد قرار مراجعة ناجح يتيح الاستلام.</p>{% endif %}
+        </article>
+        {% endfor %}{% endfor %}{% empty %}
+        <div class="completion-empty"><h2>لا توجد عناصر استلام</h2><p>لا يمكن تنفيذ الاستلام قبل إنشاء عناصر المشروع وإكمال تنفيذها.</p></div>
+        {% endfor %}
+
+        <section class="completion-close-panel">
+            <div><span class="completion-eyebrow">قرار مستقل</span><h3>الإغلاق الرسمي للمشروع</h3><p>يتحقق النظام من اكتمال جميع الأنشطة والقبول ومعالجة الملاحظات المانعة، ثم يسجل هوية المنفذ وتاريخ القرار وسببه في سجل غير قابل للتعديل.</p></div>
+            {% if can_close %}
+            <form method="post" class="completion-form-grid">{% csrf_token %}<input type="hidden" name="action" value="close"><input type="hidden" name="tab" value="acceptance">
+                <label class="completion-field-wide">سبب الإغلاق الرسمي<textarea name="reason" required rows="3" maxlength="4000"></textarea></label>
+                <div class="completion-field-wide"><button class="completion-button completion-button-primary" type="submit" {% if close_blocked %}disabled{% endif %}>إغلاق المشروع رسمياً</button></div>
+            </form>
+            {% if close_blocked %}<p class="completion-blocked-note">الإغلاق محجوب: يجب اكتمال التنفيذ والمراجعة والاستلام، وإرفاق وثيقة إغلاق لكل نشاط، والتحقق من الملاحظات المانعة.</p>{% endif %}
+            {% elif project_closed %}<p class="completion-inline-status">تم الإغلاق الرسمي ولا يوجد إجراء إغلاق آخر.</p>
+            {% else %}<p class="completion-blocked-note">لا تملك صلاحية الإغلاق الرسمي لهذا المشروع.</p>{% endif %}
+        </section>
+    </section>
+    {% else %}
+    <section class="completion-tab-panel" aria-labelledby="history-heading">
+        <div class="completion-section-head"><div><h2 id="history-heading">السجل والوثائق</h2><p>كل القرارات محفوظة زمنياً مع منفذها؛ محضر الاستلام المعتمد قابل للطباعة.</p></div></div>
+        {% if can_view_documents %}
+        {% for phase in project.phases %}{% for task in phase.tasks %}{% for activity in task.activities %}
+        {% if activity.case %}
+        <article class="completion-work-item">
+            <div class="completion-activity-head"><div><span class="completion-code">{{ activity.activity_code }}</span><h3>{{ activity.name }}</h3></div><span class="completion-badge">{{ activity.completion_label }}</span></div>
+            {% if activity.documents %}
+            <ul class="completion-documents">{% for document in activity.documents %}<li><a href="{{ document.download_url }}">{{ document.filename }}</a><span>{{ document.category }} · {{ document.size }} بايت</span></li>{% endfor %}</ul>
+            {% else %}<p class="completion-muted">لا توجد مرفقات إضافية لهذا العنصر. محضر الاستلام الإلكتروني يظهر في سجل القرارات.</p>{% endif %}
+            {% if can_upload_document and activity.case.status != 'closed' %}
+            <form method="post" enctype="multipart/form-data" class="completion-upload-form">{% csrf_token %}<input type="hidden" name="action" value="upload_document"><input type="hidden" name="case_id" value="{{ activity.case.id }}"><input type="hidden" name="tab" value="history">
+                <label>نوع الوثيقة<select name="category"><option value="review_evidence">دليل مراجعة</option><option value="receipt_minutes">محضر استلام مرفق</option><option value="closeout_document">وثيقة إغلاق</option><option value="issue_evidence">دليل معالجة ملاحظة</option></select></label>
+                <label>الملاحظة المرتبطة عند رفع دليل معالجة<select name="issue_id"><option value="">لا يوجد</option>{% for issue in activity.issues %}<option value="{{ issue.id }}">{{ issue.description|truncatechars:80 }}</option>{% endfor %}</select></label>
+                <label>الملف<input type="file" name="file" accept=".pdf,.png,.jpg,.jpeg,.txt,.csv" required></label>
+                <button class="completion-button" type="submit">رفع الوثيقة</button>
+            </form><small class="completion-muted">PDF أو PNG أو JPEG أو TXT أو CSV، حتى 5 MB. دليل معالجة الملاحظة يتطلب اختيار الملاحظة.</small>
+            {% endif %}
+            {% for event in activity.events %}
+            {% if event.action == 'acceptance_decision' and event.to_status == 'accepted' and event.receipt_url %}
+            <a class="completion-button completion-button-secondary" href="{{ event.receipt_url }}" target="_blank" rel="noopener">طباعة محضر الاستلام</a>
+            {% endif %}
+            {% endfor %}
+            {% if activity.issues %}
+            <h4>الملاحظات</h4><ul class="completion-history-list">{% for issue in activity.issues %}<li><strong>{{ issue.description }}</strong><span>{{ issue.status_label }} · {{ issue.severity }}{% if issue.owner_name %} · {{ issue.owner_name }}{% endif %}</span></li>{% endfor %}</ul>
+            {% endif %}
+        </article>
+        {% endif %}
+        {% endfor %}{% endfor %}{% endfor %}
+        {% else %}<div class="completion-alert is-neutral">يتطلب عرض الوثائق صلاحية مستقلة. لا تعرض هذه الصفحة بيانات المرفقات للمستخدم غير المخول.</div>{% endif %}
+        <section class="completion-history-panel">
+            <h3>سجل القرارات والتغييرات</h3>
+            <ol class="completion-timeline">
+                {% for event in all_events %}
+                <li><div><strong>{{ event.action_label }}</strong><span>{{ event.activity_name }}{% if event.phase_name %} · {{ event.phase_name }} / {{ event.task_name }}{% endif %}</span></div><p>{{ event.notes|default:'لا توجد ملاحظات إضافية.' }}</p><small>{{ event.actor_name }} · {{ event.created_at }}{% if event.from_status %} · {{ event.from_status }} ← {{ event.to_status }}{% endif %}</small></li>
+                {% empty %}<li class="completion-empty-inline">لا توجد قرارات مسجلة بعد.</li>
+                {% endfor %}
+            </ol>
+        </section>
+    </section>
+    {% endif %}
+</main>
+{% endblock %}
+{% block extra_js %}{{ block.super }}<script src="{% static 'pm/completion.js' %}?v=20261018-v1" defer></script>{% endblock %}

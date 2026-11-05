@@ -1,0 +1,47 @@
+﻿<!-- ===== مودال: تفاصيل المستخدم ===== -->
+<div class="modal-overlay" id="detailModal">
+    <div class="modal-content" style="max-width:650px;">
+        <div class="modal-header">
+            <h2><i class="fas fa-user"></i> تفاصيل المستخدم</h2>
+            <button class="close-btn" onclick="document.getElementById('detailModal').classList.remove('active')">&times;</button>
+        </div>
+        <div class="modal-body" id="detailBody">
+            <div style="text-align:center;padding:2rem;">
+                <div id="detailAvatar" style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--gradient-1),var(--gradient-2));color:white;display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:800;margin:0 auto 1rem;"></div>
+                <h2 id="detailName" style="color:var(--text-primary);margin-bottom:0.2rem;"></h2>
+                <p id="detailUsername" style="color:var(--text-muted);margin-bottom:0.5rem;"></p>
+                <span id="detailStatusBadge" style="padding:0.3rem 0.8rem;border-radius:20px;font-size:0.8rem;"></span>
+            </div>
+            
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-top:1rem;">
+                <div style="background:var(--bg-card);padding:0.8rem;border-radius:0.8rem;">
+                    <div style="font-size:0.7rem;color:var(--text-muted);">📧 البريد الإلكتروني</div>
+                    <div id="detailEmail" style="font-weight:600;color:var(--text-primary);"></div>
+                </div>
+                <div style="background:var(--bg-card);padding:0.8rem;border-radius:0.8rem;">
+                    <div style="font-size:0.7rem;color:var(--text-muted);">📱 رقم الجوال</div>
+                    <div id="detailPhone" style="font-weight:600;color:var(--text-primary);"></div>
+                </div>
+                <div style="background:var(--bg-card);padding:0.8rem;border-radius:0.8rem;">
+                    <div style="font-size:0.7rem;color:var(--text-muted);">👤 الدور</div>
+                    <div id="detailRole" style="font-weight:600;color:var(--text-primary);"></div>
+                </div>
+                <div style="background:var(--bg-card);padding:0.8rem;border-radius:0.8rem;">
+                    <div style="font-size:0.7rem;color:var(--text-muted);">🏢 الجهة</div>
+                    <div id="detailOrg" style="font-weight:600;color:var(--text-primary);"></div>
+                </div>
+                <div style="background:var(--bg-card);padding:0.8rem;border-radius:0.8rem;">
+                    <div style="font-size:0.7rem;color:var(--text-muted);">💼 المنصب</div>
+                    <div id="detailPosition" style="font-weight:600;color:var(--text-primary);"></div>
+                </div>
+                <div style="background:var(--bg-card);padding:0.8rem;border-radius:0.8rem;">
+                    <div style="font-size:0.7rem;color:var(--text-muted);">📅 تاريخ التسجيل</div>
+                    <div id="detailDate" style="font-weight:600;color:var(--text-primary);"></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="document.getElementById('detailModal').classList.remove('active')">إغلاق</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,100 @@
+/* Common final compatibility layer for base.html legacy pages. */
+/* The workspace shell predates Core themes and hard-codes a navy sidebar.
+   Keep its layout while sourcing its palette from the active Core theme. */
+body.core-shell .sidebar {
+  background: var(--bg-sidebar);
+  border-color: var(--color-border);
+}
+body.core-shell .sidebar .brand-name,
+body.core-shell .sidebar .core-sidebar-user { color: var(--color-text); }
+body.core-shell .sidebar .brand-sub,
+body.core-shell .sidebar .nav-section-title,
+body.core-shell .sidebar .nav-item,
+body.core-shell .sidebar .core-sidebar-user small,
+body.core-shell .sidebar .core-logout { color: var(--color-text-muted); }
+body.core-shell .sidebar .nav-item:hover { background: var(--color-surface-muted); color: var(--color-text); }
+body.core-shell .sidebar .nav-item.active { background: var(--color-primary); color: var(--text-inverse, #fff); }
+/* The shell and several legacy module pages declare their own light values
+   with higher specificity. Keep the final shell surfaces on Core tokens so a
+   palette change reaches the frame as well as buttons. */
+body.core-shell {
+  background: var(--core-palette-canvas, var(--color-canvas)) !important;
+  color: var(--core-palette-text, var(--color-text));
+}
+body.core-shell .top-header {
+  background: var(--core-palette-surface, var(--color-surface)) !important;
+  color: var(--core-palette-text, var(--color-text)) !important;
+  border-color: var(--core-palette-border, var(--color-border)) !important;
+}
+body.core-shell .main-content,
+body.core-shell .page-content {
+  --bg-primary: var(--core-palette-canvas, var(--color-canvas)) !important;
+  --bg-secondary: var(--core-palette-surface, var(--color-surface)) !important;
+  --bg-elevated: var(--core-palette-raised, var(--color-surface-raised)) !important;
+  --bg-card: var(--core-palette-raised, var(--color-surface-raised)) !important;
+  --bg-input: var(--core-palette-raised, var(--color-surface-raised)) !important;
+  --bg-tertiary: var(--core-palette-surface, var(--color-surface-muted)) !important;
+  --text-primary: var(--core-palette-text, var(--color-text)) !important;
+  --text-secondary: var(--core-palette-secondary, var(--color-text)) !important;
+  --text-muted: var(--core-palette-muted, var(--color-text-muted)) !important;
+  --border-color: var(--core-palette-border, var(--color-border)) !important;
+  --border-light: var(--core-palette-border, var(--color-border-subtle)) !important;
+  background: var(--core-palette-canvas, var(--color-canvas)) !important;
+  color: var(--core-palette-text, var(--color-text));
+}
+body.core-shell .top-header {
+  --bg-secondary: var(--core-palette-surface, var(--color-surface)) !important;
+  --bg-header: var(--core-palette-surface, var(--color-surface)) !important;
+  --text-primary: var(--core-palette-text, var(--color-text)) !important;
+  --text-secondary: var(--core-palette-secondary, var(--color-text)) !important;
+  --text-muted: var(--core-palette-muted, var(--color-text-muted)) !important;
+  --border-color: var(--core-palette-border, var(--color-border)) !important;
+}
+body.core-shell .sidebar {
+  /* The sidebar is a shell surface, not a palette swatch. Keep it neutral in
+     light mode and appropriately elevated in dark mode; the palette remains
+     visible on the brand mark and active navigation item. */
+  background: var(--core-palette-surface, var(--color-surface)) !important;
+}
+body.core-shell .sidebar .nav-item.active {
+  background: var(--core-palette-brand, var(--color-primary)) !important;
+}
+body.core-shell :is(.core-filter-bar, .core-table-wrap, .modal-content) {
+  background-color: var(--core-palette-surface, var(--color-surface)) !important;
+  border-color: var(--core-palette-border, var(--color-border)) !important;
+  color: var(--core-palette-text, var(--color-text));
+}
+body.core-shell :is(.pm-projects-page article, .pm-projects-page .pm-project-card, .pm-projects-page .pm-projects-filters, .pm-projects-page table) {
+  background-color: var(--core-palette-surface, var(--color-surface)) !important;
+  border-color: var(--core-palette-border, var(--color-border)) !important;
+  color: var(--core-palette-text, var(--color-text));
+}
+.page-content :is(.tabs-modern, .tabs-container, .filter-bar, .notification-item, .notification-filters .btn, .org-grid > *, .tree-container, .type-table, .users-grid > *, .fade-in > *, .modal-content) {
+  color: var(--color-text);
+  border-color: var(--color-border);
+  border-radius: var(--ds-radius-md);
+}
+.page-content :is(.notification-item, .org-grid > *, .tree-container, .type-table, .users-grid > *, .fade-in > *) {
+  background-color: var(--color-surface) !important;
+  box-shadow: var(--ds-shadow-card);
+}
+.page-content :is(.filter-bar, .notification-filters .btn, .tabs-modern, .tabs-container) {
+  background-color: var(--color-surface-raised) !important;
+}
+.page-content :is(input, select, textarea) {
+  min-height: var(--control-height);
+  color: var(--color-text) !important;
+  background-color: var(--color-surface-raised) !important;
+  border-color: var(--color-border) !important;
+  border-radius: var(--ds-radius-md) !important;
+}
+.page-content :is(.btn-primary, .btn-add, .notification-filters .btn.active, .tabs-modern .tab.active, .tabs-container .tab.active) {
+  color: var(--text-inverse, #fff) !important;
+  background: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  border-radius: var(--ds-radius-md) !important;
+}
+.page-content :is(.notification-item .content .title, .notification-item .content .text, .notification-item .content .time, .user-name, .user-username, .empty-state) { color: var(--color-text-muted) !important; }
+.page-content :is(table th, .type-table th) { color: var(--color-text-muted) !important; background: var(--color-surface-muted) !important; border-color: var(--color-border-subtle) !important; }
+.page-content :is(table td, .type-table td) { color: var(--color-text) !important; border-color: var(--color-border-subtle) !important; }
+html[data-density="compact"] .page-content :is(.notification-item, .filter-bar, .org-grid > *, .users-grid > *, .fade-in > *) { padding: var(--ds-space-3) !important; }

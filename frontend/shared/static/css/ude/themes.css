@@ -1,0 +1,31 @@
+/* UDE V1.1 — Theme application contract. Not loaded until the page flag is enabled. */
+[data-ude-root] {
+  color: var(--ude-color-text);
+  background-color: var(--ude-color-canvas);
+  font-family: var(--ude-font-family-sans);
+  font-size: var(--ude-font-size-md);
+  line-height: var(--ude-line-height-normal);
+}
+
+[data-ude-root][data-ude-density="compact"] { --ude-density-factor: 0.875; }
+[data-ude-root][data-ude-density="comfortable"] { --ude-density-factor: 1.125; }
+[data-ude-root][data-ude-motion="reduced"],
+[data-ude-root][data-ude-motion="reduced"] * {
+  animation-duration: 1ms !important;
+  transition-duration: 1ms !important;
+  scroll-behavior: auto !important;
+}
+
+[data-ude-root] :focus-visible {
+  outline: 3px solid var(--ude-color-focus);
+  outline-offset: 2px;
+  box-shadow: var(--ude-focus-ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-ude-root], [data-ude-root] * {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}

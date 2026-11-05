@@ -1,0 +1,16 @@
+{
+  "schema": "ude.asset-manifest.v1",
+  "package": "UDE-03",
+  "offline": true,
+  "external_references": [],
+  "assets": [
+    {
+      "path": "frontend/shared/static/ude/user-preferences-v1.1.0.js",
+      "sha256": "b2cae26054f722fe0d7f24e5b4293bbb3871b22795538eaf5001508ce78101b8"
+    },
+    {
+      "path": "frontend/shared/static/ude/ude-03-feature-flags-v1.1.0.json",
+      "sha256": "8ff5e19c8815ac125eb6cac21848184ae8779902abecc14825c165cd72930d20"
+    }
+  ]
+}

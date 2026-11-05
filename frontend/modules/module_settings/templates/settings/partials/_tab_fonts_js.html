@@ -1,0 +1,92 @@
+﻿<script>
+// ═══════════════════════════════════════════════════════════════
+// 📐 نظام الخطوط - نوع وحجم مع معاينة
+// ═══════════════════════════════════════════════════════════════
+
+// توليد بطاقات أنواع الخطوط
+function buildFontCards() {
+    var grid = document.getElementById('fontFamilyGrid');
+    if (!grid || !AppSettings.fonts) return;
+    
+    var html = '';
+    AppSettings.fonts.forEach(function(f) {
+        var isActive = AppSettings.getFontFamily() === f.key;
+        html += '<div class="font-card" data-font="' + f.key + '" onclick="setFontFamily(\'' + f.key + '\', this)" style="background:' + (isActive ? 'rgba(168,85,247,0.08)' : 'rgba(255,255,255,0.03)') + ';border:2px solid ' + (isActive ? '#a855f7' : 'var(--border-color)') + ';border-radius:0.8rem;padding:0.8rem;cursor:pointer;transition:all 0.3s;">';
+        html += '<div style="font-family:' + f.css + ';font-size:1.1rem;font-weight:700;color:var(--text-primary);">' + f.nameAr + '</div>';
+        html += '<div style="font-family:' + f.css + ';font-size:0.75rem;color:var(--text-muted);">' + f.name + '</div>';
+        html += '<div style="font-size:0.65rem;color:var(--icon-color);margin-top:0.2rem;">' + f.type + '</div>';
+        if (isActive) html += '<div style="margin-top:0.3rem;padding:0.15rem 0.5rem;border-radius:2rem;font-size:0.6rem;background:rgba(168,85,247,0.2);color:#a855f7;display:inline-block;">مفعل ✓</div>';
+        html += '</div>';
+    });
+    grid.innerHTML = html;
+    
+    // تحديث المعاينة
+    updateFontPreview();
+    updateFontSizeSlider();
+}
+
+// اختيار نوع الخط
+function setFontFamily(fontKey, el) {
+    AppSettings.setFontFamily(fontKey);
+    
+    // تحديث البطاقات
+    document.querySelectorAll('.font-card').forEach(function(c) {
+        c.style.border = '2px solid var(--border-color)';
+        c.style.background = 'rgba(255,255,255,0.03)';
+        var badge = c.querySelector('div:last-child');
+        if (badge && badge.textContent.includes('مفعل')) badge.remove();
+    });
+    if (el) {
+        el.style.border = '2px solid #a855f7';
+        el.style.background = 'rgba(168,85,247,0.08)';
+        var newBadge = document.createElement('div');
+        newBadge.style.cssText = 'margin-top:0.3rem;padding:0.15rem 0.5rem;border-radius:2rem;font-size:0.6rem;background:rgba(168,85,247,0.2);color:#a855f7;display:inline-block;';
+        newBadge.textContent = 'مفعل ✓';
+        el.appendChild(newBadge);
+    }
+    updateFontPreview();
+}
+
+// 🎚️ شريط تمرير حجم الخط
+function setFontSizeSlider(value) {
+    var v = parseInt(value);
+    var size, label;
+    if (v <= 25) { size = 'small'; label = 'صغير'; }
+    else if (v <= 50) { size = 'medium'; label = 'متوسط'; }
+    else if (v <= 75) { size = 'large'; label = 'كبير'; }
+    else { size = 'xlarge'; label = 'كبير جداً'; }
+    
+    AppSettings.setFontSize(size);
+    document.getElementById('fontSizeLabel').textContent = label;
+    updateFontPreview();
+}
+
+// تحديث شريط التمرير حسب القيمة الحالية
+function updateFontSizeSlider() {
+    var current = AppSettings.getFontSize();
+    var map = { small: 15, medium: 50, large: 75, xlarge: 95 };
+    var labels = { small: 'صغير', medium: 'متوسط', large: 'كبير', xlarge: 'كبير جداً' };
+    document.getElementById('fontSizeSlider').value = map[current] || 50;
+    document.getElementById('fontSizeLabel').textContent = labels[current] || 'متوسط';
+}
+
+// 🖼️ تحديث المعاينة المباشرة
+function updateFontPreview() {
+    var f = AppSettings.fonts.find(function(x) { return x.key === AppSettings.getFontFamily(); }) || AppSettings.fonts[0];
+    var size = AppSettings.getFontSize();
+    var sizes = { small: '0.8rem', medium: '0.9rem', large: '1.05rem', xlarge: '1.2rem' };
+    var base = sizes[size] || '0.9rem';
+    
+    var preview = document.getElementById('fontPreview');
+    preview.style.fontFamily = f.css;
+    preview.style.fontSize = base;
+    
+    document.getElementById('previewHeading').style.fontFamily = f.css;
+    document.getElementById('previewSubtext').style.fontFamily = f.css;
+    document.getElementById('previewSample').style.fontFamily = f.css;
+    document.getElementById('previewLatin').style.fontFamily = f.css;
+}
+
+// تهيئة
+buildFontCards();
+</script>

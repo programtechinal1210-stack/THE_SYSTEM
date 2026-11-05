@@ -1,0 +1,26 @@
+﻿{% extends 'core/workspace.html' %}
+{% load static %}
+
+{% block extra_head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/ude/ude-05-shell-adapter-v1.0.0.css' %}">
+<link rel="stylesheet" href="{% static 'css/ude/tokens.css' %}">
+<link rel="stylesheet" href="{% static 'css/ude/themes.css' %}">
+<link rel="stylesheet" href="{% static 'ude/components-v1.1.0.css' %}">
+<link rel="stylesheet" href="{% static 'ude/ude-color-palettes-v1.0.css' %}">
+{% endblock %}
+
+{% block content %}
+<div data-ude-root data-ude-pilot="core-home" data-ude-theme="ude-light-default" data-ude-density="comfortable">
+  {{ block.super }}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="{% static 'ude/theme-resolver-v1.1.0.js' %}"></script>
+<script src="{% static 'ude/ude-color-palettes-v1.0.js' %}?v=20261025-palette-balance-v1"></script>
+<script src="{% static 'ude/components-v1.1.0.js' %}"></script>
+{{ ude_theme_bootstrap|json_script:"ude-theme-bootstrap" }}
+<script src="{% static 'js/ude-05-shell-adapter-v1.0.0.js' %}"></script>
+{% endblock %}

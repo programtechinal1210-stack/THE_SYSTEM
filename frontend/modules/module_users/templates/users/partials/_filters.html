@@ -1,0 +1,51 @@
+﻿<div class="filter-group">
+    <label><i class="fas fa-search"></i> بحث</label>
+    <input type="text" id="searchInput" placeholder="الاسم، البريد الإلكتروني، اسم المستخدم...">
+</div>
+
+<div class="filter-group">
+    <label><i class="fas fa-user-tag"></i> الدور</label>
+    <select id="roleFilter">
+        <option value="">الكل</option>
+        <option value="مدير النظام">👑 مدير النظام</option>
+        <option value="مدير المكتب">📋 مدير المكتب</option>
+        <option value="مراجع">🔍 مراجع</option>
+        <option value="منفذ">✅ منفذ</option>
+        <option value="سكرتارية">📝 سكرتارية</option>
+        <option value="متابعة">📊 متابعة</option>
+        <option value="مطلع">👁️ مطلع</option>
+    </select>
+</div>
+
+<div class="filter-group">
+    <label><i class="fas fa-circle"></i> الحالة</label>
+    <select id="statusFilter">
+        <option value="">الكل</option>
+        <option value="نشط">🟢 نشط</option>
+        <option value="غير نشط">🔴 غير نشط</option>
+        <option value="معلق">⏸️ معلق</option>
+    </select>
+</div>
+
+<div class="filter-group">
+    <label><i class="fas fa-building"></i> الجهة</label>
+    <select id="orgFilter">
+        <option value="">الكل</option>
+        <option value="الإدارة العليا">الإدارة العليا</option>
+        <option value="السكرتارية العامة">السكرتارية العامة</option>
+        <option value="إدارة المشتريات">إدارة المشتريات</option>
+        <option value="إدارة الموارد البشرية">إدارة الموارد البشرية</option>
+        <option value="إدارة التقنية">إدارة التقنية</option>
+        <option value="إدارة المالية">إدارة المالية</option>
+        <option value="وحدة المتابعة">وحدة المتابعة</option>
+    </select>
+</div>
+
+<div class="filter-actions">
+    <button class="btn btn-primary btn-sm" onclick="UsersManager.filterUsers()">
+        <i class="fas fa-search"></i> بحث
+    </button>
+    <button class="btn btn-secondary btn-sm" id="resetFilters">
+        <i class="fas fa-undo"></i> إعادة تعيين
+    </button>
+</div>

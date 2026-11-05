@@ -1,0 +1,22 @@
+﻿<div class="table-header">
+    <div class="table-title">
+        <i class="fas fa-users"></i>
+        <span>قائمة المستخدمين</span>
+    </div>
+    <div class="table-actions">
+        <div class="view-toggle">
+            <button class="active" data-view="grid" title="عرض شبكي">
+                <i class="fas fa-th-large"></i>
+            </button>
+            <button data-view="table" title="عرض جدولي">
+                <i class="fas fa-list"></i>
+            </button>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="UsersManager.openModal('addModal')">
+            <i class="fas fa-plus"></i> مستخدم جديد
+        </button>
+        <button class="btn btn-outline btn-sm" onclick="UsersManager.exportUsers()">
+            <i class="fas fa-download"></i> تصدير
+        </button>
+    </div>
+</div>

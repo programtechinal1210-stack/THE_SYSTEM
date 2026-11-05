@@ -1,0 +1,82 @@
+﻿<!-- ===== مودال: إضافة مستخدم ===== -->
+<div class="modal-overlay" id="addModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-user-plus"></i> إضافة مستخدم جديد</h2>
+<button class="close-btn" onclick="document.getElementById('addModal').classList.remove('active')">&times;</button>        </div>
+        <div class="modal-body">
+            <form id="addUserForm" onsubmit="return false;">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>الاسم الكامل <span class="required">*</span></label>
+                        <input type="text" id="addFullName" placeholder="أدخل الاسم الكامل..." required>
+                    </div>
+                    <div class="form-group">
+                        <label>اسم المستخدم <span class="required">*</span></label>
+                        <input type="text" id="addUsername" placeholder="اسم المستخدم" required>
+                        <span class="help-text">يستخدم لتسجيل الدخول</span>
+                    </div>
+                    <div class="form-group">
+                        <label>البريد الإلكتروني <span class="required">*</span></label>
+                        <input type="email" id="addEmail" placeholder="example@domain.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>كلمة المرور <span class="required">*</span></label>
+                        <input type="password" id="addPassword" placeholder="كلمة المرور" required>
+                    </div>
+                    <div class="form-group">
+                        <label>تأكيد كلمة المرور <span class="required">*</span></label>
+                        <input type="password" id="addConfirmPassword" placeholder="تأكيد كلمة المرور" required>
+                    </div>
+                    <div class="form-group">
+                        <label>الدور <span class="required">*</span></label>
+                 <select id="addRole" required>
+    <option value="">اختر الدور...</option>
+</select>
+
+                    </div>
+                    <div class="form-group">
+                        <label>الجهة <span class="required">*</span></label>
+                      <select id="addOrganization" required>
+    <option value="">اختر الجهة...</option>
+</select>
+                    </div>
+                    <div class="form-group">
+                        <label>المسمى الوظيفي</label>
+                        <input type="text" id="addPosition" placeholder="المسمى الوظيفي">
+                    </div>
+                    <div class="form-group">
+                        <label>رقم الجوال</label>
+                        <input type="tel" id="addPhone" placeholder="05XXXXXXXX">
+                    </div>
+                    <div class="form-group">
+                        <label>الحالة</label>
+                        <select id="addStatus">
+                            <option value="نشط" selected>🟢 نشط</option>
+                            <option value="غير نشط">🔴 غير نشط</option>
+                            <option value="معلق">⏸️ معلق</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:normal;">
+                            <input type="checkbox" id="addSendEmail" checked style="width:18px;height:18px;cursor:pointer;">
+                            إرسال بريد إلكتروني ترحيبي للمستخدم
+                        </label>
+                        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:normal;">
+                            <input type="checkbox" id="addChangePassword" style="width:18px;height:18px;cursor:pointer;">
+                            يجب تغيير كلمة المرور عند أول دخول
+                        </label>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="document.getElementById('addModal').classList.remove('active')">
+                <i class="fas fa-times"></i> إلغاء
+            </button>
+<button class="btn btn-success" onclick="saveUserAjax()">
+                    <i class="fas fa-check"></i> إنشاء المستخدم
+            </button>
+        </div>
+    </div>
+</div>

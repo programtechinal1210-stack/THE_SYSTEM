@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block module_token_bridge %}<link rel="stylesheet" href="{% static 'inventory/core-token-bridge.css' %}?v=20261024-batch04b">{% endblock %}
+{% block title %}إدارة المخازن والمواد — THE_SYSTEM{% endblock %}
+{% block page_title %}إدارة المخازن والمواد{% endblock %}
+{% block breadcrumb_text %}إدارة المخازن والمواد{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'inventory/home.css' %}?v=20261019-fluid">{% endblock %}
+{% block content %}
+<main class="inventory-home core-workspace" dir="rtl">
+  <section class="inventory-home__hero" aria-labelledby="inventory-home-title">
+    <div class="inventory-home__hero-copy">
+      <span class="inventory-home__eyebrow">مركز إدارة المواد</span>
+      <h2 id="inventory-home-title">إدارة المخازن والمواد</h2>
+      <p>مركز الوصول إلى جميع وظائف المخازن والمواد بسهولة ووضوح.</p>
+      {% if selected_organization_name %}
+      <span class="inventory-home__organization">الجهة الحالية: {{ selected_organization_name }}</span>
+      {% elif not organization_selected %}
+      <span class="inventory-home__organization">اختر جهة العمل من الشريط العلوي لعرض بياناتها.</span>
+      {% endif %}
+      {% if errors.work_context %}<p class="inventory-home__inline-error" role="alert">{{ errors.work_context }}</p>{% endif %}
+    </div>
+    <div class="inventory-home__hero-art" aria-hidden="true">
+      <svg viewBox="0 0 300 170" fill="none">
+        <path d="M18 141h264v12H18z" fill="#17395D"/>
+        <path d="M36 140V56l91-34 91 34v84H36Z" fill="#102F50" stroke="#4A8DCE" stroke-width="3"/>
+        <path d="M48 62 127 33l79 29" stroke="#75B8FA" stroke-width="4"/>
+        <path d="M61 70h132v70H61z" fill="#071A2E" stroke="#376B9D" stroke-width="2"/>
+        <path d="M118 140V88c0-10 8-18 18-18h28c10 0 18 8 18 18v52" fill="#0A2037" stroke="#3976AD" stroke-width="2"/>
+        <path d="M133 96h34v44h-34z" fill="#142E49"/>
+        <path d="M75 104h31v18H75zM75 125h31v15H75zM202 101h27v18h-27zM202 122h27v18h-27z" fill="#C98C4D"/>
+        <path d="M79 104v18M90 104v18M202 101v18M215 101v18" stroke="#E7B574" stroke-width="2"/>
+        <path d="M236 132h23l7 8h-37l7-8Z" fill="#347BB8"/>
+        <circle cx="239" cy="143" r="5" fill="#06172A" stroke="#73B8F4" stroke-width="2"/>
+        <circle cx="258" cy="143" r="5" fill="#06172A" stroke="#73B8F4" stroke-width="2"/>
+      </svg>
+    </div>
+  </section>
+
+  <section class="inventory-home__functions" aria-labelledby="inventory-functions-title">
+    <div class="inventory-home__section-heading">
+      <div>
+        <h2 id="inventory-functions-title">الوظائف الرئيسية</h2>
+        <p>اختر الوظيفة المطلوبة للانتقال مباشرة إلى صفحتها.</p>
+      </div>
+    </div>
+    <div class="inventory-home__cards">
+      {% for card in cards %}
+        {% if card.available %}
+        <a class="inventory-home__card" href="{{ card.href }}">
+          <span class="inventory-home__icon inventory-home__icon--{{ card.tone }}" aria-hidden="true">
+            {% include 'inventory/home_icon.html' with icon=card.icon %}
+          </span>
+          <span class="inventory-home__card-copy">
+            <strong>{{ card.title }}</strong>
+            <span>{{ card.description }}</span>
+          </span>
+          <span class="inventory-home__arrow" aria-hidden="true">←</span>
+        </a>
+        {% else %}
+        <div class="inventory-home__card inventory-home__card--unavailable" aria-disabled="true">
+          <span class="inventory-home__icon inventory-home__icon--{{ card.tone }}" aria-hidden="true">
+            {% include 'inventory/home_icon.html' with icon=card.icon %}
+          </span>
+          <span class="inventory-home__card-copy">
+            <strong>{{ card.title }}</strong>
+            <span>{{ card.description }}</span>
+          </span>
+          <span class="inventory-home__unavailable-label">غير متاح</span>
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="inventory-home__follow-up" aria-labelledby="inventory-follow-up-title">
+    <div class="inventory-home__section-heading inventory-home__section-heading--follow-up">
+      <div>
+        <h2 id="inventory-follow-up-title">المتابعة اليومية</h2>
+        <p>أحدث المستندات والأعمال التي تستحق انتباهك.</p>
+      </div>
+      {% if can_select_warehouse %}
+      <form method="get" class="inventory-home__warehouse-filter">
+        <label for="inventory-warehouse">المخزن</label>
+        <select id="inventory-warehouse" name="warehouse_id">
+          {% for warehouse in warehouses %}
+          <option value="{{ warehouse.id }}" {% if warehouse.id == selected_warehouse %}selected{% endif %}>
+            {{ warehouse.name_ar|default:warehouse.name|default:warehouse.code }}
+          </option>
+          {% endfor %}
+        </select>
+        <button type="submit">عرض</button>
+      </form>
+      {% elif selected_warehouse_name %}
+      <span class="inventory-home__scope-label">المخزن: {{ selected_warehouse_name }}</span>
+      {% endif %}
+    </div>
+
+    <div class="inventory-home__follow-up-grid">
+      <section class="inventory-home__panel" aria-labelledby="inventory-documents-title">
+        <header class="inventory-home__panel-heading">
+          <h3 id="inventory-documents-title">آخر المستندات</h3>
+          {% if can_recent_documents and has_document_scope %}
+          <a href="{{ document_list_url }}">عرض الكل</a>
+          {% endif %}
+        </header>
+        {% if not can_recent_documents %}
+        <p class="inventory-home__empty">لا تتوفر صلاحية عرض المستندات.</p>
+        {% elif errors.documents or errors.warehouses %}
+        <p class="inventory-home__empty inventory-home__empty--error" role="alert">
+          {{ errors.documents|default:errors.warehouses }}
+        </p>
+        {% elif not has_document_scope %}
+        <p class="inventory-home__empty">
+          {% if organization_selected %}لا يوجد مخزن متاح ضمن جهة العمل الحالية.{% else %}اختر جهة العمل والمخزن لعرض المستندات.{% endif %}
+        </p>
+        {% elif recent_documents %}
+        <ul class="inventory-home__document-list">
+          {% for document in recent_documents %}
+          <li>
+            <a href="{{ document.url }}" class="inventory-home__document-row">
+              <span class="inventory-home__document-main">
+                <strong>{{ document.number }}</strong>
+                <span>{{ document.type }} · <bdi dir="ltr">{{ document.date }}</bdi></span>
+              </span>
+              <span class="inventory-home__status">{{ document.status }}</span>
+              <span class="inventory-home__arrow" aria-hidden="true">←</span>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="inventory-home__empty">لا توجد مستندات في المخزن المختار.</p>
+        {% endif %}
+      </section>
+
+      <section class="inventory-home__panel" aria-labelledby="inventory-tasks-title">
+        <header class="inventory-home__panel-heading">
+          <h3 id="inventory-tasks-title">أعمال تحتاج إلى متابعتك</h3>
+          {% if can_recent_requests and has_request_scope %}
+          <a href="{% url 'inventory:requests' %}">طلبات المواد</a>
+          {% elif can_recent_documents and has_document_scope %}
+          <a href="{{ document_list_url }}">المستندات</a>
+          {% endif %}
+        </header>
+        {% if errors.requests or errors.documents or errors.document_actions or errors.custody or errors.warehouses or errors.readiness %}
+        <p class="inventory-home__empty inventory-home__empty--error" role="alert">
+          تعذر تحميل بعض أعمال المتابعة.
+        </p>
+        {% endif %}
+        {% if tasks %}
+        <ul class="inventory-home__task-list">
+          {% for task in tasks %}
+          <li>
+            <a href="{{ task.url }}" class="inventory-home__task">
+              <span class="inventory-home__task-dot inventory-home__task-dot--{{ task.tone }}" aria-hidden="true"></span>
+              <span><strong>{{ task.label }}</strong><small>{{ task.detail }}</small></span>
+              <span class="inventory-home__arrow" aria-hidden="true">←</span>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+        {% elif not errors.requests and not errors.documents and not errors.document_actions and not errors.custody and not errors.readiness %}
+        <p class="inventory-home__empty">
+          {% if can_recent_requests or can_recent_documents or can_recent_custody %}
+            لا توجد أعمال معلقة حالياً.
+          {% else %}
+            لا توجد أعمال متاحة للمتابعة ضمن صلاحيات حسابك.
+          {% endif %}
+        </p>
+        {% endif %}
+      </section>
+
+      <section class="inventory-home__panel" aria-labelledby="inventory-alerts-title">
+        <header class="inventory-home__panel-heading">
+          <h3 id="inventory-alerts-title">تنبيهات مهمة</h3>
+          {% if can_recent_custody and has_custody_scope %}
+          <a href="{{ custody_url }}">عرض العهدة</a>
+          {% endif %}
+        </header>
+        {% if errors.custody or errors.warehouses %}
+        <p class="inventory-home__empty inventory-home__empty--error" role="alert">
+          {{ errors.custody|default:errors.warehouses }}
+        </p>
+        {% elif not can_recent_custody %}
+        <p class="inventory-home__empty">لا تتوفر صلاحية عرض التنبيهات المخزنية.</p>
+        {% elif not has_custody_scope %}
+        <p class="inventory-home__empty">
+          {% if organization_selected %}لا يوجد مخزن متاح ضمن جهة العمل الحالية.{% else %}اختر جهة العمل والمخزن لعرض التنبيهات.{% endif %}
+        </p>
+        {% elif overdue_custody %}
+        <ul class="inventory-home__alert-list">
+          {% for row in overdue_custody %}
+          <li>
+            <a href="{{ custody_url }}" class="inventory-home__alert">
+              <span class="inventory-home__alert-mark" aria-hidden="true">!</span>
+              <span><strong>عهدة متأخرة</strong><small>{{ row.item_name }}{% if row.due_date %} · موعد الإعادة <bdi dir="ltr">{{ row.due_date }}</bdi>{% endif %}</small></span>
+              <span class="inventory-home__arrow" aria-hidden="true">←</span>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="inventory-home__empty">لا توجد تنبيهات مهمة حالياً.</p>
+        {% endif %}
+      </section>
+    </div>
+  </section>
+</main>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% if section == 'work-orders' %}
+<div class="exec-back-bar"><a class="exec-back-btn" href="/pm/workspace/work-orders/">← العودة إلى المشاريع</a></div>
+<div class="exec-page-header"><h1><i class="fas fa-hard-hat" aria-hidden="true"></i> واجهة التنفيذ</h1><p>إدارة أوامر التشغيل والتسجيل الميداني لأنشطة المشروع</p></div>
+<div class="exec-project-info-bar"><div class="exec-info-item"><span class="exec-info-label">المشروع</span><span class="exec-info-value">{{ project.name }}</span></div><div class="exec-info-item"><span class="exec-info-label">العملة</span><span class="exec-info-value">{{ project.currency }}</span></div><div class="exec-info-item"><span class="exec-info-label">أوامر التشغيل في القائمة</span><span class="exec-info-value">{{ rows|length }}</span></div></div>
+{% elif section == 'reports' %}
+<section class="dr-exec-intro"><div class="dr-exec-intro-main"><div class="dr-exec-intro-icon"><i class="fas fa-chart-line" aria-hidden="true"></i></div><div><h1>متابعة وتحليل التقارير اليومية</h1><p>راجع الأداء اليومي للمشروع، وافتح التقرير لتعديله أو تقديمه للاعتماد.</p></div></div></section>
+{% else %}
+<nav class="pl-topbar"><a class="pl-topbar-back" href="{{ project_url }}">← المشروع</a><div class="pl-topbar-avatar">{{ project.name|first }}</div><div class="pl-topbar-center"><span class="pl-topbar-name">{{ project.name }}</span><div class="pl-topbar-sub">{{ label }} · {{ project.currency }}</div></div></nav><h1>{{ label }}</h1>
+{% endif %}
+{% if rows %}<div class="dr-stats-bar"><div class="dr-stat-card dr-stat-total"><div class="dr-stat-data"><div class="dr-stat-value">{{ rows|length }}</div><div class="dr-stat-label">إجمالي السجلات</div></div></div>{% for state in state_counts %}<div class="dr-stat-card"><div class="dr-stat-data"><div class="dr-stat-value">{{ state.count }}</div><div class="dr-stat-label">{{ state.label }}</div></div></div>{% endfor %}</div>{% endif %}

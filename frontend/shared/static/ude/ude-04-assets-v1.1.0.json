@@ -1,0 +1,12 @@
+{
+  "schema": "ude.asset-manifest.v1",
+  "package": "UDE-04",
+  "offline": true,
+  "external_references": [],
+  "assets": [
+    {"path":"frontend/shared/static/ude/components-v1.1.0.css","sha256":"adcf410861c32f3d8fbd6b95f8f374e54465f029cd5c2aef0894f44b2bdff3a6"},
+    {"path":"frontend/shared/static/ude/components-v1.1.0.js","sha256":"8c15ddb3623a824c24460e6ce3d34c4f89d2baf8ac5af49a1138f25930559152"},
+    {"path":"frontend/shared/static/ude/components-lab-v1.1.1.js","sha256":"9ea4fdf5dbe4553812b73e9963cc66477ac4a1325b00af7602c56139e59d43cc"},
+    {"path":"frontend/shared/static/ude/ude-04-feature-flags-v1.1.0.json","sha256":"e3e602818f3eebc34f403b203cfd81982a52c4611eda2f5ab87423c3a6aaf970"}
+  ]
+}

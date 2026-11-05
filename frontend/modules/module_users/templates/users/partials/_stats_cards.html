@@ -1,0 +1,32 @@
+﻿<div class="stat-mini-card" onclick="document.getElementById('statusFilter').value='';UsersManager.filterUsers();">
+    <div class="stat-mini-icon total"><i class="fas fa-users"></i></div>
+    <div class="stat-mini-info">
+        <div class="stat-mini-value" id="totalCount">0</div>
+        <div class="stat-mini-label">إجمالي المستخدمين</div>
+    </div>
+</div>
+
+<div class="stat-mini-card" onclick="document.getElementById('statusFilter').value='نشط';UsersManager.filterUsers();">
+    <div class="stat-mini-icon active"><i class="fas fa-user-check"></i></div>
+    <div class="stat-mini-info">
+        <div class="stat-mini-value" id="activeCount">0</div>
+        <div class="stat-mini-label">نشط</div>
+        <div class="stat-mini-trend up"><i class="fas fa-arrow-up"></i> 85%</div>
+    </div>
+</div>
+
+<div class="stat-mini-card" onclick="document.getElementById('statusFilter').value='غير نشط';UsersManager.filterUsers();">
+    <div class="stat-mini-icon inactive"><i class="fas fa-user-slash"></i></div>
+    <div class="stat-mini-info">
+        <div class="stat-mini-value" id="inactiveCount">0</div>
+        <div class="stat-mini-label">غير نشط / معلق</div>
+    </div>
+</div>
+
+<div class="stat-mini-card" onclick="document.getElementById('roleFilter').value='مدير النظام';UsersManager.filterUsers();">
+    <div class="stat-mini-icon admins"><i class="fas fa-crown"></i></div>
+    <div class="stat-mini-info">
+        <div class="stat-mini-value" id="adminsCount">0</div>
+        <div class="stat-mini-label">مدراء النظام</div>
+    </div>
+</div>

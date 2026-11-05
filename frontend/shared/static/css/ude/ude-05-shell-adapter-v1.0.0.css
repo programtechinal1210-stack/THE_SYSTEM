@@ -1,0 +1,67 @@
+/* UDE-05 shell adapter: loaded only by the core-home pilot template. */
+.ude-05-pilot-shell {
+  --ude-shell-surface: var(--ude-color-surface-raised, #fff);
+  --ude-shell-border: var(--ude-color-border, #d1d5db);
+  --ude-shell-text: var(--ude-color-text, #111827);
+  --bg-primary: var(--ude-color-canvas);
+  --bg-secondary: var(--ude-color-surface-raised);
+  --bg-card: var(--ude-color-surface-raised);
+  --bg-elevated: var(--ude-color-surface);
+  --text-primary: var(--ude-color-text);
+  --text-secondary: var(--ude-color-text-secondary);
+  --text-muted: var(--ude-color-text-muted);
+  --border-color: var(--ude-color-border);
+  --border-strong: var(--ude-color-brand);
+  --accent: var(--ude-color-brand);
+  --primary-500: var(--ude-color-brand);
+  --primary-600: var(--ude-color-brand-strong);
+  --gradient-primary: linear-gradient(135deg, var(--ude-color-brand), var(--ude-color-brand-strong));
+  --focus-color: var(--ude-color-focus);
+}
+.ude-05-pilot-shell .sidebar,
+.ude-05-pilot-shell .top-header,
+.ude-05-pilot-shell .page-content,
+.ude-05-pilot-shell .site-footer {
+  color: var(--ude-shell-text);
+}
+.ude-05-pilot-shell .top-header,
+.ude-05-pilot-shell .site-footer {
+  border-color: var(--ude-shell-border);
+  background: var(--ude-shell-surface);
+}
+body.core-shell.ude-05-pilot-shell .sidebar { background: var(--ude-color-surface); border-color: var(--ude-color-border); }
+body.core-shell.ude-05-pilot-shell .sidebar .nav-item { color: var(--ude-color-text-secondary); }
+html[data-theme] body.core-shell.ude-05-pilot-shell .sidebar .nav-item:hover,
+html[data-theme] body.core-shell.ude-05-pilot-shell .sidebar .nav-item.active { background: var(--ude-color-brand); color: var(--ude-color-on-brand); }
+html[data-theme] body.core-shell.ude-05-pilot-shell .sidebar .nav-item.active .core-icon { color: var(--ude-color-on-brand); }
+html[data-theme] body.core-shell.ude-05-pilot-shell .top-header,
+html[data-theme] body.core-shell.ude-05-pilot-shell .footer { background: var(--ude-color-surface-raised); color: var(--ude-color-text); }
+body.core-shell.ude-05-pilot-shell .header-page-title::after,
+body.core-shell.ude-05-pilot-shell .header-title-home,
+body.core-shell.ude-05-pilot-shell .header-icon-btn:hover,
+body.core-shell.ude-05-pilot-shell .core-footer-links a:hover { color: var(--ude-color-brand); }
+body.core-shell.ude-05-pilot-shell .btn-primary,
+body.core-shell.ude-05-pilot-shell .core-module-card .btn-primary { background: var(--ude-color-brand); border-color: var(--ude-color-brand); color: var(--ude-color-on-brand); }
+body.core-shell.ude-05-pilot-shell .core-module-card:hover,
+body.core-shell.ude-05-pilot-shell .core-panel:focus-within { border-color: var(--ude-color-brand); }
+.ude-05-pilot-shell [data-ude-root] {
+  color: var(--ude-color-text);
+  background: var(--ude-color-canvas);
+  font-family: var(--ude-font-family-sans);
+}
+.ude-05-pilot-shell [data-ude-root] .core-hero,
+.ude-05-pilot-shell [data-ude-root] .core-panel,
+.ude-05-pilot-shell [data-ude-root] .core-module-card,
+.ude-05-pilot-shell [data-ude-root] .core-stats > article {
+  border-color: var(--ude-color-border);
+  background: var(--ude-color-surface-raised);
+}
+.ude-05-pilot-shell [data-ude-root] :focus-visible {
+  outline: 3px solid var(--ude-color-focus);
+  outline-offset: 3px;
+  box-shadow: var(--ude-focus-ring);
+}
+@media (max-width: 600px) {
+  .ude-05-pilot-shell [data-ude-root] { min-inline-size: 0; }
+  .ude-05-pilot-shell [data-ude-root] .core-module-grid { grid-template-columns: minmax(0, 1fr); }
+}

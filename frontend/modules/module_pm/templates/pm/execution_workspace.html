@@ -1,0 +1,629 @@
+﻿{% extends "pm/reference_base.html" %}
+{% load static %}
+{% block breadcrumb %}{% endblock %}
+{% block title %}تنفيذ {{ project.name }} — إدارة المشاريع{% endblock %}
+{% block page_title %}إدارة المشاريع{% endblock %}
+{% block breadcrumb_text %}
+  <a href="/pm/">إدارة المشاريع</a><span aria-hidden="true">/</span>
+  <a href="/pm/execution/">مركز تنفيذ المشاريع</a><span aria-hidden="true">/</span>
+  <span aria-current="page">{{ project.name }}</span>
+{% endblock %}
+{% block extra_head %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'pm/execution-workspace.css' %}?v=20261102-execution-plan-refine-06">
+<link rel="stylesheet" href="{% static 'pm/execution-order-cards.css' %}?v=20261030-ui02b-register">
+{% endblock %}
+{% block extra_js %}{{ block.super }}
+<script src="{% static 'pm/execution-workspace.js' %}?v=20261102-execution-plan-removed-01" defer></script>
+{% endblock %}
+{% block pm_content %}
+<main class="pm-execution-v2" aria-labelledby="pm-execution-title" data-project-id="{{ project.id }}">
+  {% if error %}<p class="pm-execution-alert" role="alert">{{ error }}</p>{% endif %}
+
+  <header class="pm-execution-hero">
+    <div class="pm-execution-hero-main">
+      <div class="pm-execution-identity">
+        <span class="pm-execution-symbol" aria-hidden="true"><i class="fa-solid fa-building"></i></span>
+        <div class="pm-execution-project-copy">
+          <div class="pm-execution-project-heading">
+            <h1 id="pm-execution-title">{{ project.name }}</h1>
+            <div class="pm-execution-project-meta">
+              {% if project.project_code %}<span class="pm-execution-code" dir="ltr">{{ project.project_code }}</span>{% endif %}
+              <span class="pm-execution-status">{{ project_status_label }}</span>
+            </div>
+          </div>
+          {% if project.client_name %}<p class="pm-execution-project-client"><i class="fa-regular fa-building" aria-hidden="true"></i><span>العميل</span><strong>{{ project.client_name }}</strong></p>{% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="pm-execution-project-facts">
+      <div class="pm-execution-hero-progress" data-progress-ring="{{ execution_metrics.progress_percent|default:0 }}" role="img" aria-label="نسبة الإنجاز الفعلي">
+        <strong>{% if execution_metrics.progress_percent != None %}{{ execution_metrics.progress_percent }}٪{% else %}—{% endif %}</strong>
+      </div>
+      <div class="pm-execution-progress-copy">
+        <span>الإنجاز الفعلي</span>
+        <div class="pm-execution-progress-track" aria-hidden="true"><span{% if execution_metrics.progress_percent != None %} style="width:{{ execution_metrics.progress_percent }}%"{% endif %}></span></div>
+      </div>
+      <div class="pm-execution-project-dates">
+        {% if project.start_date %}<div><i class="fa-regular fa-calendar" aria-hidden="true"></i><span>البداية</span><strong><bdi>{{ project.start_date }}</bdi></strong></div>{% endif %}
+        {% if schedule_plan.project_finish %}<div><i class="fa-regular fa-calendar-check" aria-hidden="true"></i><span>النهاية المتوقعة</span><strong><bdi>{{ schedule_plan.project_finish }}</bdi></strong></div>{% endif %}
+      </div>
+    </div>
+    <div class="pm-execution-hero-actions">
+      <details class="pm-execution-project-actions">
+        <summary class="pm-execution-button pm-execution-button-primary"><i class="fa-solid fa-list-check" aria-hidden="true"></i> إجراءات المشروع <i class="fa-solid fa-chevron-down pm-execution-actions-chevron" aria-hidden="true"></i></summary>
+        <div class="pm-execution-project-actions-menu" aria-label="إجراءات المشروع">
+          {% if completion_review_ready %}<a href="{{ completion_review_url }}" class="pm-execution-project-action"><i class="fa-solid fa-clipboard-check" aria-hidden="true"></i> مراجعة اكتمال المشروع</a>{% endif %}
+          {% if can_create_work_order %}<a href="#work-orders-form" data-execution-open-form class="pm-execution-project-action"><i class="fa-solid fa-file-circle-plus" aria-hidden="true"></i> إصدار أمر تشغيل</a>{% endif %}
+        </div>
+      </details>
+      <details class="pm-execution-project-actions pm-execution-overflow-actions">
+        <summary class="pm-execution-button pm-execution-overflow-trigger" aria-label="إجراءات إضافية" title="إجراءات إضافية"><i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i></summary>
+        <div class="pm-execution-project-actions-menu" aria-label="إجراءات إضافية">
+          <a class="pm-execution-project-action" href="/pm/execution/"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i> العودة إلى مركز التنفيذ</a>
+        </div>
+      </details>
+    </div>
+    {% if manage and not can_create_work_order %}<p class="pm-execution-note" role="status">{{ execution_block_reason }}</p>{% endif %}
+  </header>
+
+  <nav class="pm-execution-tabs" role="tablist" aria-label="أقسام التنفيذ">
+    <button type="button" role="tab" id="execution-tab-weekly" aria-controls="execution-panel-weekly" aria-selected="true" data-execution-tab="weekly" title="استعراض الالتزام الأسبوعي ونتائج الإغلاق">الخطة الأسبوعية</button>
+    <button type="button" role="tab" id="execution-tab-operations" aria-controls="execution-panel-operations" aria-selected="false" data-execution-tab="operations">إدارة التشغيل اليومي</button>
+    <button type="button" role="tab" id="execution-tab-results" aria-controls="execution-panel-results" aria-selected="false" data-execution-tab="results">المتابعة والنتائج</button>
+  </nav>
+
+  {% if can_view_wep %}{% include "pm/weekly_execution_panel.html" %}{% else %}<section id="execution-panel-weekly" class="pm-execution-panel pm-schedule-unavailable" role="tabpanel" aria-labelledby="execution-tab-weekly" data-execution-panel="weekly" hidden>لا تملك صلاحية عرض الخطة الأسبوعية. اختيار الأعمال والكميات يبقى ضمن عقد WEP.</section>{% endif %}
+
+  <section id="execution-panel-results" class="pm-execution-panel pm-results-panel" role="tabpanel" aria-labelledby="execution-tab-results" data-execution-panel="results" hidden>
+    <div class="pm-results-toolbar">
+      <div class="pm-results-title">
+        <h2><i class="fa-regular fa-rectangle-list" aria-hidden="true"></i> المتابعة والنتائج</h2>
+        <p>متابعة التقدم العام للمشروع والانحرافات ونتائج التنفيذ.</p>
+      </div>
+      <div class="pm-results-report-actions" aria-label="إجراءات التقرير">
+        <span class="pm-results-read-date">حتى تاريخ: <bdi>{{ results_read_date }}</bdi> <i class="fa-regular fa-calendar" aria-hidden="true"></i></span>
+        {% if can_view_reports %}<a class="pm-execution-button pm-execution-button-primary" href="{{ project_url }}reporting/"><i class="fa-regular fa-file-lines" aria-hidden="true"></i> تقرير المشروع</a>{% endif %}
+      </div>
+    </div>
+
+    <div class="pm-results-kpis" aria-label="مؤشرات التنفيذ المختصرة">
+      <article class="is-progress"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i><div><span>نسبة الإنجاز الكلي</span><strong>{% if results_reporting.progress_percent != None %}{{ results_reporting.progress_percent|floatformat:0 }}٪{% else %}غير متاح{% endif %}</strong><small>مقابل المخطط المعتمد</small></div></article>
+      <article class="is-warning"><i class="fa-regular fa-clock" aria-hidden="true"></i><div><span>الأنشطة المتأخرة</span><strong>{{ results_summary.status_counts.late }}</strong><small>من أصل {{ results_summary.activity_count }} نشاط</small></div></article>
+      <article class="is-danger"><i class="fa-solid fa-coins" aria-hidden="true"></i><div><span>الانحراف المالي</span><strong>{% if results_reporting.cost_variance_percent != None %}{{ results_reporting.cost_variance_percent|floatformat:0 }}٪{% else %}غير متاح{% endif %}</strong><small>{% if results_reporting.cost_overrun %}تجاوز عن الميزانية{% else %}ضمن الميزانية{% endif %}</small></div></article>
+      <article class="is-risk"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i><div><span>المخاطر المفتوحة</span><strong>{% if open_issue_count != None %}{{ open_issue_count }}{% else %}غير متاح{% endif %}</strong><small>مخاطر وانحرافات ضمن الصلاحية</small></div></article>
+    </div>
+
+    <div class="pm-results-grid pm-results-grid-top">
+      <section class="pm-execution-card pm-results-chart-card" aria-labelledby="pm-results-time-title">
+        <div class="pm-execution-card-heading"><div><h3 id="pm-results-time-title">تقدم المشروع مع مرور الوقت</h3><p>الإنجاز المخطط والفعلي يحتاجان إلى سلسلة زمنية موثقة.</p></div><span class="pm-results-source">{{ results_summary.historical_series_note }}</span></div>
+        <div class="pm-results-chart-legend" aria-hidden="true"><span class="is-planned">المخطط</span><span class="is-actual">الفعلي</span></div>
+        <div class="pm-results-chart-shell" role="img" aria-label="مخطط تقدم المشروع مع مرور الوقت">
+          <div class="pm-results-chart-y-axis" aria-hidden="true"><span>100%</span><span>75%</span><span>50%</span><span>25%</span><span>0%</span></div>
+          <div class="pm-results-chart-plot">
+            <div class="pm-results-chart-grid" aria-hidden="true"></div>
+            {% if results_summary.historical_series_available %}<svg class="pm-results-chart-lines" viewBox="0 0 640 220" preserveAspectRatio="none" aria-hidden="true"><polyline class="is-planned" points="{{ results_summary.planned_points }}"></polyline><polyline class="is-actual" points="{{ results_summary.actual_points }}"></polyline>{% for point in results_summary.progress_series %}<circle class="is-planned" cx="{{ point.x }}" cy="{{ point.planned_y }}" r="4"></circle><text class="is-planned" x="{{ point.x }}" y="{{ point.planned_label_y }}">{{ point.planned_label }}%</text><circle class="is-actual" cx="{{ point.x }}" cy="{{ point.actual_y }}" r="4"></circle><text class="is-actual" x="{{ point.x }}" y="{{ point.actual_label_y }}">{{ point.actual_label }}%</text>{% endfor %}</svg>{% endif %}
+            {% if not results_summary.historical_series_available %}<div class="pm-results-chart-empty">{{ results_summary.historical_series_note }}<small>لن تُرسم نقاط تقديرية قبل توفر سجل فعلي موثق.</small></div>{% endif %}
+          </div>
+        </div>
+        <div class="pm-results-chart-x-axis" aria-hidden="true">{% for point in results_summary.progress_series %}<span>{{ point.label }}</span>{% empty %}<span>الفترة الأولى</span><span>الفترة الثانية</span><span>الفترة الثالثة</span><span>الفترة الرابعة</span><span>الفترة الخامسة</span>{% endfor %}</div>
+      </section>
+      <section class="pm-execution-card pm-results-phases-card" aria-labelledby="pm-results-phases-title">
+        <div class="pm-execution-card-heading"><div><h3 id="pm-results-phases-title">متابعة الأنشطة والمراحل</h3><p>قراءة مختصرة من الخطة والتنفيذ.</p></div></div>
+        <div class="pm-results-mini-table-wrap"><table class="pm-results-mini-table"><thead><tr><th>المرحلة / النشاط</th><th>الحالة</th><th>المخطط</th><th>الفعلي</th><th>الانحراف</th><th>الإجراء التالي</th></tr></thead><tbody>{% for activity in activities|slice:':5' %}<tr><td><strong>{{ activity.name }}</strong><small>{{ activity.activity_code|default:'نشاط' }}{% if activity.phase_name %} · {{ activity.phase_name }}{% endif %}</small></td><td><span class="pm-results-status">{% if activity.progress_percent == 100 %}مكتمل{% elif activity.active_order %}قيد التنفيذ{% elif activity.schedule_late %}متأخر{% else %}لم يبدأ{% endif %}</span></td><td>{{ activity.planned_quantity }} {{ activity.unit|default:'—' }}</td><td>{{ activity.actual_quantity }} {{ activity.unit|default:'—' }}</td><td>{% if activity.planned_quantity != None and activity.actual_quantity != None %}{{ activity.remaining_quantity }}{% else %}غير متاح{% endif %}</td><td>{% if activity.progress_percent == 100 %}متابعة الأعمال{% elif activity.active_order %}تسريع التنفيذ{% else %}بدء التنفيذ{% endif %}</td></tr>{% empty %}<tr><td colspan="6" class="pm-execution-empty">لا توجد أنشطة مرتبطة بالمشروع.</td></tr>{% endfor %}</tbody></table></div>
+      </section>
+    </div>
+
+    <section class="pm-execution-card pm-results-weekly" aria-labelledby="pm-results-weekly-title">
+      <div class="pm-execution-card-heading"><div><h3 id="pm-results-weekly-title">نتائج الخطط الأسبوعية</h3><p>الالتزام الأسبوعي منفصل عن إنجاز النشاط الكلي، والنتائج المغلقة تُعرض كما حُفظت.</p></div>{% if can_view_wep %}<a class="pm-execution-text-link" href="#execution-panel-weekly" data-execution-open-tab="weekly">فتح الخطط الأسبوعية</a>{% endif %}</div>
+      <div class="pm-results-weekly-grid"><div><span>الخطة المحددة</span><strong>{% if wep_selected %}{{ wep_selected.week_code }} · {{ wep_selected.start_date }} — {{ wep_selected.end_date }}{% else %}لا توجد خطة أسبوعية{% endif %}</strong></div><div><span>المستهدف الأسبوعي</span><strong>{% if wep_selected %}{{ wep_metrics.planned_items }} نشاطاً{% else %}غير متاح{% endif %}</strong></div><div><span>تحقيق الالتزام</span><strong>{% if wep_selected and wep_metrics.achievement_known %}{{ wep_metrics.achievement_percent }}٪{% else %}غير متاح{% endif %}</strong></div><div><span>حالة الإغلاق</span><strong>{{ wep_selected.status_label|default:'غير محفوظة' }}</strong></div></div>
+    </section>
+
+    <section class="pm-execution-card pm-results-costs" aria-labelledby="pm-results-costs-title">
+      <div class="pm-results-compact-heading"><h3 id="pm-results-costs-title">متابعة التكاليف</h3><span aria-hidden="true">▣</span></div>
+      {% if results_reporting %}<div class="pm-results-cost-summary">
+        <article><span>الميزانية المعتمدة</span><strong>{{ results_reporting.planned_cost|default:'غير متاح' }}</strong><small>{{ results_reporting.currency|default:'—' }}</small></article>
+        <article><span>التكلفة الفعلية</span><strong>{{ results_reporting.actual_cost|default:'غير متاح' }}</strong><small>{{ results_reporting.currency|default:'—' }}</small></article>
+        <article><span>الانحراف المالي</span><strong>{{ results_reporting.cost_variance|default:'غير متاح' }}</strong><small>{{ results_reporting.currency|default:'—' }}</small></article>
+        <article class="pm-results-cost-variance {% if results_reporting.cost_overrun %}is-overrun{% else %}is-under{% endif %}"><span>الانحراف في التكلفة</span><strong>{% if results_reporting.cost_variance_percent != None %}{{ results_reporting.cost_variance_percent }}٪{% else %}غير متاح{% endif %}</strong><small>{% if results_reporting.cost_overrun %}تجاوز عن الميزانية{% else %}ضمن الميزانية{% endif %}</small></article>
+      </div>{% else %}<div class="pm-results-unavailable">بيانات التكاليف غير متاحة ضمن صلاحية التقارير الحالية.</div>{% endif %}
+    </section>
+
+    <section class="pm-execution-card pm-results-final" aria-labelledby="pm-results-final-title">
+      <div class="pm-results-compact-heading"><h3 id="pm-results-final-title">ملخص نتائج التنفيذ</h3><span aria-hidden="true">▤</span></div>
+      <div class="pm-results-execution-summary">
+        <article class="is-complete"><i aria-hidden="true">✓</i><span>الأنشطة المكتملة</span><strong>{{ results_summary.status_counts.complete }}</strong></article>
+        <article class="is-late"><i aria-hidden="true">◷</i><span>الأنشطة المتأخرة</span><strong>{{ results_summary.status_counts.late }}</strong></article>
+        <article class="is-active"><i aria-hidden="true">▷</i><span>الأنشطة قيد التنفيذ</span><strong>{{ results_summary.status_counts.active }}</strong></article>
+        <article class="is-forecast"><i aria-hidden="true">▦</i><span>التوقع لنهاية المشروع</span><div><strong>{{ results_forecast_finish|default:'غير متاح' }}</strong>{% if results_forecast_delay_days > 0 %}<small>(تأخر {{ results_forecast_delay_days }} يوم)</small>{% elif results_forecast_delay_days == 0 %}<small>ضمن الموعد</small>{% else %}<small>حسب Forecast المعتمد</small>{% endif %}</div></article>
+      </div>
+    </section>
+    <section class="pm-execution-card pm-results-activities" aria-labelledby="pm-results-activities-title">
+      <div class="pm-execution-card-heading"><div><h3 id="pm-results-activities-title">مقارنة المخطط بالفعلي</h3><p>كل كمية معروضة بوحدتها الأصلية؛ الأوامر المرفوضة مستبعدة من الإجمالي.</p></div><label class="pm-execution-search"><span class="pm-execution-visually-hidden">البحث في النتائج</span><input type="search" placeholder="ابحث عن نشاط أو مرحلة…" data-results-search></label></div>
+      <div class="pm-results-activity-grid">{% for activity in activities %}<article class="pm-results-activity-card" data-results-card data-results-status="{% if activity.progress_percent == 100 %}complete{% elif activity.over_plan %}blocked{% elif activity.active_order %}active{% else %}late{% endif %}" data-results-search-text="{{ activity.name }} {{ activity.phase_name }} {{ activity.task_name }}"><div class="pm-results-activity-head"><div><span>{{ activity.activity_code|default:'نشاط' }}</span><h4>{{ activity.name }}</h4><small>{{ activity.phase_name }}{% if activity.task_name %} · {{ activity.task_name }}{% endif %}</small></div><b class="pm-results-status">{% if activity.progress_percent == 100 %}مكتمل{% elif activity.over_plan %}تجاوز المخطط{% elif activity.active_order %}قيد التنفيذ{% else %}يحتاج متابعة{% endif %}</b></div><div class="pm-results-quantities"><div><span>المخطط</span><strong>{{ activity.planned_quantity }} {{ activity.unit|default:'—' }}</strong></div><div><span>المنجز</span><strong>{{ activity.actual_quantity }} {{ activity.unit|default:'—' }}</strong></div><div><span>المتبقي</span><strong>{{ activity.remaining_quantity }} {{ activity.unit|default:'—' }}</strong></div></div><div class="pm-results-progress"><span style="width:{% if activity.progress_percent != None %}{{ activity.progress_percent }}{% else %}0{% endif %}%"></span></div><div class="pm-results-activity-actions"><button type="button" class="pm-execution-button pm-execution-button-quiet" data-results-detail data-results-name="{{ activity.name }}" data-results-path="{{ activity.phase_name }}{% if activity.task_name %} · {{ activity.task_name }}{% endif %}" data-results-planned="{{ activity.planned_quantity }} {{ activity.unit|default:'—' }}" data-results-actual="{{ activity.actual_quantity }} {{ activity.unit|default:'—' }}" data-results-remaining="{{ activity.remaining_quantity }} {{ activity.unit|default:'—' }}">التفاصيل</button>{% if activity.active_order %}<a class="pm-execution-button pm-execution-button-primary" href="{{ activity.active_order.href }}" title="الانتقال إلى أمر التشغيل المرتبط بالنشاط">متابعة أمر التشغيل</a>{% endif %}</div></article>{% empty %}<p class="pm-execution-empty">لا توجد أنشطة لعرض نتائجها.</p>{% endfor %}</div>
+    </section>
+
+    <section class="pm-execution-card pm-results-blockers" aria-labelledby="pm-results-blockers-title">
+      <div class="pm-results-compact-heading"><h3 id="pm-results-blockers-title">الانحرافات والمشكلات</h3><span class="is-alert" aria-hidden="true">△</span></div>
+      <div class="pm-results-issues-wrap"><table class="pm-results-issues-table"><thead><tr><th>المشكلة / الانحراف</th><th>الأولوية</th><th>المسؤول</th><th>الإجراء المطلوب</th></tr></thead><tbody>{% for row in results_issue_rows %}<tr><td>{{ row.problem }}</td><td><span class="{{ row.priority_class }}">{{ row.priority }}</span></td><td>{{ row.owner }}</td><td>{{ row.action }}</td></tr>{% empty %}<tr><td colspan="4" class="pm-results-issues-empty">لا توجد مشكلات أو انحرافات مفتوحة ضمن نطاق الصلاحية.</td></tr>{% endfor %}</tbody></table></div>
+    </section>
+    <aside class="pm-results-drawer" data-results-drawer hidden aria-label="تفاصيل النتيجة"><button type="button" class="pm-results-drawer-close" data-results-close aria-label="إغلاق التفاصيل">×</button><span class="pm-execution-eyebrow">تفاصيل للقراءة والمتابعة</span><h3 data-results-drawer-name></h3><p data-results-drawer-path></p><div class="pm-results-drawer-facts"><div><span>المخطط</span><strong data-results-drawer-planned></strong></div><div><span>المنجز</span><strong data-results-drawer-actual></strong></div><div><span>المتبقي</span><strong data-results-drawer-remaining></strong></div></div><p class="pm-results-drawer-note">للتعديل أو تسجيل إنجاز جديد، انتقل إلى مصدر التنفيذ الأصلي.</p></aside>
+  </section>
+
+  <section id="execution-panel-operations" class="pm-execution-panel pm-operations-panel" role="tabpanel" aria-labelledby="execution-tab-operations" data-execution-panel="operations" hidden>
+    <div class="pm-operations-shell">
+      <header class="pm-operations-bar" data-daily-date="{{ daily_date }}">
+        <div class="pm-operations-heading"><span class="pm-execution-eyebrow">Daily Work · WEP · Work Orders</span><h2>إدارة التشغيل اليومي</h2><p>مساحة واجهية موحدة مع بقاء مصادر البيانات والاعتمادات مستقلة.</p></div>
+      </header>
+      <nav class="pm-operations-sections" role="tablist" aria-label="أقسام إدارة التشغيل اليومي">
+        <button type="button" role="tab" id="operations-tab-planning" aria-controls="operations-pane-planning" aria-selected="true" data-operations-section="planning">تخطيط العمل</button>
+        <button type="button" role="tab" id="operations-tab-orders" aria-controls="operations-pane-orders" aria-selected="false" data-operations-section="orders">تنفيذ الأوامر <b>{{ orders|length }}</b></button>
+        <button type="button" role="tab" id="operations-tab-review" aria-controls="operations-pane-review" aria-selected="false" data-operations-section="review">النتائج والمراجعة والإغلاق</button>
+      </nav>
+    </div>
+    <div id="operations-pane-planning" class="pm-operations-pane" role="tabpanel" aria-labelledby="operations-tab-planning" data-operations-pane="planning">
+    <section class="pm-daily-board" aria-labelledby="pm-daily-title" data-daily-date="{{ daily_date }}" data-daily-items-available="{% if daily_items_unavailable %}false{% else %}true{% endif %}">
+      <div class="pm-daily-daybar">
+        <div class="pm-daily-title-wrap">
+          <span class="pm-daily-eyebrow">Daily Work · الالتزام اليومي</span>
+          <div class="pm-daily-title-line"><h2 id="pm-daily-title">تخطيط العمل</h2><span class="pm-daily-plan-badge is-{{ daily_plan.status|default:'missing' }}">{{ daily_plan_status_label }}</span></div>
+          <p>إعداد أعمال اليوم ومراجعة الجاهزية والموارد والعوائق قبل التنفيذ.</p>
+        </div>
+        <div class="pm-daily-header-actions">
+          <div class="pm-daily-day-controls" aria-label="اختيار تاريخ العمل">
+            <button type="button" class="pm-daily-day-button" data-daily-day-shift="-1" aria-label="اليوم السابق" title="اليوم السابق">‹</button>
+            <div class="pm-daily-selected-day"><strong data-daily-day-label>اليوم</strong><span data-daily-day-date>{{ daily_date }}</span></div>
+            <button type="button" class="pm-daily-day-button" data-daily-day-shift="1" aria-label="اليوم التالي" title="اليوم التالي">›</button>
+            <button type="button" class="pm-execution-button pm-daily-today" data-daily-today>اليوم</button>
+          </div>
+          {% if can_manage_daily_work %}<button type="button" class="pm-execution-button pm-execution-button-primary pm-daily-add" data-daily-add-open>＋ إضافة عمل</button>{% else %}<span class="pm-daily-permission-note">العرض فقط</span>{% endif %}
+        </div>
+      </div>
+
+      <div class="pm-daily-summary pm-daily-summary-final" aria-label="مؤشرات خطة اليوم">
+        <article class="is-total"><span>إجمالي الأعمال</span><strong data-daily-count="all">{% if daily_summary.available %}{{ daily_summary.total }}{% else %}غير متاح{% endif %}</strong><small>ضمن التاريخ المحدد</small></article>
+        <article class="is-success"><span>الأعمال الجاهزة</span><strong data-daily-count="ready">{% if daily_summary.available %}{{ daily_summary.ready }}{% else %}غير متاح{% endif %}</strong><small>اجتازت فحص الجاهزية</small></article>
+        <article class="is-warning"><span>تحتاج مراجعة</span><strong data-daily-count="review">{% if daily_summary.available %}{{ daily_summary.needs_review }}{% else %}غير متاح{% endif %}</strong><small>كل عمل يُحتسب مرة واحدة</small></article>
+        <article class="is-cost"><span>{% if daily_resource_summary.costs %}التكلفة التقديرية{% else %}العوائق الرئيسية{% endif %}</span><strong{% if not daily_resource_summary.costs %} data-daily-count="blockers"{% endif %}>{% if daily_resource_summary.costs|length == 1 %}{% with cost=daily_resource_summary.costs.0 %}{{ cost.value }} <small>{{ cost.currency }}</small>{% endwith %}{% elif daily_resource_summary.costs %}{{ daily_resource_summary.costs|length }} عملات{% elif daily_summary.available %}{{ daily_summary.blockers }}{% else %}غير متاح{% endif %}</strong><small>{% if daily_resource_summary.costs|length > 1 %}تعرض كل عملة مستقلة أدناه{% elif daily_resource_summary.costs %}تقدير تخطيطي فقط{% else %}عوائق مفتوحة مسجلة{% endif %}</small></article>
+      </div>
+
+      <details class="pm-daily-wep-draft" aria-labelledby="pm-daily-wep-title">
+        <summary class="pm-daily-wep-summary"><span><b id="pm-daily-wep-title">أنشطة الخطة الأسبوعية المؤهلة</b><small>اقتراحات WEP المعتمدة لهذا التاريخ دون توزيع تلقائي للكميات</small></span><em>{% if daily_wep_candidates_unavailable %}تعذر التحميل{% elif daily_wep_candidates %}{{ daily_wep_candidates|length }} نشاط{% else %}لا توجد أنشطة{% endif %}</em></summary>
+        <div class="pm-daily-wep-heading"><div><span class="pm-execution-eyebrow">WEP · التزام أسبوعي معتمد</span><h3>أنشطة مقترحة لمسودة اليوم</h3><p>اختر النشاط ثم حدّد المستهدف اليومي المستقل من خلال نموذج «إضافة عمل».</p></div><span>{{ daily_date }}</span></div>
+        {% if daily_wep_candidates_unavailable %}
+          <p class="pm-daily-wep-state is-error">تعذر جلب أنشطة WEP. لم تُعرض بيانات بديلة أو نجاح افتراضي.</p>
+        {% elif not can_view_wep %}
+          <p class="pm-daily-wep-state">لا تملك صلاحية عرض الالتزام الأسبوعي.</p>
+        {% elif daily_wep_candidates %}
+          <div class="pm-daily-wep-list">
+          {% for candidate in daily_wep_candidates %}
+            <article class="pm-daily-wep-row {% if not candidate.eligible %}is-unavailable{% endif %}">
+              <div class="pm-daily-wep-activity"><strong>{{ candidate.activity_code }} · {{ candidate.activity_name }}</strong><small>{{ candidate.phase_name }}{% if candidate.task_name %} · {{ candidate.task_name }}{% endif %} · {{ candidate.week_code }}</small></div>
+              <dl><div><dt>التزام الأسبوع</dt><dd>{{ candidate.weekly_target }} {{ candidate.unit|default:'—' }}</dd></div><div><dt>Actual المؤرخ</dt><dd>{{ candidate.actual_dated }} {{ candidate.unit|default:'—' }}{% if candidate.actual_reliability != 'available' %} <small>بيانات جزئية</small>{% endif %}</dd></div><div><dt>المتبقي الأسبوعي</dt><dd>{{ candidate.weekly_remaining }} {{ candidate.unit|default:'—' }}</dd></div><div><dt>الجاهزية</dt><dd>{% if candidate.readiness_status == 'ready' %}جاهز{% elif candidate.readiness_status == 'not_ready' %}غير جاهز{% elif candidate.readiness_status == 'warnings' %}تحذيرات{% else %}غير مسجلة{% endif %}</dd></div></dl>
+              {% if candidate.open_blockers %}<p class="pm-daily-wep-blocker">{{ candidate.open_blockers|length }} عائق مفتوح مرتبط بالنشاط لهذا التاريخ.</p>{% endif %}
+              {% if candidate.daily_items %}<p class="pm-daily-wep-existing">مدرج في مسودة اليوم: {{ candidate.daily_items|length }} بند.</p>{% endif %}
+              {% if can_add_wep_to_daily_draft and candidate.eligible %}
+                <button type="button" class="pm-execution-button pm-execution-button-primary" data-daily-wep-choice data-wep-id="{{ candidate.wep_item_id }}" data-title="{{ candidate.activity_name }}" data-unit="{{ candidate.unit }}" data-max="{{ candidate.weekly_remaining }}">إضافة عبر النموذج</button>
+              {% elif not candidate.eligible %}
+                <p class="pm-daily-wep-state">{% if candidate.ineligible_reason == 'weekly_remaining_zero' %}اكتملت الكمية الأسبوعية أو لا يوجد متبقٍ متاح.{% else %}لا يمكن الإدراج قبل استكمال وحدة قياس النشاط.{% endif %}</p>
+              {% endif %}
+            </article>
+          {% endfor %}
+          </div>
+        {% else %}
+          <p class="pm-daily-wep-state">لا توجد خطة أسبوعية معتمدة تغطي هذا التاريخ.</p>
+        {% endif %}
+      </details>
+
+      {% if daily_saved %}<p class="pm-execution-alert is-success" role="status">تم حفظ العمل في مسودة اليوم بعد تأكيد الخدمة.</p>{% endif %}
+      {% if error and failed_command|slice:":6" == "daily_" %}<p class="pm-execution-alert" role="alert">{{ error }}</p>{% endif %}
+      <section class="pm-daily-records" aria-labelledby="pm-daily-records-title">
+        <div class="pm-daily-records-heading"><div><h3 id="pm-daily-records-title">قائمة أعمال اليوم</h3><p>التخطيط والجاهزية والتكليفات من Daily Work؛ ولا ينشئ هذا العرض Actual أو WO.</p></div><span data-daily-visible-count>{{ daily_items|length }} عمل</span></div>
+        {% if daily_items_unavailable %}<p class="pm-daily-data-state is-error" role="alert">تعذر تحميل أعمال هذا اليوم. لم تُعامل البيانات غير المتاحة كقائمة فارغة أو قيم صفرية.</p>{% endif %}
+        {% if daily_items %}<div class="pm-daily-toolbar">
+          <label class="pm-daily-search"><span aria-hidden="true">⌕</span><input type="search" placeholder="ابحث في أعمال هذا اليوم" data-daily-search aria-label="البحث في أعمال اليوم"></label>
+          <div class="pm-daily-select-filters" aria-label="تصفية أعمال اليوم">
+            <label>النوع <select data-daily-origin-filter><option value="all">جميع الأنواع</option><option value="planned_wep">من الخطة الأسبوعية</option><option value="additional_existing_activity">إضافي مرتبط</option><option value="new_project_work">جديد داخل المشروع</option><option value="independent_project_work">تشغيلي مستقل</option></select></label>
+            <label>الحالة <select data-daily-status-filter><option value="all">جميع الحالات</option><option value="planned">مخطط</option><option value="ready">جاهز</option><option value="active">قيد التنفيذ</option><option value="blocked">محجوب</option><option value="complete">مكتمل أو مغلق</option></select></label>
+            <label>الجاهزية <select data-daily-readiness-filter><option value="all">الكل</option><option value="ready">جاهز</option><option value="not_ready">غير جاهز</option><option value="warnings">يحتاج تحقق</option></select></label>
+            <label>الفريق <select data-daily-team-filter><option value="all">جميع الفرق</option>{% for team in daily_resource_summary.teams %}<option value="{{ team }}">{{ team }}</option>{% endfor %}</select></label>
+            <button type="button" class="pm-execution-button pm-daily-reset" data-daily-reset-filters>إعادة ضبط</button>
+          </div>
+        </div>{% endif %}
+        <div class="pm-daily-table-wrap" data-daily-record-grid><table class="pm-daily-table"><thead><tr><th>نوع العمل</th><th>العمل / النشاط</th><th>الموقع</th><th>المستهدف</th><th>الزمن المقدر</th><th>المسؤول / الفريق</th><th>المعدات</th><th>الجاهزية</th><th>العوائق</th><th>الحالة والإجراءات</th></tr></thead><tbody>
+          {% for daily in daily_items %}<tr data-daily-card data-daily-status="{{ daily.status }}" data-daily-group="{% if daily.status == 'planned' %}planned{% elif daily.status == 'ready' %}ready{% elif daily.status == 'in_progress' %}active{% elif daily.status == 'blocked' %}blocked{% elif daily.status == 'completed' or daily.status == 'closed' %}complete{% else %}other{% endif %}" data-daily-origin="{{ daily.work_origin|default:'legacy_unclassified' }}" data-daily-readiness="{{ daily.readiness_status }}" data-daily-team="{{ daily.team_name|default:daily.assignee_name }}" data-daily-blockers="{{ daily.blockers|length }}" data-daily-search-text="{{ daily.title }} {{ daily.activity_name }} {{ daily.activity_code }} {{ daily.team_name }} {{ daily.location }} {{ daily.assignee_name }} {{ daily.shift }} {{ daily.work_order_code }}" data-daily-item-id="{{ daily.id }}" data-daily-actual="{{ daily.work_order_actual_quantity|default:'0' }}" data-daily-unit="{{ daily.unit }}">
+            <td><span class="pm-daily-origin-label is-{{ daily.work_origin|default:'legacy' }}">{% if daily.work_origin == 'planned_wep' %}من الخطة الأسبوعية{% elif daily.work_origin == 'additional_existing_activity' %}إضافي مرتبط{% elif daily.work_origin == 'new_project_work' %}جديد داخل المشروع{% elif daily.work_origin == 'independent_project_work' %}تشغيلي مستقل{% else %}سجل سابق غير مصنف{% endif %}</span></td>
+            <td><strong>{{ daily.title }}</strong><small>{% if daily.work_order_code %}{{ daily.work_order_code }}{% else %}Daily Work{% endif %}</small></td><td>{{ daily.location|default:'غير محدد' }}</td><td><strong>{{ daily.target_quantity }}</strong> {{ daily.unit|default:'—' }}</td><td>{% if daily.planned_minutes %}{{ daily.planned_minutes }} دقيقة{% else %}—{% endif %}</td><td>{{ daily.assignee_name|default:'غير معيّن' }}{% if daily.team_name %}<small>{{ daily.team_name }}</small>{% endif %}</td><td>{% for equipment in daily.equipment_names %}<span class="pm-daily-equipment-chip">{{ equipment }}</span>{% empty %}—{% endfor %}</td>
+            <td><span class="pm-daily-readiness is-{{ daily.readiness_status }}">{% if daily.readiness_status == 'ready' %}جاهز{% elif daily.readiness_status == 'not_ready' %}غير جاهز{% else %}يحتاج تحقق{% endif %}</span></td><td>{% if daily.blockers %}{% for blocker in daily.blockers %}<span class="pm-daily-blocker-inline">{{ blocker.description }}</span>{% if can_manage_daily_work %}<button type="button" class="pm-daily-inline-action" data-daily-open-dialog="resolve" data-daily-item="{{ daily.id }}" data-daily-blocker="{{ blocker.id }}">حل</button>{% endif %}{% endfor %}{% else %}—{% endif %}</td><td><span class="pm-daily-status {% if daily.status == 'completed' or daily.status == 'closed' %}is-success{% elif daily.status == 'blocked' %}is-warning{% else %}is-progress{% endif %}">{% if daily.status == 'planned' %}مخطط{% elif daily.status == 'ready' %}جاهز{% elif daily.status == 'in_progress' %}قيد التنفيذ{% elif daily.status == 'blocked' %}محجوب{% elif daily.status == 'completed' %}مكتمل{% elif daily.status == 'closed' %}مغلق{% else %}{{ daily.status }}{% endif %}</span>
+            {% if can_manage_daily_work %}<div class="pm-daily-record-actions">
+              {% if daily.status == 'planned' or daily.status == 'blocked' %}<button type="button" data-daily-open-dialog="readiness" data-daily-item="{{ daily.id }}">تسجيل الجاهزية</button>{% elif daily.status == 'ready' %}<button type="button" data-daily-command="status" data-daily-item="{{ daily.id }}" data-daily-status-value="in_progress">بدء العمل</button>{% endif %}
+              {% if daily.work_order_id and daily.status != 'closed' and daily.status != 'completed' %}<button type="button" data-daily-open-dialog="progress" data-daily-item="{{ daily.id }}">تسجيل كمية إضافية</button>{% endif %}
+              {% if daily.status == 'completed' %}<button type="button" data-daily-command="status" data-daily-item="{{ daily.id }}" data-daily-status-value="closed">إغلاق العمل</button>{% endif %}
+              {% if daily.status != 'closed' %}<button type="button" data-daily-open-dialog="blocker" data-daily-item="{{ daily.id }}">إضافة عائق</button>{% endif %}
+            </div>{% endif %}</td></tr>{% empty %}{% if not daily_items_unavailable %}<tr><td colspan="10" class="pm-execution-empty pm-daily-empty" data-daily-empty>لا توجد أعمال في خطة هذا اليوم بعد. استخدم «إضافة عمل» أو افتح أنشطة WEP المؤهلة.</td></tr>{% endif %}{% endfor %}
+        </tbody></table></div>
+        <p class="pm-daily-no-results" data-daily-no-results hidden>لا توجد أعمال تطابق البحث أو التصفية الحالية.</p>
+      </section>
+      <section class="pm-daily-lower-grid" aria-label="ملخص الموارد والجاهزية">
+        <article class="pm-daily-resource-panel">
+          <div class="pm-daily-panel-heading"><div><h3>ملخص موارد اليوم</h3><p>تكليفات وتقديرات لنفس المشروع والتاريخ، وليست استهلاكًا فعليًا.</p></div></div>
+          {% if daily_resource_summary.details_unavailable %}<p class="pm-daily-data-state is-warning">تعذر تحميل بعض تفاصيل التكليفات أو التقديرات؛ لا تعرض القيم الناقصة كصفر.</p>{% endif %}
+          <div class="pm-daily-resource-tiles">
+            <div><span>الفرق والمسؤولون</span><strong>{% if daily_resource_summary.teams %}{{ daily_resource_summary.teams|length }}{% else %}—{% endif %}</strong><small>{% if daily_resource_summary.teams %}{{ daily_resource_summary.teams|join:'، ' }}{% else %}غير مسجلة{% endif %}</small></div>
+            <div><span>المعدات المطلوبة</span><strong>{% if daily_resource_summary.equipment %}{{ daily_resource_summary.equipment|length }}{% else %}—{% endif %}</strong><small>{% if daily_resource_summary.equipment %}{{ daily_resource_summary.equipment|join:'، ' }}{% else %}غير مسجلة{% endif %}</small></div>
+            <div><span>الزمن المقدر</span><strong>{% if daily_resource_summary.planned_minutes_available %}{{ daily_resource_summary.planned_minutes }}{% else %}—{% endif %}</strong><small>{% if daily_resource_summary.planned_minutes_available %}دقيقة{% else %}غير متاح{% endif %}</small></div>
+            <div><span>التكلفة التقديرية</span><strong>{% if daily_resource_summary.costs|length == 1 %}{{ daily_resource_summary.costs.0.value }}{% elif daily_resource_summary.costs %}{{ daily_resource_summary.costs|length }}{% else %}—{% endif %}</strong><small>{% if daily_resource_summary.costs|length == 1 %}{{ daily_resource_summary.costs.0.currency }}{% elif daily_resource_summary.costs %}عملات منفصلة{% else %}غير متاحة{% endif %}</small></div>
+          </div>
+          <div class="pm-daily-resource-groups"><div><h4>الكميات بحسب الوحدة</h4><div class="pm-daily-summary-chips">{% for total in daily_resource_summary.quantities %}<span><b>{{ total.value }}</b> {{ total.unit }}</span>{% empty %}<span>لا توجد كميات متاحة</span>{% endfor %}</div></div><div><h4>التكاليف بحسب العملة</h4><div class="pm-daily-summary-chips">{% for total in daily_resource_summary.costs %}<span><b>{{ total.value }}</b> {{ total.currency }}</span>{% empty %}<span>غير متاحة</span>{% endfor %}</div></div></div>
+        </article>
+        <article class="pm-daily-attention-panel">
+          <div class="pm-daily-panel-heading"><div><h3>الجاهزية والعوائق</h3><p>الأعمال التي تحتاج معالجة قبل التنفيذ.</p></div><span>{{ daily_attention_items|length }}</span></div>
+          <div class="pm-daily-attention-list">
+            {% for item in daily_attention_items %}<div class="pm-daily-attention-row"><div><strong>{{ item.title }}</strong><small>{{ item.reasons|join:'، ' }}</small></div><span>{{ item.owner }}</span><b class="pm-daily-readiness is-{{ item.status }}">{% if item.status == 'not_ready' %}غير جاهز{% elif item.status == 'warnings' %}تحتاج مراجعة{% else %}غير مفحوص{% endif %}</b>{% if can_manage_daily_work and item.blockers %}<div>{% for blocker in item.blockers %}<button type="button" class="pm-daily-inline-action" data-daily-open-dialog="resolve" data-daily-item="{{ item.id }}" data-daily-blocker="{{ blocker.id }}">معالجة العائق</button>{% endfor %}</div>{% endif %}</div>{% empty %}<p class="pm-daily-empty-attention">{% if daily_items_unavailable %}تعذر تحديد حالة الجاهزية لأن أعمال اليوم غير متاحة.{% else %}لا توجد أعمال تحتاج معالجة في التاريخ المحدد.{% endif %}</p>{% endfor %}
+          </div>
+        </article>
+      </section>
+      <footer class="pm-daily-section-footer"><p>كل إضافة تحفظ مباشرة في مسودة Daily Work بعد تأكيد الخدمة. اعتماد خطة اليوم ومعاينتها الرسمية يستكملان ضمن F3-B بعد اعتماد عقودهما.</p></footer>
+      {% if can_manage_daily_work %}
+      <dialog class="pm-daily-add-dialog" id="pm-daily-add-dialog" dir="rtl" aria-labelledby="pm-daily-add-title" {% if daily_form_should_open or daily_add_again %}data-auto-open="true"{% endif %}>
+        <div class="pm-daily-add-shell">
+          <header class="pm-daily-add-header">
+            <div><span class="pm-execution-eyebrow">إدارة التشغيل اليومي</span><h3 id="pm-daily-add-title">إضافة عمل</h3><p>إضافة عمل جديد إلى مسودة {{ daily_date }} دون إنشاء أمر تشغيل أو Actual.</p></div>
+            <button type="button" class="pm-dialog-close" data-daily-add-close aria-label="إغلاق">×</button>
+          </header>
+          <form method="post" data-daily-add-form novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="command" value="daily_create">
+            <input type="hidden" name="work_date" value="{{ daily_date }}">
+            <input type="hidden" name="idempotency_key" value="{{ daily_idempotency_key }}">
+
+            <fieldset class="pm-daily-origin-picker">
+              <legend>نوع العمل</legend>
+              <label class="pm-daily-origin-card"><input type="radio" name="work_origin" value="planned_wep" {% if not daily_form_values.work_origin or daily_form_values.work_origin == 'planned_wep' %}checked{% endif %}><span aria-hidden="true">▣</span><strong>عمل من الخطة الأسبوعية</strong><small>مستمد من WEP المعتمد</small></label>
+              <label class="pm-daily-origin-card"><input type="radio" name="work_origin" value="additional_existing_activity" {% if daily_form_values.work_origin == 'additional_existing_activity' %}checked{% endif %}><span aria-hidden="true">↗</span><strong>عمل إضافي مرتبط بنشاط</strong><small>عمل إضافي لنشاط PM موجود</small></label>
+              <label class="pm-daily-origin-card"><input type="radio" name="work_origin" value="new_project_work" {% if daily_form_values.work_origin == 'new_project_work' %}checked{% endif %}><span aria-hidden="true">□</span><strong>عمل جديد داخل المشروع</strong><small>لا ينشئ نشاط WBS تلقائيًا</small></label>
+              <label class="pm-daily-origin-card"><input type="radio" name="work_origin" value="independent_project_work" {% if daily_form_values.work_origin == 'independent_project_work' %}checked{% endif %}><span aria-hidden="true">⚙</span><strong>عمل تشغيلي مستقل</strong><small>مرتبط بالمشروع دون نشاط PM</small></label>
+            </fieldset>
+
+            <section class="pm-daily-add-section" aria-labelledby="daily-basic-title">
+              <div class="pm-daily-add-section-title"><span>▤</span><h4 id="daily-basic-title">المعلومات الأساسية</h4></div>
+              <div class="pm-daily-add-grid">
+                <label>المشروع<input value="{{ project.project_code }} · {{ project.name }}" readonly></label>
+                <label>تاريخ العمل<input value="{{ daily_date }}" readonly></label>
+                <label class="pm-daily-add-span-2">اسم العمل <b>*</b><input name="title" value="{{ daily_form_values.title|default:'' }}" maxlength="200" required placeholder="أدخل اسم العمل"></label>
+                <label data-daily-origin-visible="planned_wep">الخطة الأسبوعية <b>*</b><select name="wep_item_id" data-daily-wep-select data-required-origins="planned_wep"><option value="">اختر نشاطًا مؤهلًا</option>{% for candidate in daily_wep_candidates %}<option value="{{ candidate.wep_item_id }}" data-title="{{ candidate.activity_name }}" data-unit="{{ candidate.unit }}" data-max="{{ candidate.weekly_remaining }}" {% if daily_form_values.wep_item_id == candidate.wep_item_id %}selected{% endif %} {% if not candidate.eligible %}disabled{% endif %}>{{ candidate.activity_code }} · {{ candidate.activity_name }} · متبقٍ {{ candidate.weekly_remaining }} {{ candidate.unit }}</option>{% endfor %}</select><small>{% if daily_wep_candidates_unavailable %}تعذر تحميل WEP؛ لن يسمح بالحفظ حتى تعود الخدمة.{% else %}يُحفظ عبر عقد F2 idempotent.{% endif %}</small></label>
+                <label data-daily-origin-visible="additional_existing_activity">النشاط المرتبط <b>*</b><select name="activity_id" data-daily-activity-select data-required-origins="additional_existing_activity"><option value="">اختر نشاطًا من المشروع</option>{% for activity in activities %}<option value="{{ activity.id }}" data-unit="{{ activity.unit }}" {% if daily_form_values.activity_id == activity.id %}selected{% endif %}>{{ activity.activity_code }} · {{ activity.name }}</option>{% endfor %}</select></label>
+                <label data-daily-origin-visible="additional_existing_activity,new_project_work">سبب الإضافة <b>*</b><select name="reason_code" data-required-origins="additional_existing_activity,new_project_work"><option value="">اختر السبب</option><option value="urgent" {% if daily_form_values.reason_code == 'urgent' %}selected{% endif %}>طارئ</option><option value="scope_detail" {% if daily_form_values.reason_code == 'scope_detail' %}selected{% endif %}>تفصيل نطاق</option><option value="site_need" {% if daily_form_values.reason_code == 'site_need' %}selected{% endif %}>احتياج موقع</option><option value="other" {% if daily_form_values.reason_code == 'other' %}selected{% endif %}>أخرى</option></select></label>
+                <label class="pm-daily-add-span-2" data-daily-origin-visible="additional_existing_activity,new_project_work">توضيح السبب <b>*</b><textarea name="reason_note" rows="2" maxlength="4000" data-required-origins="additional_existing_activity,new_project_work" placeholder="وضح سبب إضافة العمل وأثره التشغيلي">{{ daily_form_values.reason_note|default:'' }}</textarea></label>
+                <label>الأولوية <b>*</b><select name="priority" required><option value="low" {% if daily_form_values.priority == 'low' %}selected{% endif %}>منخفضة</option><option value="normal" {% if not daily_form_values.priority or daily_form_values.priority == 'normal' %}selected{% endif %}>عادية</option><option value="high" {% if daily_form_values.priority == 'high' %}selected{% endif %}>عالية</option><option value="urgent" {% if daily_form_values.priority == 'urgent' %}selected{% endif %}>عاجلة</option></select></label>
+                <label>الموقع<input name="location" value="{{ daily_form_values.location|default:'' }}" maxlength="200" placeholder="موقع التنفيذ"></label>
+                <label>الوردية<input name="shift" value="{{ daily_form_values.shift|default:'' }}" maxlength="120" placeholder="مثال: صباحية"></label>
+                <label class="pm-daily-add-span-2">ملاحظات<textarea name="notes" rows="2" maxlength="4000">{{ daily_form_values.notes|default:'' }}</textarea></label>
+              </div>
+            </section>
+
+            <section class="pm-daily-add-section" aria-labelledby="daily-plan-title">
+              <div class="pm-daily-add-section-title"><span>◎</span><h4 id="daily-plan-title">التخطيط والتنفيذ</h4></div>
+              <div class="pm-daily-add-grid pm-daily-add-grid-4">
+                <label>الكمية المستهدفة <b>*</b><input name="target_quantity" type="number" min="0.000001" step="0.000001" inputmode="decimal" value="{{ daily_form_values.target_quantity|default:'' }}" required data-daily-target></label>
+                <label>وحدة القياس <b>*</b><input name="unit" value="{{ daily_form_values.unit|default:'' }}" maxlength="40" required data-daily-add-unit placeholder="الوحدة"></label>
+                <label>الزمن المقدر<input name="estimated_duration" type="number" min="0" step="0.25" value="{{ daily_form_values.estimated_duration|default:'' }}" inputmode="decimal"></label>
+                <label>وحدة الزمن<select name="duration_unit"><option value="hours" {% if daily_form_values.duration_unit != 'minutes' %}selected{% endif %}>ساعة</option><option value="minutes" {% if daily_form_values.duration_unit == 'minutes' %}selected{% endif %}>دقيقة</option></select></label>
+                <label>مفتاح التقسيم<input name="allocation_key" value="{{ daily_form_values.allocation_key|default:'' }}" maxlength="80" data-allocation-key placeholder="مثال: shift-a"></label>
+                <label class="pm-daily-add-span-3">سبب ونطاق التقسيم<input name="allocation_reason" value="{{ daily_form_values.allocation_reason|default:'' }}" maxlength="4000" data-allocation-reason placeholder="إلزامي عند استخدام مفتاح تقسيم"></label>
+              </div>
+              <p class="pm-daily-add-hint">لا توزع الكمية الأسبوعية تلقائيًا، ولا يسمح مفتاح التقسيم بتجاوز الالتزام المتاح.</p>
+            </section>
+
+            <details class="pm-daily-add-section pm-daily-add-collapsible" open>
+              <summary><span>♙</span><strong>الموارد والتكاليف التقديرية</strong><small>تكليفات وتقديرات فقط، وليست استهلاكًا فعليًا</small></summary>
+              <div class="pm-daily-add-grid pm-daily-add-grid-3">
+                <label>المسؤول <b>* للأعمال الجديدة والمستقلة</b><select name="assignee_user_id" data-required-origins="new_project_work,independent_project_work"><option value="">بدون مسؤول محدد</option>{% for user in daily_users %}<option value="{{ user.id }}" {% if daily_form_values.assignee_user_id == user.id %}selected{% endif %}>{{ user.name|default:user.id }}</option>{% endfor %}</select></label>
+                <label>الفريق<input name="team_name" value="{{ daily_form_values.team_name|default:'' }}" maxlength="120" placeholder="اسم الفريق المنفذ"></label>
+                <label>المعدات<select name="equipment_ids" multiple size="3" {% if daily_equipment_unavailable %}disabled{% endif %}>{% for equipment in daily_equipment %}<option value="{{ equipment.id }}" {% if equipment.id in daily_form_equipment_ids %}selected{% endif %}>{{ equipment.asset_code }} · {{ equipment.asset_name }}</option>{% endfor %}</select><small>{% if not can_view_daily_equipment %}لا تملك صلاحية عرض المعدات.{% elif daily_equipment_unavailable %}تعذر تحميل سجل المعدات.{% else %}يمكن اختيار أكثر من معدة.{% endif %}</small></label>
+                <label>تقدير العمال<input name="labor_cost" type="number" min="0" step="0.01" value="{{ daily_form_values.labor_cost|default:'' }}" inputmode="decimal"></label>
+                <label>تقدير المعدات<input name="equipment_cost" type="number" min="0" step="0.01" value="{{ daily_form_values.equipment_cost|default:'' }}" inputmode="decimal"></label>
+                <label>تقدير المواد<input name="material_cost" type="number" min="0" step="0.01" value="{{ daily_form_values.material_cost|default:'' }}" inputmode="decimal"></label>
+                <label>مصروفات أخرى<input name="expense_cost" type="number" min="0" step="0.01" value="{{ daily_form_values.expense_cost|default:'' }}" inputmode="decimal"></label>
+                <label>العملة<select name="estimate_currency"><option value="{{ daily_project_currency }}">{{ daily_project_currency }} · عملة المشروع</option>{% for currency in daily_currencies %}{% if currency.id != daily_project_currency %}<option value="{{ currency.id }}" {% if daily_form_values.estimate_currency == currency.id %}selected{% endif %}>{{ currency.id }} · {{ currency.name }}</option>{% endif %}{% endfor %}</select></label>
+                <label>تاريخ سعر الصرف<input name="fx_as_of" type="date" value="{{ daily_form_values.fx_as_of|default:daily_date }}"><small>يستخرج السعر ومصدره من خدمة العملات عند الحفظ.</small></label>
+              </div>
+            </details>
+
+            <section class="pm-daily-add-section" aria-labelledby="daily-ready-title">
+              <div class="pm-daily-add-section-title"><span>✓</span><h4 id="daily-ready-title">الجاهزية والمتطلبات</h4></div>
+              <div class="pm-daily-add-grid">
+                <label>حالة الجاهزية<select name="readiness_result"><option value="not_checked" {% if not daily_form_values.readiness_result or daily_form_values.readiness_result == 'not_checked' %}selected{% endif %}>لم تُفحص</option><option value="ready" {% if daily_form_values.readiness_result == 'ready' %}selected{% endif %}>جاهز</option><option value="warning" {% if daily_form_values.readiness_result == 'warning' %}selected{% endif %}>جاهز مع ملاحظة</option><option value="blocked" {% if daily_form_values.readiness_result == 'blocked' %}selected{% endif %}>غير جاهز / محجوب</option></select></label>
+                <label>نوع العائق<select name="blocker_type"><option value="operational">تشغيلي</option><option value="material">مواد</option><option value="equipment">معدات</option><option value="access">وصول</option><option value="safety">سلامة</option></select></label>
+                <label class="pm-daily-add-span-2">المتطلبات<textarea name="requirements_note" rows="2" maxlength="4000" placeholder="متطلبات يجب التحقق منها">{{ daily_form_values.requirements_note|default:'' }}</textarea></label>
+                <label class="pm-daily-add-span-2">العوائق<textarea name="blocker_description" rows="2" maxlength="4000" placeholder="وصف العائق إن وجد">{{ daily_form_values.blocker_description|default:'' }}</textarea></label>
+                <label class="pm-daily-add-span-2">ملاحظات الجاهزية<textarea name="readiness_note" rows="2" maxlength="4000">{{ daily_form_values.readiness_note|default:'' }}</textarea></label>
+              </div>
+              <p class="pm-daily-add-hint">الجاهزية لا تعني بدء التنفيذ ولا تسجل إنجازًا فعليًا.</p>
+            </section>
+
+            <p class="pm-daily-add-feedback" data-daily-add-feedback role="alert" hidden></p>
+            <footer class="pm-daily-add-actions">
+              <button type="button" class="pm-execution-button pm-execution-button-quiet" data-daily-add-close>إلغاء</button>
+              <button type="submit" name="save_mode" value="close" class="pm-execution-button pm-execution-button-quiet" data-daily-save>حفظ المسودة</button>
+              <button type="submit" name="save_mode" value="add_another" class="pm-execution-button pm-execution-button-primary" data-daily-save>＋ حفظ وإضافة عمل آخر</button>
+            </footer>
+          </form>
+        </div>
+      </dialog>
+      <dialog class="pm-reference-dialog pm-daily-dialog" id="pm-daily-action-dialog" aria-labelledby="pm-daily-dialog-title">
+        <button type="button" class="pm-dialog-close" data-daily-dialog-close aria-label="إغلاق">×</button>
+        <div class="pm-daily-dialog-body">
+          <span class="pm-execution-eyebrow">العمل اليومي · {{ daily_date }}</span><h3 id="pm-daily-dialog-title" data-daily-dialog-title>إجراء على العمل اليومي</h3>
+          <p class="pm-daily-dialog-intro" data-daily-dialog-intro>سجّل الإجراء في مصدره الرسمي.</p>
+          <form method="post" data-daily-action-form>
+            {% csrf_token %}<input type="hidden" name="command" value="daily_create" data-daily-command-value><input type="hidden" name="work_date" value="{{ daily_date }}"><input type="hidden" name="item_id" value="" data-daily-item-value><input type="hidden" name="blocker_id" value="" data-daily-blocker-value>
+            <div class="pm-daily-dialog-fields" data-daily-mode-fields="readiness" hidden>
+              <label>نتيجة فحص الجاهزية<select name="result"><option value="ready">جاهز</option><option value="warning">جاهز مع ملاحظة</option><option value="blocked">غير جاهز · محجوب</option></select></label>
+              <label class="pm-daily-form-wide">ملاحظة الفحص<textarea name="note" rows="3" placeholder="سجل ما تم التحقق منه أو ما ينقص العمل"></textarea></label>
+            </div>
+            <div class="pm-daily-dialog-fields" data-daily-mode-fields="progress" hidden>
+              <p class="pm-daily-current-quantity" data-daily-current-output></p>
+              <label>الكمية الإضافية المنفذة اليوم<input name="quantity" type="number" min="0.000001" step="0.000001" inputmode="decimal"></label>
+              <p class="pm-daily-projected-quantity" data-daily-projected-output aria-live="polite"></p>
+              <label class="pm-daily-form-wide">ملاحظات الإنجاز<textarea name="notes" rows="2"></textarea></label>
+              <label class="pm-daily-confirm"><input type="checkbox" name="confirm_increment" value="yes" required><span>أؤكد أن هذه كمية إضافية لم يسبق تسجيلها، وستُضاف إلى إجمالي أمر التشغيل.</span></label>
+            </div>
+            <div class="pm-daily-dialog-fields" data-daily-mode-fields="blocker" hidden>
+              <label>نوع العائق<input name="blocker_type" value="تشغيلي" required maxlength="80"></label>
+              <label class="pm-daily-form-wide">وصف العائق<textarea name="description" required rows="3" maxlength="4000" placeholder="صف ما يمنع تنفيذ العمل"></textarea></label>
+            </div>
+            <div class="pm-daily-dialog-fields" data-daily-mode-fields="resolve" hidden>
+              <label class="pm-daily-form-wide">ملاحظة حل العائق<textarea name="note" rows="3" placeholder="كيف تمت معالجة العائق؟"></textarea></label>
+            </div>
+            <p class="pm-daily-dialog-feedback" data-daily-dialog-feedback role="status" hidden></p>
+            <div class="pm-daily-dialog-actions"><button type="submit" class="pm-execution-button pm-execution-button-primary" data-daily-dialog-submit>حفظ العمل</button><button type="button" class="pm-execution-button pm-execution-button-quiet" data-daily-dialog-close>إلغاء</button></div>
+          </form>
+        </div>
+      </dialog>
+      {% endif %}
+    </section>
+    </div>
+    <div id="operations-pane-orders" class="pm-operations-pane" role="tabpanel" aria-labelledby="operations-tab-orders" data-operations-pane="orders" hidden>
+    <div class="pm-execution-columns">
+      <section class="pm-execution-card pm-execution-ready-panel" aria-labelledby="execution-activities-title">
+        <div class="pm-execution-card-heading">
+          <div><span class="pm-execution-eyebrow">PM · الإنجاز الفعلي</span><h2 id="execution-activities-title">إنجاز أنشطة المشروع</h2><p>المنفذ مشتق من أحداث أوامر التشغيل؛ حالة الأمر منفصلة عن اكتمال الكمية.</p></div>
+          <label class="pm-execution-search"><span class="pm-execution-visually-hidden">البحث عن نشاط أو أمر</span><input type="search" placeholder="ابحث عن نشاط أو رقم أمر…" data-execution-search></label>
+        </div>
+        <div class="pm-execution-activity-summary" aria-label="ملخص إنجاز الأنشطة"><span>كل الأنشطة <b data-execution-count="all">{{ activities|length }}</b></span><span>مكتملة الكمية <b data-execution-count="complete">0</b></span><span>لها أمر نشط <b data-execution-count="active">0</b></span><span>دون أمر نشط <b data-execution-count="unassigned">0</b></span></div>
+        <div class="pm-execution-activity-filters" role="group" aria-label="تصفية أنشطة المشروع"><button type="button" class="is-active" data-execution-filter="all">الكل</button><button type="button" data-execution-filter="active">لها أمر نشط</button><button type="button" data-execution-filter="complete">اكتملت الكمية</button><button type="button" data-execution-filter="unassigned">دون أمر نشط</button><button type="button" data-execution-filter="over-plan">تجاوزت المخطط</button></div>
+        <div class="pm-execution-table-wrap">
+          <table class="pm-execution-table">
+            <thead><tr><th scope="col">النشاط</th><th scope="col">المخطط</th><th scope="col">المنفذ</th><th scope="col">المتبقي</th><th scope="col">الحالة</th><th scope="col">الإجراء</th></tr></thead>
+            <tbody>
+              {% for activity in activities %}
+              <tr data-execution-row data-execution-activity="{{ activity.id }}" data-execution-status="{% if activity.over_plan %}over-plan{% elif activity.progress_percent == 100 %}complete{% else %}unassigned{% endif %}" data-execution-complete-quantity="{% if activity.progress_percent == 100 or activity.over_plan %}true{% else %}false{% endif %}" data-execution-over-plan="{% if activity.over_plan %}true{% else %}false{% endif %}" data-execution-has-active-order="{% if activity.active_order %}true{% else %}false{% endif %}" data-search-text="{{ activity.name }} {{ activity.phase_name }} {{ activity.task_name }}{% for order in activity.orders %} {{ order.work_order_code }}{% endfor %}">
+                <td><button type="button" class="pm-execution-activity-select" data-execution-select="{{ activity.id }}" aria-pressed="{% if selected_activity.id == activity.id %}true{% else %}false{% endif %}"><strong>{{ activity.name }}</strong><small>{{ activity.phase_name }}{% if activity.task_name %} · {{ activity.task_name }}{% endif %}</small></button></td>
+                <td>{{ activity.planned_quantity }} {{ activity.unit|default:'—' }}</td>
+                <td>{{ activity.actual_quantity }} {{ activity.unit|default:'—' }}</td>
+                <td>{{ activity.remaining_quantity }} {{ activity.unit|default:'—' }}</td>
+                <td>
+                  {% if activity.active_order %}<span class="pm-execution-badge is-active">{{ activity.active_order.status_label }}</span>
+                  {% elif activity.over_plan %}<span class="pm-execution-badge is-warning">تجاوز المخطط</span>
+                  {% elif activity.progress_percent == 100 %}<span class="pm-execution-badge is-complete">اكتملت الكمية</span>
+                  {% else %}<span class="pm-execution-badge is-neutral">لا يوجد أمر نشط</span>{% endif %}
+                </td>
+                <td>
+                  {% if activity.active_order %}<a class="pm-execution-text-link" href="{{ activity.active_order.href }}">متابعة الأمر</a>
+                  {% elif activity.can_issue_order %}<a class="pm-execution-text-link" href="#work-orders-form" data-execution-open-form>إصدار أمر</a>
+                  {% else %}<span class="pm-execution-muted">—</span>{% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="6" class="pm-execution-empty">لا توجد أنشطة مرتبطة بهذا المشروع.</td></tr>
+              {% endfor %}
+              <tr data-execution-filter-empty hidden><td colspan="6" class="pm-execution-empty">لا توجد أنشطة تطابق البحث أو التصفية الحالية.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        {% if can_create_work_order %}
+        <form id="work-orders-form" method="post" class="pm-form-panel pm-operation-form pm-execution-source-form" data-pm-inline-dialog data-pm-form-key="create" data-execution-form="create"{% if error and failed_command == 'create' %} data-pm-auto-open{% endif %}>
+          {% csrf_token %}
+          <header class="pm-operation-form-heading"><span class="pm-form-kicker">{{ project.name }} · أوامر التشغيل</span><h2>إصدار أمر تشغيل</h2><p>اربط الأمر بنشاط مخطط لهذا المشروع. لا يمكن إصدار أمر آخر لنشاط لديه أمر نشط.</p></header>
+          {% for group in form_sections %}<fieldset class="pm-form-section"><legend>{{ group.title }}</legend><div class="pm-form-grid">{% for field in group.fields %}<div class="pm-form-field"><div class="pm-execution-field-label">{{ field.label_tag }}{% if field.field.required %}<span>إلزامي</span>{% endif %}</div>{{ field }}{{ field.errors }}{% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}</div>{% endfor %}</div></fieldset>{% endfor %}
+          <div class="pm-form-actions"><button type="submit" name="command" value="create">إصدار الأمر</button><button type="button" class="pm-execution-cancel" data-pm-dialog-close>إلغاء</button></div>
+        </form>
+        {% endif %}
+      </section>
+
+      <section class="pm-execution-card pm-execution-issued-panel" aria-labelledby="execution-issued-title">
+        <div class="pm-execution-card-heading">
+          <div><span class="pm-execution-eyebrow">المتابعة المباشرة</span><h2 id="execution-issued-title">أوامر التشغيل الصادرة</h2><p>الأوامر المرتبطة بالأنشطة مع حالتها وآخر كمية مسجلة.</p></div>
+          <span class="pm-execution-section-count">{{ orders|length }}</span>
+        </div>
+        <div class="pm-execution-order-cards">
+          {% for order in orders %}
+          <article class="pm-execution-order-card" data-order-row data-order-status="{{ order.status }}">
+            <div class="pm-execution-order-card-head">
+              <div><strong>{{ order.work_order_code }}</strong><small>{{ order.activity_name }}</small></div>
+              <span class="pm-execution-badge {% if order.status == 'completed' or order.status == 'closed' %}is-complete{% elif order.status == 'rejected' %}is-neutral{% else %}is-active{% endif %}">{{ order.status_label }}</span>
+            </div>
+            <div class="pm-execution-order-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ order.progress_percent|default:0 }}"><span style="width: {{ order.progress_percent|default:0 }}%"></span></div>
+            <div class="pm-execution-order-card-meta"><span>المنفذ <b>{{ order.actual_quantity_snapshot|default:'0' }}</b></span><span>التكلفة <b>{{ order.actual_cost|default:'0' }} {{ project.currency }}</b></span></div>
+            <a class="pm-execution-button pm-execution-button-primary pm-execution-card-action" href="{{ order.href }}">متابعة الأمر <span aria-hidden="true">←</span></a>
+          </article>
+          {% empty %}
+          <p class="pm-execution-empty">لا توجد أوامر تشغيل صادرة لهذا المشروع.</p>
+          {% endfor %}
+        </div>
+      </section>
+
+      <aside class="pm-execution-card pm-execution-details" aria-labelledby="execution-details-title">
+        <div class="pm-execution-card-heading"><div><span class="pm-execution-eyebrow">تفاصيل النشاط</span><h2 id="execution-details-title">{% if selected_activity %}{{ selected_activity.name }}{% else %}لا يوجد نشاط محدد{% endif %}</h2></div></div>
+        {% for activity in activities %}
+        <div data-execution-detail="{{ activity.id }}" {% if selected_activity.id != activity.id %}hidden{% endif %}>
+          <p class="pm-execution-path">{{ activity.phase_name }}{% if activity.task_name %} · {{ activity.task_name }}{% endif %}</p>
+          <div class="pm-execution-quantities">
+            <div><span>المخطط</span><strong>{{ activity.planned_quantity }}</strong><small>{{ activity.unit|default:'—' }}</small></div>
+            <div><span>المنفذ</span><strong>{{ activity.actual_quantity }}</strong><small>{{ activity.unit|default:'—' }}</small></div>
+            <div><span>المتبقي</span><strong>{{ activity.remaining_quantity }}</strong><small>{{ activity.unit|default:'—' }}</small></div>
+          </div>
+          {% if activity.planned_start_date or activity.planned_end_date %}<p class="pm-execution-date">الفترة المخططة: {{ activity.planned_start_date|default:'غير محددة' }} — {{ activity.planned_end_date|default:'غير محددة' }}</p>{% endif %}
+          {% if activity.over_plan %}<p class="pm-execution-alert" role="status">الكمية المسجلة تتجاوز الكمية المخططة؛ راجع سجل الأمر قبل المتابعة.</p>{% endif %}
+          {% if activity.orders %}
+          <h3>أوامر النشاط</h3>
+          <ul class="pm-execution-order-links">{% for order in activity.orders %}<li><a href="{{ order.href }}">{{ order.work_order_code }}</a><span class="pm-execution-badge {% if order.status == 'rejected' %}is-neutral{% elif order.status == 'completed' or order.status == 'closed' %}is-complete{% else %}is-active{% endif %}">{{ order.status_label }}</span></li>{% endfor %}</ul>
+          {% else %}<p class="pm-execution-muted">لم يصدر أمر تشغيل لهذا النشاط.</p>{% endif %}
+          {% if activity.can_issue_order %}<a class="pm-execution-button pm-execution-button-primary" href="#work-orders-form" data-execution-open-form>＋ إصدار أمر لهذا النشاط</a>{% endif %}
+        </div>
+        {% empty %}<p class="pm-execution-muted">ستظهر تفاصيل النشاط هنا عند توفر أنشطة للمشروع.</p>{% endfor %}
+      </aside>
+    </div>
+    {% if item %}
+    <section class="pm-execution-card pm-execution-order-detail" aria-labelledby="execution-order-title" data-order-detail data-order-activity="{{ item.activity_id }}">
+      <div class="pm-execution-card-heading">
+        <div><span class="pm-execution-eyebrow">تفاصيل أمر التشغيل</span><h2 id="execution-order-title">{{ item.work_order_code }}</h2></div>
+        <span class="pm-execution-badge {% if item.status == 'completed' %}is-complete{% elif item.status == 'rejected' %}is-neutral{% elif item.status == 'closed' %}is-partial{% else %}is-active{% endif %}">{{ status_label }}</span>
+      </div>
+      <div class="pm-execution-order-summary">
+        <span>الإجمالي التراكمي: <strong>{{ item.actual_quantity_snapshot }} {{ selected_activity.unit|default:'—' }}</strong></span>
+        <span>التكلفة الفعلية: <strong>{{ item.actual_cost }} {{ project.currency }}</strong></span>
+        {% if item.approved_at %}<span>اعتماد المدير: <strong>{{ approved_by_name|default:'معتمد' }}</strong> · {{ item.approved_at }}</span>{% endif %}
+      </div>
+      {% if item.rejection_reason %}<p class="pm-execution-lifecycle-message is-rejected"><strong>سبب الرفض:</strong> {{ item.rejection_reason }}{% if rejected_by_name %} · {{ rejected_by_name }}{% endif %}</p>{% endif %}
+      {% if item.partial_close_reason %}<p class="pm-execution-lifecycle-message is-partial"><strong>سبب الإغلاق الجزئي:</strong> {{ item.partial_close_reason }}{% if partial_closed_by_name %} · {{ partial_closed_by_name }}{% endif %}</p>{% endif %}
+      {% if manage %}
+      <div class="pm-execution-action-row">
+        {% for entry in command_forms %}
+          <form method="post" class="pm-form-panel pm-operation-form pm-execution-source-form" data-pm-inline-dialog data-pm-form-key="{{ entry.command }}" data-execution-form="{{ entry.command }}"{% if entry.command == 'quantity' %} data-current-quantity="{{ item.actual_quantity_snapshot|default:'0' }}" data-planned-quantity="{{ selected_activity.planned_quantity|default:'0' }}" data-quantity-unit="{{ selected_activity.unit|default:'—' }}"{% elif entry.command == 'consumption' %} data-project-currency="{{ project.currency }}"{% endif %}{% if error and failed_command == entry.command or open_action == entry.command %} data-pm-auto-open{% endif %}>
+            {% csrf_token %}<header class="pm-operation-form-heading"><span class="pm-form-kicker">{{ project.name }} · {{ item.work_order_code }}</span><h3>{{ entry.title }}</h3>{% if entry.command == 'quantity' %}<p>أدخل كمية دفعة الإنجاز الجديدة. الإجمالي الحالي <strong>{{ item.actual_quantity_snapshot }} {{ selected_activity.unit|default:'—' }}</strong>، ولا يمكن تجاوز المخطط.</p>{% elif entry.command == 'consumption' %}<p>سجّل الاستهلاك الفعلي أثناء التنفيذ. يُمنع تسجيله بعد الاعتماد أو الرفض أو الإغلاق النهائي، وتُشتق التكلفة من هذه السجلات.</p>{% elif entry.command == 'update-order' %}<p>التعديل متاح قبل تسجيل أي إنجاز أو اتخاذ قرار على الأمر.</p>{% elif entry.command == 'partial-close' %}<p>يُنهي هذا الإجراء الأمر بكمية أقل من المخطط؛ يتطلب سببًا، ثم يمكن تسجيل الاستهلاك واعتماد الإغلاق.</p>{% elif entry.command == 'reject' %}<p>الرفض لا يحذف سجل الإنجاز؛ يحتفظ النظام بالكميات وسجلها ويستبعدها من مجموع الإنجاز المعتمد.</p>{% endif %}</header>
+            {% for group in entry.form_sections %}<fieldset class="pm-form-section"><legend>{{ group.title }}</legend><div class="pm-form-grid">{% for field in group.fields %}<div class="pm-form-field"><div class="pm-execution-field-label">{{ field.label_tag }}{% if field.field.required %}<span>إلزامي</span>{% endif %}</div>{{ field }}{{ field.errors }}{% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}</div>{% endfor %}</div></fieldset>{% endfor %}
+            {% if entry.command == 'quantity' %}<p class="pm-execution-quantity-validation" data-quantity-validation role="alert" hidden></p><section class="pm-execution-form-preview" data-quantity-preview aria-live="polite" aria-atomic="true"><div><span>الإجمالي الحالي</span><strong data-quantity-current-output>{{ item.actual_quantity_snapshot }} {{ selected_activity.unit|default:'—' }}</strong></div><div><span>الإجمالي بعد الدفعة</span><strong data-quantity-next-output>—</strong></div><div><span>كمية الدفعة</span><strong data-quantity-delta-output>—</strong></div></section>{% elif entry.command == 'consumption' %}<section class="pm-execution-form-preview" data-consumption-preview aria-live="polite" aria-atomic="true"><div><span>المبلغ بعملة المورد</span><strong data-consumption-source-output>—</strong></div><div><span>سعر الصرف المعتمد</span><strong data-consumption-rate-output>—</strong></div><div><span>ما يعادله بعملة المشروع</span><strong data-consumption-converted-output>—</strong></div></section><div class="pm-consumption-fx-actions"><button type="button" data-consumption-fx-preview>معاينة التحويل</button><p data-consumption-fx-result role="status" aria-live="polite">أدخل الكمية وسعر الوحدة والعملة وتاريخ المصارفة ثم اعرض المعاينة.</p></div>{% endif %}
+            <div class="pm-form-actions"><button type="submit" name="command" value="{{ entry.command }}">حفظ</button><button type="button" class="pm-execution-cancel" data-pm-dialog-close>إلغاء</button></div>
+          </form>
+        {% endfor %}
+        {% if can_approve %}<form method="post" class="pm-execution-transition">{% csrf_token %}<button type="submit" name="command" value="approve" class="is-approve">اعتماد التنفيذ</button></form>{% endif %}
+      </div>
+      {% endif %}
+      {% if consumption_unavailable and manage %}<p class="pm-execution-note">لا تُقبل سجلات استهلاك جديدة بعد اكتمال الاعتماد أو الرفض النهائي.</p>{% endif %}
+      <div class="pm-execution-history-grid">
+        <section><h3>سجل الكميات</h3><div class="pm-execution-table-wrap"><table class="pm-execution-table"><thead><tr><th>التاريخ (UTC)</th><th>قبل</th><th>الإجمالي بعد التسجيل</th><th>الفرق المحسوب</th></tr></thead><tbody>{% for event in events %}<tr><td>{{ event.recorded_at }}</td><td>{{ event.before_quantity }}</td><td>{{ event.after_quantity }}</td><td>{{ event.delta }}</td></tr>{% empty %}<tr><td colspan="4" class="pm-execution-empty">لا توجد أحداث كمية مسجلة.</td></tr>{% endfor %}</tbody></table></div></section>
+        <section><h3>الاستهلاكات والتكلفة</h3><div class="pm-execution-table-wrap"><table class="pm-execution-table"><thead><tr><th>المورد</th><th>النوع</th><th>الكمية</th><th>التكلفة المحولة</th></tr></thead><tbody>{% for consumption in consumptions %}<tr><td>{{ consumption.item_name }}</td><td>{{ consumption.item_type|default:'—' }}</td><td>{{ consumption.quantity }} {{ consumption.unit }}</td><td>{{ consumption.cost }} {{ project.currency }}</td></tr>{% empty %}<tr><td colspan="4" class="pm-execution-empty">لا توجد استهلاكات مسجلة.</td></tr>{% endfor %}</tbody></table></div></section>
+      </div>
+    </section>
+    {% endif %}
+
+  <section id="execution-panel-orders" class="pm-operations-legacy-anchor" aria-label="قائمة أوامر التشغيل">
+    <section class="pm-execution-card pm-order-board" aria-labelledby="execution-issued-title">
+      <header class="pm-execution-card-heading pm-order-board-heading">
+        <div><span class="pm-execution-section-kicker">PM · Work Orders · التنفيذ الفعلي</span><h2 id="execution-issued-title">تنفيذ أوامر التشغيل</h2><p>إصدار أوامر التشغيل ومتابعة التنفيذ والاستهلاك والمراجعة.</p></div>
+        <div class="pm-order-board-heading-actions"><div class="pm-order-board-summary"><span class="pm-execution-section-count">{{ orders|length }}</span><span>أمر تشغيل<br><small>ضمن هذا المشروع</small></span></div>{% if can_create_work_order %}<a class="pm-execution-button pm-execution-button-primary" href="#work-orders-form" data-execution-open-form data-execution-keep-tab="true">＋ إصدار أمر تشغيل</a>{% endif %}</div>
+      </header>
+
+      <div class="pm-order-kpis" aria-label="مؤشرات أوامر التشغيل">
+        <article class="is-total"><span>إجمالي أوامر التشغيل</span><strong>{{ execution_metrics.total_orders }}</strong><small>ضمن هذا المشروع</small></article>
+        <article class="is-active"><span>قيد التنفيذ</span><strong>{{ execution_metrics.active_orders }}</strong><small>صادر أو قيد التنفيذ</small></article>
+        <article class="is-review"><span>تحتاج مراجعة</span><strong>{{ execution_metrics.needs_review_orders }}</strong><small>تنتظر اعتمادًا أو قرارًا</small></article>
+        <article class="is-complete"><span>مكتمل أو مغلق</span><strong>{{ execution_metrics.completed_orders }}</strong><small>حسب حالة WO الرسمية</small></article>
+      </div>
+
+      <div class="pm-execution-orders-toolbar pm-order-toolbar">
+        <label class="pm-execution-orders-search"><span aria-hidden="true">⌕</span><span class="pm-execution-visually-hidden">البحث في أوامر التشغيل</span><input type="search" data-order-search placeholder="ابحث برقم الأمر أو اسم النشاط" autocomplete="off"></label>
+        <div class="pm-execution-status-pills" role="group" aria-label="تصفية أوامر التشغيل"><button type="button" class="is-active" data-order-status-filter="all">كل الأوامر <b>{{ orders|length }}</b></button><button type="button" data-order-status-filter="issued">صادر</button><button type="button" data-order-status-filter="in_progress">قيد التنفيذ</button><button type="button" data-order-status-filter="completed">مكتمل</button><button type="button" data-order-status-filter="closed">مغلق</button><button type="button" data-order-status-filter="rejected">مرفوض</button></div>
+      </div>
+
+      {% if unissued_activities %}
+      <details class="pm-execution-ready-orders pm-order-ready" aria-labelledby="execution-ready-orders-title">
+        <summary class="pm-execution-ready-heading"><div><span class="pm-execution-section-kicker">من الخطة المعتمدة</span><h3 id="execution-ready-orders-title">أنشطة لم يصدر لها أمر تشغيل نشط</h3><p>افتح القائمة لإصدار أمر لنشاط مؤهل؛ لا يظهر زر الإصدار إلا عند استيفاء الشروط.</p></div><span class="pm-execution-section-count">{{ unissued_activities|length }}</span></summary>
+        <div class="pm-order-ready-list">
+          {% for activity in unissued_activities %}
+          <article class="pm-order-ready-row{% if not activity.can_issue_order %} is-blocked{% endif %}">
+            <div class="pm-order-ready-name"><span>{{ activity.activity_code|default:'نشاط' }}</span><strong>{{ activity.name }}</strong><small>{{ activity.phase_name }}{% if activity.task_name %} · {{ activity.task_name }}{% endif %}</small></div>
+            <div><small>المخطط</small><strong>{{ activity.planned_quantity }} {{ activity.unit|default:'—' }}</strong></div><div><small>المنجز</small><strong>{{ activity.actual_quantity }} {{ activity.unit|default:'—' }}</strong></div><div><small>المتبقي</small><strong>{{ activity.remaining_quantity }} {{ activity.unit|default:'—' }}</strong></div>
+            <div class="pm-order-ready-state"><span class="pm-execution-activity-ready{% if not activity.can_issue_order %} is-blocked{% endif %}">{% if activity.can_issue_order %}جاهز للإصدار{% else %}بانتظار شرط{% endif %}</span>{% if not activity.can_issue_order %}<small>{{ activity.issue_block_reason }}</small>{% endif %}</div>
+            <div class="pm-order-ready-action">{% if activity.can_issue_order %}<a class="pm-execution-button pm-execution-button-primary" href="#work-orders-form" data-execution-open-form data-execution-keep-tab="true" data-execution-activity="{{ activity.id }}">إصدار أمر تشغيل</a>{% else %}<button class="pm-execution-button" type="button" disabled title="{{ activity.issue_block_reason }}">غير متاح</button>{% endif %}</div>
+          </article>
+          {% endfor %}
+        </div>
+      </details>
+      {% endif %}
+
+      <form id="work-order-bulk-print" method="get" action="{{ request.path }}" target="_blank" class="pm-order-bulk-form"><input type="hidden" name="bulk_print" value="1"><label class="pm-order-select-all-control"><input type="checkbox" aria-label="تحديد كل الأوامر الظاهرة" data-order-select-all> تحديد الكل</label><button type="submit" class="pm-execution-button pm-execution-button-primary" data-order-bulk-print disabled>طباعة الأوامر المحددة <span data-order-selected-count>0</span></button><span data-order-selection-hint>حدد أمرًا واحدًا أو أكثر من القائمة</span></form>
+      <div class="pm-order-workspace" data-order-workspace>
+        <div class="pm-order-table-wrap">
+          <table class="pm-order-table">
+            <thead><tr><th scope="col">تحديد</th><th scope="col">#</th><th scope="col">أمر التشغيل / النشاط</th><th scope="col">الكمية الفعلية / المخططة</th><th scope="col">التكلفة الفعلية</th><th scope="col">الحالة</th><th scope="col">الإنجاز</th><th scope="col">الإجراءات</th></tr></thead>
+            <tbody>
+              {% for order in orders %}
+              <tr data-order-row data-order-id="{{ order.id }}" data-order-status="{{ order.status }}" data-order-search="{{ order.work_order_code }} {{ order.activity_name }} {{ order.status_label }}">
+                <td data-label="تحديد"><input type="checkbox" form="work-order-bulk-print" name="order_id" value="{{ order.id }}" aria-label="تحديد أمر {{ order.work_order_code }}" data-order-checkbox></td>
+                <td data-label="#"><span class="pm-order-row-number">{{ forloop.counter }}</span></td>
+                <td data-label="الأمر والنشاط"><div class="pm-order-title"><strong dir="auto">{{ order.work_order_code }}</strong><span>{{ order.activity_name }}</span>{% if order.planned_start_date %}<small>البداية المخططة: <b>{{ order.planned_start_date }}</b></small>{% endif %}</div></td>
+                <td data-label="الفعلي / المخطط"><strong>{{ order.actual_quantity_snapshot|default:'0' }}</strong><span class="pm-order-quantity-divider">/</span>{{ order.activity.planned_quantity|default:'—' }} <small>{{ order.activity.unit|default:'—' }}</small></td>
+                <td data-label="التكلفة"><strong>{{ order.actual_cost|default:'0' }}</strong> <small>{{ project.currency }}</small></td>
+                <td data-label="الحالة"><span class="pm-execution-order-status status-{{ order.status }}">{{ order.status_label }}</span></td>
+                <td data-label="الإنجاز"><div class="pm-order-progress"><strong>{{ order.progress_percent|default:0 }}%</strong><span><i style="width:{{ order.progress_percent|default:0 }}%"></i></span></div></td>
+                <td data-label="الإجراءات"><div class="pm-order-row-actions">
+                  <button type="button" class="pm-order-action is-details" data-order-detail-open="{{ order.id }}" aria-expanded="false">التفاصيل</button>
+                  {% if order.can_record_quantity %}<a class="pm-order-action is-primary" href="{{ order.href }}?open_action=quantity" data-pm-dialog>تسجيل الإنجاز</a>{% endif %}
+                  {% if manage and order.can_edit_order %}<a class="pm-order-action" href="{{ order.href }}?open_action=update-order" data-pm-dialog>تعديل الأمر</a>{% endif %}
+                  {% if manage and order.can_consume %}<a class="pm-order-action" href="{{ order.href }}?open_action=consumption" data-pm-dialog>تسجيل استهلاك</a>{% endif %}
+                  {% if manage and order.can_partial_close %}<a class="pm-order-action" href="{{ order.href }}?open_action=partial-close" data-pm-dialog>إغلاق جزئي</a>{% endif %}
+                  {% if manage and order.can_reject %}<a class="pm-order-action is-danger" href="{{ order.href }}?open_action=reject" data-pm-dialog>رفض الأمر</a>{% endif %}
+                  {% if manage and order.can_approve %}<a class="pm-order-action is-approve" href="{{ order.href }}?open_action=approve" data-pm-dialog>اعتماد الإنجاز</a>{% endif %}
+                  <a class="pm-order-action is-print" data-work-order-print href="{{ order.href }}?print=1" target="_blank" rel="noopener" aria-label="طباعة {{ order.work_order_code }}">طباعة</a>
+                </div></td>
+              </tr>
+              <template data-order-detail-template="{{ order.id }}"><div class="pm-order-detail-content"><div class="pm-order-detail-code"><span>رمز أمر التشغيل</span><strong dir="ltr">{{ order.work_order_code }}</strong></div><h3>{{ order.activity_name }}</h3><p>{{ order.activity.phase_name|default:'—' }}{% if order.activity.task_name %} · {{ order.activity.task_name }}{% endif %}</p><dl><div><dt>الحالة</dt><dd>{{ order.status_label }}</dd></div><div><dt>الكمية المخططة</dt><dd>{{ order.activity.planned_quantity|default:'—' }} {{ order.activity.unit|default:'—' }}</dd></div><div><dt>الكمية المنفذة</dt><dd>{{ order.actual_quantity_snapshot|default:'0' }} {{ order.activity.unit|default:'—' }}</dd></div><div><dt>المتبقي</dt><dd>{{ order.activity.remaining_quantity|default:'—' }} {{ order.activity.unit|default:'—' }}</dd></div><div><dt>التكلفة الفعلية</dt><dd>{{ order.actual_cost|default:'0' }} {{ project.currency }}</dd></div><div><dt>تاريخ الإصدار</dt><dd>{{ order.issue_date|default:'—' }}</dd></div><div><dt>البداية المخططة</dt><dd>{{ order.planned_start_date|default:'—' }}</dd></div></dl><div class="pm-order-detail-progress"><span>نسبة الإنجاز</span><strong>{{ order.progress_percent|default:0 }}%</strong><i><b style="width:{{ order.progress_percent|default:0 }}%"></b></i></div>{% if order.notes %}<section><span>ملاحظات الأمر</span><p>{{ order.notes }}</p></section>{% endif %}{% if order.partial_close_reason %}<section><span>سبب الإغلاق الجزئي</span><p>{{ order.partial_close_reason }}</p></section>{% endif %}{% if order.rejection_reason %}<section><span>سبب الرفض</span><p>{{ order.rejection_reason }}</p></section>{% endif %}<a class="pm-execution-button pm-execution-button-quiet" href="{{ order.href }}">فتح سجل الأمر الكامل</a></div></template>
+              {% empty %}<tr><td colspan="8" class="pm-order-empty"><strong>لا توجد أوامر تشغيل صادرة</strong><span>ستظهر هنا الأوامر المرتبطة بأنشطة المشروع بعد إصدارها.</span>{% if can_create_work_order %}<a class="pm-execution-button pm-execution-button-primary" href="#work-orders-form" data-execution-open-form data-execution-keep-tab="true">إصدار أمر تشغيل</a>{% endif %}</td></tr>{% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <aside class="pm-order-detail-drawer" data-order-detail-drawer aria-labelledby="pm-order-detail-title" hidden><header><div><span>تفاصيل أمر التشغيل</span><h3 id="pm-order-detail-title">التفاصيل</h3></div><button type="button" aria-label="إغلاق التفاصيل" data-order-detail-close>×</button></header><div data-order-detail-content></div></aside>
+      </div>
+      <p class="pm-order-no-results" data-order-no-results hidden>لا توجد أوامر تطابق البحث أو الحالة المحددة.</p>
+    </section>
+  </section>
+    </div>
+    <div id="operations-pane-review" class="pm-operations-pane pm-review-pane" role="tabpanel" aria-labelledby="operations-tab-review" data-operations-pane="review" hidden>
+      <section class="pm-review-board" aria-labelledby="pm-review-title">
+        <header class="pm-review-header">
+          <div><span class="pm-execution-eyebrow">Daily Work · Work Orders · WEP</span><h2 id="pm-review-title">النتائج والمراجعة والإغلاق</h2><p>عرض ما أُنجز اليوم، وما يحتاج متابعة، والقرارات المتاحة قبل الإغلاق.</p></div>
+          <div class="pm-review-date" aria-label="تاريخ العمل"><button type="button" class="pm-review-date-button" data-daily-day-shift="-1" aria-label="اليوم السابق">‹</button><span><small>تاريخ العمل</small><strong data-daily-review-date>{{ daily_date }}</strong></span><button type="button" class="pm-review-date-button" data-daily-day-shift="1" aria-label="اليوم التالي">›</button></div>
+        </header>
+
+        <div class="pm-review-kpis" aria-label="مؤشرات نتائج اليوم">
+          <article class="is-total"><span>إجمالي الأعمال</span><strong>{% if daily_summary.available %}{{ daily_summary.total }}{% else %}غير متاح{% endif %}</strong><small>خطة Daily Work للتاريخ المحدد</small></article>
+          <article class="is-complete"><span>الأعمال المكتملة</span><strong>{{ daily_results.summary.complete }}</strong><small>من بنود Daily Work للتاريخ المحدد</small></article>
+          <article class="is-followup"><span>تحتاج متابعة</span><strong>{{ daily_results.summary.followup }}</strong><small>بنود غير مكتملة أو متعثرة</small></article>
+          <article class="is-status"><span>حالة خطة اليوم</span><strong>{{ daily_plan_status_label }}</strong><small>{% if daily_plan_read_unavailable %}تعذر القراءة{% else %}من Daily Work{% endif %}</small></article>
+        </div>
+
+        <section class="pm-review-results-card" aria-labelledby="pm-review-results-title">
+          <div class="pm-review-card-heading"><div><h3 id="pm-review-results-title">نتائج أعمال اليوم</h3><p>Actual من أحداث WO للبنود المرتبطة، ومن سجل Daily Work للبنود المستقلة؛ لا ينشئ هذا العرض Actual ولا يعدل الالتزامات.</p></div><span class="pm-review-source">{{ daily_results.summary.total }} عمل يومي</span></div>
+          <div class="pm-review-table-wrap"><table class="pm-review-table"><thead><tr><th>#</th><th>العمل / النشاط</th><th>المخطط</th><th>المنفذ</th><th>المتبقي</th><th>النتيجة</th><th>الإجراء</th></tr></thead><tbody>
+            {% for row in daily_results.rows %}
+            <tr><td>{{ forloop.counter }}</td><td><strong>{{ row.title }}</strong><small>{{ row.source_label }}{% if row.work_order_code %} · {{ row.work_order_code }}{% endif %}</small></td><td>{{ row.planned_quantity }} {{ row.unit }}</td><td>{% if row.actual_available %}{{ row.actual_quantity }} {{ row.unit }}{% else %}غير متاح{% endif %}</td><td>{% if row.actual_available %}{{ row.remaining_quantity }} {{ row.unit }}{% else %}غير متاح{% endif %}</td><td><span class="pm-review-status {% if row.result == 'complete' %}is-complete{% elif row.result == 'blocked' %}is-blocked{% elif row.result == 'active' %}is-active{% else %}is-followup{% endif %}">{{ row.result_label }}</span></td><td>{% if row.complete %}<span class="pm-review-muted">مكتمل</span>{% elif row.blocked %}<span class="pm-review-muted">معالجة العائق</span>{% else %}<span class="pm-review-muted">متابعة</span>{% endif %}</td></tr>
+            {% empty %}<tr><td colspan="7" class="pm-execution-empty">لا توجد نتائج أعمال متاحة للتاريخ المحدد.</td></tr>{% endfor %}
+          </tbody></table></div>
+        </section>
+
+        <div class="pm-review-lower-grid">
+          <section class="pm-review-actions" aria-labelledby="pm-review-actions-title"><div class="pm-review-next-icon" aria-hidden="true">➜</div><div class="pm-review-actions-copy"><h3 id="pm-review-actions-title">الخطوة التالية</h3><p>الإجراء المقترح بناءً على نتائج اليوم.</p><strong>راجع الأعمال الجزئية</strong><small>يوجد أعمال غير مكتملة أو تحتاج قرارًا قبل المراجعة والإغلاق.</small></div><div class="pm-review-action-list">{% if completion_review_ready %}<a class="pm-execution-button pm-execution-button-primary" href="{{ completion_review_url }}">فتح المراجعة والإغلاق</a>{% else %}<span class="pm-review-action-disabled">المراجعة الرسمية غير متاحة</span>{% endif %}</div></section>
+          <section class="pm-review-summary-card" aria-labelledby="pm-review-summary-title"><div class="pm-review-card-heading"><div><h3 id="pm-review-summary-title">ملخص النتائج</h3><p>أهم ما تم إنجازه اليوم وملخصات عامة.</p></div><span class="pm-review-summary-icon" aria-hidden="true">◔</span></div><dl><div><dt>الأعمال المكتملة</dt><dd>{{ daily_results.summary.complete }}</dd></div><div><dt>الأعمال المرحّلة</dt><dd>{{ daily_results.summary.followup }}</dd></div><div><dt>العوائق</dt><dd>{{ daily_results.summary.blocked }}</dd></div><div><dt>ملاحظات اليوم</dt><dd>{{ daily_results.summary.followup }}</dd></div></dl></section>
+          <section class="pm-review-followup-card" aria-labelledby="pm-review-followup-title"><div class="pm-review-card-heading"><div><h3 id="pm-review-followup-title">الأعمال التي تحتاج متابعة</h3><p>بنود Daily Work غير المكتملة للتاريخ المحدد.</p></div><span class="pm-review-alert-count">{{ daily_results.summary.followup }}</span></div><div class="pm-review-followup-list">
+            {% if daily_results.summary.followup %}{% for row in daily_results.rows %}{% if row.followup %}<article><div><strong>{{ row.title }}</strong><small>{% if row.blocked %}عائق مفتوح{% elif row.result == 'active' %}تنفيذ جزئي أو مستمر{% else %}لم يبدأ التنفيذ{% endif %}</small></div><span>{{ row.status_label }}</span></article>{% endif %}{% endfor %}{% else %}<p class="pm-review-empty">لا توجد أعمال تحتاج متابعة.</p>{% endif %}
+          </div></section>
+        </div>
+
+        <section class="pm-review-boundary-note" aria-label="حدود الإجراءات"><p>لا يظهر زر اعتماد أو إغلاق ما لم يوجد عقد رسمي يدعمه. الانتقال إلى أوامر التشغيل والخطة الأسبوعية والتقارير متاح وفق الصلاحية.</p><div class="pm-review-action-list"><button type="button" class="pm-execution-button" data-operations-go="orders">مراجعة أوامر التشغيل</button>{% if can_view_wep %}<button type="button" class="pm-execution-button" data-execution-open-tab="weekly">فتح الخطة الأسبوعية</button>{% endif %}{% if can_view_reports %}<a class="pm-execution-button pm-execution-button-quiet" href="{{ project_url }}reporting/">عرض التقارير</a>{% endif %}</div></section>
+      </section>
+    </div>
+  </section>
+
+  <section id="execution-panel-control" class="pm-execution-panel" role="tabpanel" aria-labelledby="execution-tab-control" data-execution-panel="control" hidden>
+    <div class="pm-execution-control-grid">
+      <section class="pm-execution-card"><div class="pm-execution-card-heading"><div><h2>التكلفة الفعلية</h2><p>مشتقة حصراً من الاستهلاكات المسجلة على أوامر التشغيل.</p></div></div><strong class="pm-execution-control-value">{{ execution_metrics.actual_cost }} {{ project.currency }}</strong><a class="pm-execution-text-link" href="#execution-panel-orders" data-execution-open-tab="orders">مراجعة الأوامر والاستهلاكات</a></section>
+      <section class="pm-execution-card"><div class="pm-execution-card-heading"><div><h2>المخاطر المفتوحة</h2><p>تعرض حسب صلاحية المستخدم ونطاق المشروع.</p></div></div>{% if can_view_risks %}<strong class="pm-execution-control-value">{{ open_risk_count|default:0 }}</strong><a class="pm-execution-text-link" href="{{ project_url }}risks/">فتح سجل المخاطر</a>{% else %}<p class="pm-execution-muted">غير متاحة ضمن صلاحياتك.</p>{% endif %}</section>
+      <section class="pm-execution-card"><div class="pm-execution-card-heading"><div><h2>الانحرافات المفتوحة</h2><p>سجل PM للمتابعة التصحيحية.</p></div></div>{% if can_view_deviations %}<strong class="pm-execution-control-value">{{ open_deviation_count|default:0 }}</strong><a class="pm-execution-text-link" href="{{ project_url }}deviations/">فتح سجل الانحرافات</a>{% else %}<p class="pm-execution-muted">غير متاحة ضمن صلاحياتك.</p>{% endif %}</section>
+      {% if can_view_reports %}<section class="pm-execution-card"><div class="pm-execution-card-heading"><div><h2>تقارير المشروع</h2><p>تقارير تحليلية للقراءة؛ لا تنشئ Actual.</p></div></div><a class="pm-execution-button" href="{{ project_url }}reporting/">فتح التقارير</a></section>{% endif %}
+    </div>
+    <p class="pm-execution-note">تعرض المؤشرات بيانات API الحالية فقط. الاعتماد المنفصل، الإغلاق الجزئي، سبب تصحيح الإجمالي، وتنبيهات الجاهزية غير متاحة في عقود التنفيذ الحالية.</p>
+  </section>
+</main>
+{% endblock %}

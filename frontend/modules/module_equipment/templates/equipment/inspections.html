@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+{% block module_token_bridge %}<link rel="stylesheet" href="{% static 'module_equipment/core-token-bridge.css' %}?v=20261024">{% endblock %}
+{% block title %}الفحوصات والسلامة{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'module_equipment/inspections.css' %}">{% endblock %}
+{% block content %}
+<main class="inspection-page" dir="rtl">
+  <div class="inspection-heading">
+    <div><div class="eyebrow">إدارة المعدات</div><h1>الفحوصات والسلامة</h1><p>تسجيل الفحوصات ومراجعتها ومتابعة موانع التشغيل.</p></div>
+    {% if can_record %}<a class="primary-button" href="?mode=create">＋ تسجيل فحص جديد</a>{% endif %}
+  </div>
+  {% if error_message %}<div class="alert error">{{ error_message }}</div>{% endif %}
+  {% if saved == "inspection" %}<div class="alert success">تم تسجيل الفحص وإرساله للمراجعة.</div>{% endif %}
+  {% if verified %}<div class="alert success">تم اعتماد الفحص.</div>{% endif %}
+  {% if released %}<div class="alert success">تم تحرير مانع التشغيل.</div>{% endif %}
+
+  <section class="summary-grid" aria-label="ملخص الفحوصات">
+    <a class="summary-card" href="?status=submitted"><span class="summary-icon blue">▣</span><span>فحوصات مستحقة</span><strong>{{ due_count }}</strong></a>
+    <a class="summary-card" href="?status=submitted"><span class="summary-icon amber">◷</span><span>بانتظار المراجعة</span><strong>{{ pending_count }}</strong></a>
+    <a class="summary-card" href="#blockers"><span class="summary-icon red">!</span><span>موانع تشغيل</span><strong>{{ blocked_count }}</strong></a>
+    <a class="summary-card" href="?status=verified"><span class="summary-icon green">✓</span><span>فحوصات مكتملة</span><strong>{{ completed_count }}</strong></a>
+  </section>
+
+  <section class="panel filters-panel">
+    <form method="get" class="filters-form">
+      <label class="search-field">البحث في الفحوصات<input type="search" name="search" value="{{ request.GET.search }}" placeholder="اسم المعدة أو الرمز"></label>
+      <label>المعدة<select name="asset_id"><option value="">جميع المعدات</option>{% for asset in assets %}<option value="{{ asset.id }}" {% if request.GET.asset_id == asset.id|stringformat:'s' %}selected{% endif %}>{{ asset.asset_code }} — {{ asset.asset_name }}</option>{% endfor %}</select></label>
+      <label>نوع الفحص<select name="inspection_type"><option value="">جميع الأنواع</option><option value="pre_operation">قبل التشغيل</option><option value="post_repair">بعد الإصلاح</option><option value="periodic">دوري</option><option value="return">عند الإرجاع</option></select></label>
+      <label>النتيجة<select name="result"><option value="">جميع النتائج</option><option value="passed">سليم</option><option value="conditional">مشروط</option><option value="failed">غير سليم</option></select></label>
+      <label>الحالة<select name="status"><option value="">جميع الحالات</option><option value="submitted">بانتظار المراجعة</option><option value="verified">تم التحقق</option></select></label>
+      <label>من<input type="date" name="from" value="{{ request.GET.from }}"></label><label>إلى<input type="date" name="to" value="{{ request.GET.to }}"></label>
+      <div class="filter-actions"><button class="primary-button" type="submit">تطبيق</button><a class="ghost-button" href="{% url 'equipment:inspections' %}">إعادة ضبط</a></div>
+    </form>
+  </section>
+
+  {% if open_form %}<section class="panel form-panel" id="new-inspection"><div class="section-heading"><div><h2>تسجيل فحص جديد</h2><p>أدخل بيانات الفحص وفق قائمة الفحص المعتمدة للمعدة.</p></div><a class="ghost-button" href=".">إغلاق</a></div>
+    <form method="post" class="entry-form" data-prevent-double-submit>{% csrf_token %}<input type="hidden" name="action" value="create_inspection">
+      {% for field in inspection_form %}<div class="field{% if field.name == 'findings' or field.name == 'checklist_version' %} wide{% endif %}"><label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<em>*</em>{% endif %}</label>{{ field }}{% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}</div>{% endfor %}
+      <div class="form-actions"><button class="primary-button" type="submit">حفظ الفحص</button><a class="ghost-button" href=".">إلغاء</a></div>
+    </form>
+  </section>{% endif %}
+
+  <section class="panel list-panel"><div class="section-heading"><div><h2>سجل الفحوصات</h2><p>{{ page_obj.paginator.count }} فحص ضمن النطاق المحدد.</p></div></div>
+    {% if inspections %}<div class="inspection-table-wrap"><table><thead><tr><th>رقم الفحص</th><th>المعدة</th><th>نوع الفحص</th><th>التاريخ</th><th>النتيجة</th><th>الحالة</th><th>الإجراء</th></tr></thead><tbody>{% for row in inspections %}<tr><td data-label="رقم الفحص">{{ row.id|slice:':12' }}</td><td data-label="المعدة"><strong>{{ row.asset_name }}</strong><small>{{ row.asset_code }}</small></td><td data-label="نوع الفحص">{{ row.inspection_type_label }}</td><td data-label="التاريخ">{{ row.inspected_at|default:'—' }}</td><td data-label="النتيجة"><span class="badge {{ row.result }}">{{ row.result_label }}</span></td><td data-label="الحالة"><span class="badge {{ row.status }}">{{ row.status_label }}</span></td><td data-label="الإجراء"><a class="small-button" href="?inspection_id={{ row.id }}#inspection-detail">فتح الفحص</a></td></tr>{% endfor %}</tbody></table></div>
+    <nav class="pagination">{% if page_obj.has_previous %}<a href="?{% if query %}{{ query }}&{% endif %}page={{ page_obj.previous_page_number }}">‹</a>{% endif %}<span>صفحة {{ page_obj.number }} من {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a href="?{% if query %}{{ query }}&{% endif %}page={{ page_obj.next_page_number }}">›</a>{% endif %}</nav>
+    {% else %}<div class="empty-state"><div>▣</div><h3>لا توجد فحوصات مطابقة</h3><p>ستظهر الفحوصات الحقيقية هنا بحسب نطاق صلاحيتك والفلاتر المختارة.</p></div>{% endif %}
+  </section>
+
+  {% if selected_inspection %}<section class="panel detail-panel" id="inspection-detail"><div class="section-heading"><div><h2>تفاصيل الفحص</h2><p>{{ selected_inspection.asset_name }} — {{ selected_inspection.asset_code }}</p></div><span class="badge {{ selected_inspection.result }}">{{ selected_inspection.result_label }}</span></div><div class="detail-grid"><div><span>نوع الفحص</span><strong>{{ selected_inspection.inspection_type_label }}</strong></div><div><span>تاريخ الفحص</span><strong>{{ selected_inspection.inspected_at|default:'—' }}</strong></div><div><span>الحالة</span><strong>{{ selected_inspection.status_label }}</strong></div><div><span>حالة المانع</span><strong>{{ selected_inspection.block_status_label }}</strong></div></div>{% if selected_inspection.findings %}<details><summary>عرض نتائج قائمة الفحص</summary><pre>{{ selected_inspection.findings }}</pre></details>{% endif %}<div class="detail-actions">{% if selected_inspection.can_verify %}<form method="post" data-prevent-double-submit>{% csrf_token %}<input type="hidden" name="action" value="verify_inspection"><input type="hidden" name="inspection_id" value="{{ selected_inspection.id }}"><button class="primary-button" type="submit">اعتماد الفحص</button></form>{% endif %}{% if can_record %}<a class="ghost-button" href="?mode=create&asset_id={{ selected_inspection.asset_id }}">تسجيل فحص جديد للمعدة</a>{% endif %}</div></section>{% endif %}
+
+  <section class="panel blockers-panel" id="blockers"><div class="section-heading"><div><h2>موانع التشغيل</h2><p>السجلات النشطة فقط التي تمنع التشغيل أو تتطلب إجراءً.</p></div></div>{% if active_blocks %}<div class="blockers-list">{% for block in active_blocks %}<article class="blocker"><span class="blocker-mark">!</span><div><strong>{{ block.asset_name }}{% if block.asset_code %} <small>{{ block.asset_code }}</small>{% endif %}</strong><p>{{ block.reason|default:'يتطلب مراجعة فنية' }}</p><small>{{ block.created_at|default:'—' }}</small></div>{% if block.source != 'maintenance' %}<a class="small-button" href="?inspection_id={{ block.id }}#inspection-detail">عرض التفاصيل</a>{% endif %}</article>{% endfor %}</div>{% else %}<div class="empty-state compact"><h3>لا توجد موانع تشغيل نشطة</h3><p>لم تُرجع الخدمة أي مانع تشغيل فعال ضمن نطاقك.</p></div>{% endif %}</section>
+</main>
+{% endblock %}
+{% block extra_js %}<script>document.querySelectorAll('[data-prevent-double-submit]').forEach(function(form){form.addEventListener('submit',function(){var button=form.querySelector('button[type="submit"]');if(button){button.disabled=true;button.dataset.originalText=button.textContent;button.textContent='جارٍ الحفظ…';}});});</script>{% endblock %}

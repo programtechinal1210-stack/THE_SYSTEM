@@ -1,0 +1,180 @@
+﻿<!-- 🔔 مودال إرسال إشعار - مربوط بقاعدة البيانات -->
+<div class="modal-overlay" id="sendNotificationModal">
+    <div class="modal-content modal-lg" style="max-width:700px;">
+        <div class="modal-header-gradient" style="background:linear-gradient(135deg, #f59e0b, #ef4444);padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;color:white;border-radius:1rem 1rem 0 0;">
+            <div style="display:flex;align-items:center;gap:0.8rem;">
+                <div style="width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:1.2rem;">🔔</div>
+                <div><h2 style="margin:0;font-size:1.1rem;">إرسال إشعار</h2><p style="margin:0;font-size:0.75rem;opacity:0.8;">إرسال إشعار للمستخدمين من قاعدة البيانات</p></div>
+            </div>
+            <button onclick="closeModal('sendNotificationModal')" style="background:rgba(255,255,255,0.1);border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;color:white;font-size:1.2rem;">✕</button>
+        </div>
+        <div style="padding:1.5rem;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                <div class="form-group">
+                    <label>نوع الإشعار <span style="color:#ef4444;">*</span></label>
+                    <select id="notifType" class="form-select">
+                        <option value="">اختر النوع...</option>
+                        <optgroup label="📨 المعاملات">
+                            <option value="case_referred">📨 إحالة معاملة</option>
+                            <option value="case_created">📋 معاملة جديدة</option>
+                            <option value="case_closed">🔒 إقفال معاملة</option>
+                        </optgroup>
+                        <optgroup label="✅ المهام">
+                            <option value="task_assigned">🆕 مهمة جديدة</option>
+                            <option value="task_completed">🎉 مهمة مكتملة</option>
+                            <option value="task_overdue">⚠️ مهمة متأخرة</option>
+                            <option value="task_due_soon">⏰ مهمة شارفت</option>
+                        </optgroup>
+                        <optgroup label="📢 التوجيهات">
+                            <option value="directive_issued">📢 توجيه جديد</option>
+                            <option value="directive_completed">✅ توجيه منجز</option>
+                        </optgroup>
+                        <optgroup label="💬 الردود">
+                            <option value="response_added">💬 رد جديد</option>
+                            <option value="response_replied">↩️ رد على رد</option>
+                        </optgroup>
+                        <optgroup label="⚡ الإجراءات">
+                            <option value="action_assigned">⚡ إجراء جديد</option>
+                            <option value="action_completed">✅ إجراء مكتمل</option>
+                        </optgroup>
+                        <optgroup label="🔔 النظام">
+                            <option value="system_update">🔄 تحديث نظام</option>
+                            <option value="custom">✏️ إشعار مخصص</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>المستخدم <span style="color:#ef4444;">*</span></label>
+                    <select id="notifUser" class="form-select">
+                        <option value="">جاري تحميل المستخدمين...</option>
+                    </select>
+                </div>
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label>العنوان <span style="color:#ef4444;">*</span></label>
+                    <input type="text" id="notifTitle" class="form-input" placeholder="عنوان الإشعار...">
+                </div>
+                <div class="form-group" style="grid-column:1/-1;">
+                    <label>المحتوى <span style="color:#ef4444;">*</span></label>
+                    <textarea id="notifContent" class="form-textarea" rows="3" placeholder="محتوى الإشعار..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>الرابط</label>
+                    <input type="text" id="notifLink" class="form-input" placeholder="/cases/123">
+                </div>
+                <div class="form-group">
+                    <label>الأولوية</label>
+                    <select id="notifPriority" class="form-select">
+                        <option value="normal">🟡 عادية</option>
+                        <option value="high">🟠 عالية</option>
+                        <option value="urgent">🔴 عاجلة</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div style="display:flex;gap:0.5rem;justify-content:flex-end;padding:1rem 1.5rem;border-top:1px solid var(--border-light);">
+            <button class="btn btn-secondary" onclick="closeModal('sendNotificationModal')">إلغاء</button>
+            <button class="btn btn-primary" onclick="sendNotification()" style="background:linear-gradient(135deg,#f59e0b,#ef4444);">🚀 إرسال</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// تحميل المستخدمين من API عند فتح المودال
+// تحميل المستخدمين من API
+async function loadUsersForNotif() {
+    var sel = document.getElementById('notifUser');
+    sel.innerHTML = '<option value="">جاري تحميل المستخدمين...</option>';
+    
+    try {
+        var r = await fetch('/settings/api/users/list/');
+        var d = await r.json();
+        sel.innerHTML = '<option value="">اختر المستخدم...</option><option value="all">👥 جميع المستخدمين</option>';
+        
+        if (d.users && d.users.length > 0) {
+            d.users.forEach(function(u) {
+                var name = u.full_name || u.username || 'مستخدم';
+                var role = u.role || u.position || '';
+                sel.innerHTML += '<option value="' + u.id + '">👤 ' + name + (role ? ' - ' + role : '') + '</option>';
+            });
+        }
+    } catch(e) {
+        sel.innerHTML = '<option value="">اختر المستخدم...</option><option value="all">👥 جميع المستخدمين</option><option value="969600f7-9fbb-4719-a9af-af57fa44a944">👤 أحمد محمد - مدير المكتب</option>';
+    }
+}
+
+// فتح المودال مع تحميل المستخدمين
+var origOpenModal = openModal;
+openModal = function(id) {
+    origOpenModal(id);
+    if (id === 'sendNotificationModal') loadUsersForNotif();
+};
+
+async function sendNotification() {
+    var title = document.getElementById('notifTitle').value.trim();
+    var content = document.getElementById('notifContent').value.trim();
+    var type = document.getElementById('notifType').value;
+    var userId = document.getElementById('notifUser').value;
+    
+    if (!title || !content || !type || !userId) { showToast('❌ يرجى ملء جميع الحقول المطلوبة', 'error'); return; }
+    
+    try {
+        var r = await fetch('/settings/api/notifications/send/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': getCSRF()},
+            body: JSON.stringify({
+                title: title, content: content, type: type, user_id: userId,
+                link: document.getElementById('notifLink').value,
+                priority: document.getElementById('notifPriority').value
+            })
+        });
+        var d = await r.json();
+        if (d.success) { 
+            showToast('✅ تم إرسال الإشعار بنجاح', 'success'); 
+            closeModal('sendNotificationModal'); 
+            document.getElementById('notifTitle').value = ''; 
+            document.getElementById('notifContent').value = ''; 
+            if (typeof loadNotifList === 'function') loadNotifList();
+            if (typeof loadNotifications === 'function') loadNotifications();
+        } else { 
+            showToast('❌ ' + (d.error || 'فشل الإرسال'), 'error'); 
+        }
+    } catch(e) { showToast('❌ خطأ في الاتصال', 'error'); }
+}
+// تحميل أنواع الإشعارات من API
+async function loadNotifTypes() {
+    try {
+        var r = await fetch('/settings/api/notifications/types/');
+        var d = await r.json();
+        var sel = document.getElementById('notifType');
+        sel.innerHTML = '<option value="">اختر النوع...</option>';
+        
+        if (d.types) {
+            // تجميع حسب الفئة
+            var cats = {};
+            d.types.forEach(function(t) {
+                var cat = t.category || 'أخرى';
+                if (!cats[cat]) cats[cat] = [];
+                cats[cat].push(t);
+            });
+            
+            Object.keys(cats).forEach(function(cat) {
+                sel.innerHTML += '<optgroup label="' + cat + '">';
+                cats[cat].forEach(function(t) {
+                    sel.innerHTML += '<option value="' + t.type + '">' + t.name + '</option>';
+                });
+                sel.innerHTML += '</optgroup>';
+            });
+        }
+    } catch(e) {}
+}
+
+// تحديث openModal لتحميل البيانات
+var origOpenModal = openModal;
+openModal = function(id) {
+    origOpenModal(id);
+    if (id === 'sendNotificationModal') {
+        loadUsersForNotif();
+        loadNotifTypes();
+    }
+};
+</script>

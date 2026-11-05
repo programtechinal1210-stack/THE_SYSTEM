@@ -1,0 +1,100 @@
+/* Final shell geometry contract.
+   Module styles may tune their content, but cannot move the institutional frame. */
+body.core-shell:has(*) .sidebar {
+    width: 286px !important;
+}
+
+/* The overlay must not participate in the shell until the mobile menu is open. */
+body.core-shell:has(*) .sidebar-overlay {
+    display: none;
+}
+
+body.core-shell:has(*) .sidebar-overlay.show {
+    display: block;
+}
+
+body.core-shell:has(*) .sidebar.collapsed {
+    width: 78px !important;
+}
+
+body.core-shell:has(*) .main-content {
+    margin-right: 286px !important;
+    top: 0 !important;
+    margin-top: 0 !important;
+}
+
+body.core-shell:has(*) .main-content.expanded {
+    margin-right: 78px !important;
+}
+
+body.core-shell:has(*) .page-content {
+    top: 0 !important;
+}
+
+body.core-shell:has(*) .footer {
+    inset-inline-start: 286px;
+    display: flex !important;
+}
+
+body.core-shell:has(*) .main-content.expanded .footer {
+    inset-inline-start: 78px;
+}
+
+@media (max-width: 1100px) {
+    body.core-shell:has(*) {
+        --core-mobile-sidebar-width: 286px;
+    }
+
+    body.core-shell:has(*) .sidebar {
+        width: var(--core-mobile-sidebar-width) !important;
+    }
+
+    body.core-shell:has(*) .main-content,
+    body.core-shell:has(*) .main-content.expanded {
+        margin-right: 0 !important;
+    }
+
+    /* Keep the open toggle outside the header stacking context so neither the
+       RTL drawer nor its overlay can intercept the close click. */
+    body.core-shell > .menu-toggle.menu-toggle-floating {
+        display: flex;
+        position: fixed;
+        inset-block-start: 12px;
+        right: min(calc(var(--core-mobile-sidebar-width) + 12px), calc(100vw - 54px));
+        left: auto;
+        z-index: calc(var(--z-sidebar) + 1);
+        background: var(--bg-elevated);
+        box-shadow: var(--shadow-md);
+    }
+
+    body.core-shell:has(*) .footer {
+        inset-inline-start: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    body.core-shell .top-header .menu-toggle:not(.menu-toggle-floating) {
+        position: relative;
+        z-index: calc(var(--z-sidebar) + 1);
+    }
+}
+
+@media (max-width: 700px) {
+    body.core-shell:has(*) {
+        --core-mobile-sidebar-width: 224px;
+    }
+
+    body.core-shell:has(*) .sidebar {
+        width: var(--core-mobile-sidebar-width) !important;
+    }
+
+    body.core-shell:has(*) .sidebar.collapsed {
+        width: 78px !important;
+    }
+}
+
+@media print {
+    body.core-shell:has(*) .footer {
+        display: none !important;
+    }
+}

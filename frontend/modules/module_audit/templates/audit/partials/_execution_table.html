@@ -1,0 +1,30 @@
+﻿<div class="table-responsive">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>المستخدم</th>
+                <th>المهمة</th>
+                <th>الملاحظات</th>
+                <th>التقدم</th>
+                <th>التاريخ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if executions %}
+                {% for e in executions %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ e.user_id|default:"--"|truncatechars:8 }}</td>
+                    <td>{{ e.task_id|default:"--"|truncatechars:8 }}</td>
+                    <td>{{ e.notes|default:"--"|truncatechars:40 }}</td>
+                    <td>{{ e.progress_percentage|default:0 }}%</td>
+                    <td style="font-size:11px;">{{ e.created_at|slice:":19" }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr><td colspan="6" style="text-align:center;padding:40px;">لا توجد سجلات</td></tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>

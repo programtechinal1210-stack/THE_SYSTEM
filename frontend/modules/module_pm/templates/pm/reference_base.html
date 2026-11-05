@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+{% block extra_head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'pm/reference/projects.css' %}">
+<link rel="stylesheet" href="{% static 'pm/reference/planning.css' %}">
+<link rel="stylesheet" href="{% static 'pm/reference/execution.css' %}">
+<link rel="stylesheet" href="{% static 'pm/reference/daily_reports.css' %}">
+<link rel="stylesheet" href="{% static 'pm/reference/project_command_center.css' %}">
+<link rel="stylesheet" href="{% static 'pm/reference/reports_v2.css' %}">
+<link rel="stylesheet" href="{% static 'pm/reference/soft_deletion.css' %}">
+<link rel="stylesheet" href="{% static 'pm/reference-adapter.css' %}?v=20261014-planning">
+<link rel="stylesheet" href="{% static 'pm/project-forms.css' %}?v=20261024-requirement-ux-v2">
+<link rel="stylesheet" href="{% static 'pm/reference/weekly_execution.css' %}?v=20261024-weekly-owner-fields-v1">
+{% endblock %}
+{% block breadcrumb_text %}إدارة المشاريع{% endblock %}
+{% block content %}<div class="pm-reference" dir="rtl">{% block pm_content %}{% endblock %}
+<dialog class="pm-reference-dialog" id="pm-reference-dialog" aria-label="نموذج المشروع"><button type="button" class="pm-dialog-close" aria-label="إغلاق">×</button><div data-dialog-content></div></dialog>
+</div>{% endblock %}
+{% block extra_js %}{{ block.super }}<script src="{% static 'pm/reference-adapter.js' %}?v=20261025-dialog-guard-v1" defer></script><script src="{% static 'pm/planning-context.js' %}?v=20261014" defer></script><script src="{% static 'pm/planning-fx.js' %}?v=20261024-requirement-ux-v4" defer></script>{% endblock %}

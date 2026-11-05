@@ -1,0 +1,155 @@
+/*
+ * Inventory compatibility bridge.
+ * Loaded after the existing inventory page styles so the shared Core identity
+ * controls surfaces, type, radii, fields, and tables without changing markup.
+ */
+:where(.inventory-home, .inventory-catalog, .inventory-operations, .inventory-requests,
+  .inventory-configuration, .inventory-stocktakes, .inventory-reports, .inventory-custody,
+  .inventory-document, .inventory-request-detail, .documents-center, .stocktake-execution,
+  .stocktake-review, .warehouse-detail, .inventory-settings) {
+  --inventory-panel: var(--bg-secondary);
+  --inventory-panel-raised: var(--bg-elevated, var(--bg-secondary));
+  --inventory-border: var(--border-color);
+  --inventory-text: var(--text-primary);
+  --inventory-muted: var(--text-muted);
+  --catalog-border: var(--border-color);
+  --catalog-panel: var(--bg-secondary);
+  --catalog-panel-raised: var(--bg-elevated, var(--bg-secondary));
+  --catalog-text: var(--text-primary);
+  --catalog-muted: var(--text-muted);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+}
+
+:where(.inventory-home, .inventory-catalog, .inventory-operations, .inventory-requests,
+  .inventory-configuration, .inventory-stocktakes, .inventory-reports, .inventory-custody,
+  .inventory-document, .inventory-request-detail, .documents-center, .stocktake-execution,
+  .stocktake-review, .warehouse-detail, .inventory-settings) :is(input, select, textarea) {
+  min-height: var(--control-height, 40px);
+  border-color: var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-input, var(--bg-secondary));
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.inventory-home,
+.inventory-catalog {
+  border-color: var(--border-color) !important;
+  border-radius: var(--radius-lg) !important;
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.inventory-home__hero,
+.inventory-catalog__hero,
+.inventory-warehouses__hero {
+  border-color: var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  background: color-mix(in srgb, var(--brand-color) 13%, var(--bg-secondary)) !important;
+}
+
+.inventory-home__hero :is(h2, h3),
+.inventory-catalog__hero :is(h1, h2, h3),
+.inventory-home__section-heading h2,
+.inventory-home__panel-heading h3,
+.inventory-catalog__results-heading h2 {
+  color: var(--text-primary) !important;
+}
+
+.inventory-home__hero :is(p, .inventory-home__organization),
+.inventory-catalog__hero p,
+.inventory-home__section-heading p,
+.inventory-home__empty,
+.inventory-catalog__results-heading p {
+  color: var(--text-muted) !important;
+}
+
+.inventory-home__card,
+.inventory-home__panel,
+.inventory-catalog__results,
+.inventory-catalog__form-panel,
+.inventory-catalog__filters {
+  border-color: var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  box-shadow: var(--shadow-sm, none);
+}
+
+.inventory-home__card[href]:hover {
+  border-color: var(--brand-color) !important;
+  background: color-mix(in srgb, var(--brand-color) 8%, var(--bg-secondary)) !important;
+}
+
+.inventory-catalog__primary-button,
+.inventory-catalog__apply-button,
+.inventory-home__warehouse-filter button {
+  min-height: var(--control-height, 40px);
+  border-radius: var(--radius-sm);
+  background: var(--brand-color) !important;
+  border-color: var(--brand-color) !important;
+  color: #fff !important;
+  font: inherit;
+}
+
+.inventory-catalog__table :is(th, td) {
+  border-color: var(--border-color) !important;
+  color: var(--text-primary);
+}
+
+.inventory-catalog__table th {
+  background: color-mix(in srgb, var(--brand-color) 7%, var(--bg-secondary)) !important;
+  color: var(--text-secondary) !important;
+}
+
+[data-density="compact"] :where(.inventory-home, .inventory-catalog) {
+  padding: 12px !important;
+}
+
+[data-density="compact"] :where(.inventory-home__card, .inventory-home__panel,
+  .inventory-catalog__filters, .inventory-catalog__results) {
+  padding: 10px !important;
+}
+
+/* Operational centres retain their existing layout while inheriting Core surfaces. */
+:where(.inventory-operations, .documents-center, .inventory-requests, .inventory-request-detail,
+  .inventory-stocktakes, .stocktake-execution, .stocktake-review, .warehouse-detail,
+  .inventory-settings, .inventory-reports) :is(.card, .panel, .surface, .toolbar, .filters,
+  .table-wrap, .modal-content, .drawer, .side-panel, .details-panel, .summary-card,
+  .documents-center__hero, .documents-center__shortcut, .counting-header, .review-header) {
+  background: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--text-primary) !important;
+  box-shadow: var(--shadow-sm, none);
+}
+
+:where(.inventory-operations, .documents-center, .inventory-requests, .inventory-request-detail,
+  .inventory-stocktakes, .stocktake-execution, .stocktake-review, .warehouse-detail,
+  .inventory-settings, .inventory-reports) :is(table, .table) :is(th, td) {
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+:where(.inventory-operations, .documents-center, .inventory-requests, .inventory-request-detail,
+  .inventory-stocktakes, .stocktake-execution, .stocktake-review, .warehouse-detail,
+  .inventory-settings, .inventory-reports) :is(table, .table) th {
+  background: color-mix(in srgb, var(--brand-color) 7%, var(--bg-secondary)) !important;
+  color: var(--text-secondary) !important;
+}
+
+:where(.inventory-operations, .documents-center, .inventory-requests, .inventory-request-detail,
+  .inventory-stocktakes, .stocktake-execution, .stocktake-review, .warehouse-detail,
+  .inventory-settings, .inventory-reports) :is(button, .button, .btn) {
+  min-height: var(--control-height, 40px);
+  border-radius: var(--radius-sm);
+  font: inherit;
+}
+
+:where(.inventory-operations, .documents-center, .inventory-requests, .inventory-request-detail,
+  .inventory-stocktakes, .stocktake-execution, .stocktake-review, .warehouse-detail,
+  .inventory-settings, .inventory-reports) :is(.muted, .empty, .empty-state, .help-text,
+  .form-help, .table-meta) {
+  color: var(--text-muted) !important;
+}

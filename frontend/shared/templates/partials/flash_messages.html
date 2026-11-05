@@ -1,0 +1,11 @@
+﻿{% if messages %}
+<div class="flash-stack">
+    {% for message in messages %}
+    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags|default:"info" }}{% endif %}">
+        <i class="alert-icon fa-solid {% if message.tags == 'success' %}fa-circle-check{% elif message.tags == 'error' %}fa-circle-xmark{% elif message.tags == 'warning' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}"></i>
+        <span>{{ message }}</span>
+        <button type="button" class="alert-close" aria-label="إغلاق">&times;</button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

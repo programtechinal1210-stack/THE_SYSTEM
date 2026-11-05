@@ -1,0 +1,127 @@
+/* UDE V2 Stage 03: scoped bridge for existing shared component contracts. */
+body.ude-v2-shared-components .core-workspace .btn,
+body.ude-v2-shared-components .page-content .btn,
+body.ude-v2-shared-components .btn-primary {
+  border-color: var(--ude-color-border);
+  border-radius: var(--ude-radius-md);
+  font-family: var(--ude-font-family-sans);
+  transition: background-color var(--ude-duration-fast) var(--ude-ease-standard),
+    border-color var(--ude-duration-fast) var(--ude-ease-standard),
+    color var(--ude-duration-fast) var(--ude-ease-standard);
+}
+body.ude-v2-shared-components .core-workspace .btn-primary,
+body.ude-v2-shared-components .page-content .btn-primary {
+  background: var(--ude-color-brand);
+  border-color: var(--ude-color-brand);
+  color: var(--ude-color-on-brand);
+}
+body.ude-v2-shared-components .core-workspace .btn-primary:hover,
+body.ude-v2-shared-components .page-content .btn-primary:hover {
+  background: var(--ude-color-brand-strong);
+  border-color: var(--ude-color-brand-strong);
+}
+body.ude-v2-shared-components .core-workspace .btn:not(.btn-primary):hover,
+body.ude-v2-shared-components .page-content .btn:not(.btn-primary):hover {
+  background: var(--ude-color-brand-soft);
+  border-color: var(--ude-color-brand);
+  color: var(--ude-color-text);
+}
+body.ude-v2-shared-components .core-workspace .btn:disabled,
+body.ude-v2-shared-components .page-content .btn:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+body.ude-v2-shared-components .core-panel,
+body.ude-v2-shared-components .core-record-card,
+body.ude-v2-shared-components .core-stats article,
+body.ude-v2-shared-components .core-module-card {
+  background: var(--ude-color-surface-raised);
+  border-color: var(--ude-color-border);
+  color: var(--ude-color-text);
+}
+body.ude-v2-shared-components .core-panel-heading,
+body.ude-v2-shared-components .core-record-card > header,
+body.ude-v2-shared-components .core-record-card > footer {
+  border-color: var(--ude-color-divider);
+}
+
+body.ude-v2-shared-components .core-workspace input,
+body.ude-v2-shared-components .core-workspace select,
+body.ude-v2-shared-components .core-workspace textarea,
+body.ude-v2-shared-components .core-filter-bar input,
+body.ude-v2-shared-components .core-filter-bar select {
+  background: var(--ude-color-surface-raised);
+  border-color: var(--ude-color-border);
+  color: var(--ude-color-text);
+}
+body.ude-v2-shared-components .core-workspace input:focus,
+body.ude-v2-shared-components .core-workspace select:focus,
+body.ude-v2-shared-components .core-workspace textarea:focus,
+body.ude-v2-shared-components .core-filter-bar input:focus,
+body.ude-v2-shared-components .core-filter-bar select:focus {
+  border-color: var(--ude-color-focus);
+  box-shadow: var(--ude-focus-ring);
+}
+
+body.ude-v2-shared-components .core-table-wrap,
+body.ude-v2-shared-components .core-table,
+body.ude-v2-shared-components .core-filter-bar,
+body.ude-v2-shared-components .core-notification-list {
+  border-color: var(--ude-color-border);
+  background: var(--ude-color-surface-raised);
+}
+body.ude-v2-shared-components .core-table th {
+  background: var(--ude-color-surface);
+  color: var(--ude-color-text-secondary);
+}
+body.ude-v2-shared-components .core-table td,
+body.ude-v2-shared-components .core-notification,
+body.ude-v2-shared-components .core-filter-bar {
+  border-color: var(--ude-color-divider);
+  color: var(--ude-color-text);
+}
+body.ude-v2-shared-components .core-table tbody tr:hover,
+body.ude-v2-shared-components .core-notification.unread {
+  background: var(--ude-color-brand-soft);
+}
+
+body.ude-v2-shared-components .core-tabs a.selected,
+body.ude-v2-shared-components .core-tabs [aria-selected="true"] {
+  background: var(--ude-color-brand-soft);
+  color: var(--ude-color-brand-strong);
+  border-color: var(--ude-color-brand);
+}
+body.ude-v2-shared-components .core-dialog,
+body.ude-v2-shared-components .core-action-menu > div,
+body.ude-v2-shared-components .alert,
+body.ude-v2-shared-components .core-empty-state {
+  background: var(--ude-color-surface-raised);
+  border-color: var(--ude-color-border);
+  color: var(--ude-color-text);
+}
+body.ude-v2-shared-components .core-dialog-heading {
+  border-color: var(--ude-color-divider);
+}
+body.ude-v2-shared-components :is(button, a, input, select, textarea, summary):focus-visible {
+  outline: 3px solid var(--ude-color-focus);
+  outline-offset: 3px;
+}
+
+/* Status semantics remain independent from aesthetic palette selection. */
+body.ude-v2-shared-components .core-status.active { color: var(--ude-color-success); }
+body.ude-v2-shared-components .core-status.inactive { color: var(--ude-color-danger); }
+
+@media (max-width: 700px) {
+  body.ude-v2-shared-components .core-form-fields { grid-template-columns: 1fr; }
+  body.ude-v2-shared-components .core-table-wrap { max-inline-size: 100%; overflow-x: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.ude-v2-shared-components *,
+  body.ude-v2-shared-components *::before,
+  body.ude-v2-shared-components *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}

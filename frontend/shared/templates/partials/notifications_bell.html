@@ -1,0 +1,110 @@
+﻿<!-- ═══════════════════════════════════════════════════════════════
+   🔔 جرس الإشعارات
+   ═══════════════════════════════════════════════════════════════ -->
+
+<div class="relative">
+    <button id="notificationBell" 
+            class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200 relative"
+            onclick="toggleNotifications()"
+            aria-label="الإشعارات">
+        <i class="ph ph-bell text-xl text-gray-600 dark:text-gray-300"></i>
+        
+        <!-- عداد الإشعارات -->
+        <span class="absolute -top-0.5 -right-0.5 min-w-[20px] h-5 flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full px-1 animate-bounce-in shadow-md shadow-red-500/30">
+            3
+        </span>
+    </button>
+    
+    <!-- قائمة الإشعارات المنسدلة -->
+    <div id="notificationsDropdown" 
+         class="fixed top-[72px] left-4 md:left-auto md:right-auto w-96 max-w-[calc(100vw-32px)] bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 hidden animate-scale-in max-h-[500px] overflow-hidden">
+        
+        <!-- رأس القائمة -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-sm font-bold text-gray-800 dark:text-gray-200">الإشعارات</h3>
+            <div class="flex items-center gap-2">
+                <button class="text-xs text-blue-600 dark:text-blue-400 hover:underline" onclick="markAllNotificationsRead()">
+                    تحديد الكل كمقروء
+                </button>
+                <a href="/notifications/" class="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                    عرض الكل
+                </a>
+            </div>
+        </div>
+        
+        <!-- قائمة الإشعارات -->
+        <div class="overflow-y-auto max-h-[400px]">
+            <!-- إشعار غير مقروء -->
+            <div class="flex gap-3 p-4 bg-blue-50/50 dark:bg-blue-900/10 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 cursor-pointer">
+                <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                    <i class="ph ph-file-text text-blue-600 dark:text-blue-400"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">معاملة جديدة محالة إليك</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">تم إحالة المعاملة رقم W/2026/00025 للمراجعة</p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">منذ 5 دقائق</p>
+                </div>
+                <div class="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0 mt-2"></div>
+            </div>
+            
+            <!-- إشعار غير مقروء -->
+            <div class="flex gap-3 p-4 bg-blue-50/50 dark:bg-blue-900/10 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 cursor-pointer">
+                <div class="w-10 h-10 rounded-lg bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center flex-shrink-0">
+                    <i class="ph ph-clock text-orange-600 dark:text-orange-400"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">مهمة تقترب من الموعد النهائي</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">المهمة "إعداد التقرير الشهري" تنتهي غداً</p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">منذ ساعة</p>
+                </div>
+                <div class="w-2 h-2 rounded-full bg-orange-500 flex-shrink-0 mt-2"></div>
+            </div>
+            
+            <!-- إشعار مقروء -->
+            <div class="flex gap-3 p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 cursor-pointer opacity-60">
+                <div class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                    <i class="ph ph-check-circle text-green-600 dark:text-green-400"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">تم إكمال المهمة</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">المهمة "مراجعة المستندات" تم إكمالها</p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">منذ 3 ساعات</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- تذييل القائمة -->
+        <div class="p-3 border-t border-gray-200 dark:border-gray-700 text-center">
+            <a href="/notifications/" class="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium">
+                عرض جميع الإشعارات ←
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleNotifications() {
+        const dropdown = document.getElementById('notificationsDropdown');
+        dropdown.classList.toggle('hidden');
+        
+        if (!dropdown.classList.contains('hidden')) {
+            // إغلاق القوائم الأخرى
+            document.getElementById('userMenu')?.classList.add('hidden');
+            document.getElementById('quickActionsMenu')?.classList.add('hidden');
+            
+            setTimeout(() => {
+                document.addEventListener('click', function closeDropdown(e) {
+                    if (!dropdown.contains(e.target) && !e.target.closest('#notificationBell')) {
+                        dropdown.classList.add('hidden');
+                        document.removeEventListener('click', closeDropdown);
+                    }
+                });
+            }, 100);
+        }
+    }
+    
+    function markAllNotificationsRead() {
+        // هنا يتم استدعاء API لتحديد الكل كمقروء
+        showToast('تم تحديد جميع الإشعارات كمقروءة', 'success');
+    }
+</script>

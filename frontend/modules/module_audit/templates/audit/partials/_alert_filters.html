@@ -1,0 +1,111 @@
+﻿<!-- ============================================================
+     فلاتر التنبيهات
+     ============================================================ -->
+<div class="filter-bar" id="alertFilterBar">
+    <!-- بحث -->
+    <div class="filter-group">
+        <label>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            بحث
+        </label>
+        <input type="text" 
+               name="search" 
+               placeholder="اسم التنبيه، وصف..." 
+               value="{{ filters.search|default:'' }}"
+               hx-get="/audit/api/alerts/"
+               hx-trigger="keyup changed delay:500ms"
+               hx-target="#alertList"
+               hx-include="#alertFilterBar">
+    </div>
+
+    <!-- الوحدة -->
+    <div class="filter-group">
+        <label>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+            الوحدة
+        </label>
+        <select name="module"
+                hx-get="/audit/api/alerts/"
+                hx-trigger="change"
+                hx-target="#alertList"
+                hx-include="#alertFilterBar">
+            <option value="">الكل</option>
+            <option value="cases" {% if filters.module == 'cases' %}selected{% endif %}>📋 المعاملات</option>
+            <option value="users" {% if filters.module == 'users' %}selected{% endif %}>👥 المستخدمون</option>
+            <option value="execution" {% if filters.module == 'execution' %}selected{% endif %}>⚡ التنفيذ</option>
+            <option value="audit" {% if filters.module == 'audit' %}selected{% endif %}>🔍 التدقيق</option>
+        </select>
+    </div>
+
+    <!-- مستوى الخطورة -->
+    <div class="filter-group">
+        <label>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            </svg>
+            الخطورة
+        </label>
+        <select name="severity_threshold"
+                hx-get="/audit/api/alerts/"
+                hx-trigger="change"
+                hx-target="#alertList"
+                hx-include="#alertFilterBar">
+            <option value="">الكل</option>
+            <option value="info" {% if filters.severity_threshold == 'info' %}selected{% endif %}>ℹ️ معلومات</option>
+            <option value="warning" {% if filters.severity_threshold == 'warning' %}selected{% endif %}>⚠️ تحذير</option>
+            <option value="critical" {% if filters.severity_threshold == 'critical' %}selected{% endif %}>🔴 حرج</option>
+        </select>
+    </div>
+
+    <!-- الحالة -->
+    <div class="filter-group">
+        <label>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+            </svg>
+            الحالة
+        </label>
+        <select name="is_active"
+                hx-get="/audit/api/alerts/"
+                hx-trigger="change"
+                hx-target="#alertList"
+                hx-include="#alertFilterBar">
+            <option value="">الكل</option>
+            <option value="true" {% if filters.is_active == 'true' %}selected{% endif %}>✅ نشط</option>
+            <option value="false" {% if filters.is_active == 'false' %}selected{% endif %}>⏸️ غير نشط</option>
+        </select>
+    </div>
+
+    <!-- أزرار -->
+    <button class="btn-search" 
+            hx-get="/audit/api/alerts/" 
+            hx-target="#alertList" 
+            hx-include="#alertFilterBar"
+            hx-trigger="click">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        بحث
+    </button>
+    
+    <button class="btn-reset" 
+            onclick="resetAlertFilters()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
+        </svg>
+        إعادة تعيين
+    </button>
+
+    <button class="btn-search" style="background: #8b5cf6;" 
+            onclick="openModal('alertAddModal')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        تنبيه جديد
+    </button>
+</div>

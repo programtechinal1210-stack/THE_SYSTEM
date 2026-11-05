@@ -1,0 +1,104 @@
+/* UDE V1.1 — Design tokens. Intentionally not loaded by production templates in UDE-01. */
+:root {
+  --ude-color-brand: var(--brand-primary, #2563eb);
+  --ude-color-brand-strong: var(--brand-primary-dark, #1d4ed8);
+  --ude-color-accent: var(--accent-color, #0f766e);
+  --ude-color-canvas: var(--bg-primary, #ffffff);
+  --ude-color-surface: var(--bg-secondary, #f8fafc);
+  --ude-color-surface-raised: var(--card-bg, #ffffff);
+  --ude-color-text: var(--text-primary, #111827);
+  --ude-color-text-secondary: var(--text-secondary, #374151);
+  --ude-color-text-muted: var(--text-muted, #6b7280);
+  --ude-color-border: var(--border-color, #d1d5db);
+  --ude-color-focus: #1d4ed8;
+  --ude-color-success: #166534;
+  --ude-color-warning: #92400e;
+  --ude-color-danger: #b91c1c;
+  --ude-color-info: #075985;
+  --ude-color-on-brand: #ffffff;
+  --ude-font-family-sans: var(--font-family, "Tajawal", "IBM Plex Sans Arabic", "Almarai", sans-serif);
+  --ude-font-family-mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+  --ude-font-size-xs: 0.75rem;
+  --ude-font-size-sm: 0.875rem;
+  --ude-font-size-md: 1rem;
+  --ude-font-size-lg: 1.125rem;
+  --ude-font-size-xl: 1.25rem;
+  --ude-font-weight-regular: 400;
+  --ude-font-weight-medium: 500;
+  --ude-font-weight-bold: 700;
+  --ude-line-height-normal: 1.5;
+  --ude-line-height-tight: 1.25;
+  --ude-space-1: 0.25rem;
+  --ude-space-2: 0.5rem;
+  --ude-space-3: 0.75rem;
+  --ude-space-4: 1rem;
+  --ude-space-5: 1.25rem;
+  --ude-space-6: 1.5rem;
+  --ude-space-8: 2rem;
+  --ude-radius-sm: 0.25rem;
+  --ude-radius-md: 0.5rem;
+  --ude-radius-lg: 0.75rem;
+  --ude-radius-pill: 999px;
+  --ude-shadow-sm: 0 1px 2px rgb(15 23 42 / 0.08);
+  --ude-shadow-md: 0 4px 12px rgb(15 23 42 / 0.12);
+  --ude-duration-fast: 120ms;
+  --ude-duration-normal: 200ms;
+  --ude-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ude-focus-ring: 0 0 0 3px rgb(29 78 216 / 0.35);
+  --ude-density-factor: 1;
+}
+
+/* Explicit theme scopes keep UDE isolated from the current data-theme contract. */
+:root[data-ude-theme="ude-light-default"] {
+  --ude-color-canvas: #ffffff;
+  --ude-color-surface: #f8fafc;
+  --ude-color-surface-raised: #ffffff;
+  --ude-color-text: #111827;
+  --ude-color-text-secondary: #374151;
+  --ude-color-text-muted: #4b5563;
+  --ude-color-border: #9ca3af;
+  --ude-color-brand: #1d4ed8;
+  --ude-color-brand-strong: #1e3a8a;
+  --ude-color-accent: #115e59;
+  --ude-color-on-brand: #ffffff;
+}
+
+:root[data-ude-theme="ude-dark-default"] {
+  --ude-color-canvas: #111827;
+  --ude-color-surface: #1f2937;
+  --ude-color-surface-raised: #273449;
+  --ude-color-text: #f9fafb;
+  --ude-color-text-secondary: #e5e7eb;
+  --ude-color-text-muted: #d1d5db;
+  --ude-color-border: #9ca3af;
+  --ude-color-brand: #93c5fd;
+  --ude-color-brand-strong: #bfdbfe;
+  --ude-color-accent: #5eead4;
+  --ude-color-on-brand: #172554;
+  --ude-color-focus: #bfdbfe;
+  --ude-color-success: #86efac;
+  --ude-color-warning: #fcd34d;
+  --ude-color-danger: #fca5a5;
+  --ude-color-info: #7dd3fc;
+}
+
+:root[data-ude-theme="ude-high-contrast"] {
+  --ude-color-canvas: #000000;
+  --ude-color-surface: #000000;
+  --ude-color-surface-raised: #000000;
+  --ude-color-text: #ffffff;
+  --ude-color-text-secondary: #ffffff;
+  --ude-color-text-muted: #ffffff;
+  --ude-color-border: #ffffff;
+  --ude-color-brand: #ffff00;
+  --ude-color-brand-strong: #ffff00;
+  --ude-color-accent: #00ffff;
+  --ude-color-on-brand: #000000;
+  --ude-color-focus: #ffff00;
+  --ude-color-success: #00ff00;
+  --ude-color-warning: #ffff00;
+  --ude-color-danger: #ff8080;
+  --ude-color-info: #00ffff;
+  --ude-shadow-sm: none;
+  --ude-shadow-md: none;
+}

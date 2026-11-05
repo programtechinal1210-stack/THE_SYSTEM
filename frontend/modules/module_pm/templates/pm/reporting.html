@@ -1,0 +1,36 @@
+{% extends "pm/reference_base.html" %}
+{% block pm_content %}
+<section class="pcc">
+<nav><a href="/pm/">إدارة المشاريع</a> / <a href="/pm/projects/">المشاريع</a></nav>
+<header class="pcc-header"><div class="pcc-identity"><a class="pcc-back" href="/pm/reporting/" aria-label="العودة إلى المشاريع">←</a><div><div class="pcc-kicker">مركز المشروع</div><h1>{{ center.name }}</h1><div class="pcc-meta">التقارير ومتابعة التنفيذ</div></div></div><nav class="pcc-actions"><button data-pm-print type="button" class="pcc-action">طباعة</button><a class="pcc-action primary" href="?{{ export_query }}&amp;download=json">تنزيل التقرير JSON</a></nav></header>
+<section class="pcc-kpis" aria-label="مؤشرات المشروع"><div class="pcc-kpi blue"><span class="pcc-kpi-label">التكلفة المخططة</span><strong>{{ center.planned_cost }}</strong><small>{{ center.currency }}</small></div><div class="pcc-kpi green"><span class="pcc-kpi-label">التكلفة الفعلية</span><strong>{{ center.actual_cost }}</strong><small>{{ center.currency }}</small></div><div class="pcc-kpi orange"><span class="pcc-kpi-label">أوامر التشغيل</span><strong>{{ center.work_orders }}</strong></div><div class="pcc-kpi red"><span class="pcc-kpi-label">المخاطر المفتوحة</span><strong>{{ center.open_risks }}</strong></div></section>
+<form method="get" class="pm-report-filters">
+<label for="report">نوع التقرير</label><select id="report" name="report">{% for key,title in reports %}<option value="{{ key }}" {% if key == report_kind %}selected{% endif %}>{{ title }}</option>{% endfor %}</select>
+<label for="phase">المرحلة</label><select id="phase" name="phase_id"><option value="">كل المراحل</option>{% for option in options.phases %}<option value="{{ option.id }}" {% if filters.phase_id == option.id %}selected{% endif %}>{{ option.name }}</option>{% endfor %}</select>
+<label for="task">المهمة</label><select id="task" name="task_id"><option value="">كل المهام</option>{% for option in options.tasks %}<option value="{{ option.id }}" {% if filters.task_id == option.id %}selected{% endif %}>{{ option.name }}</option>{% endfor %}</select>
+<label for="activity">النشاط</label><select id="activity" name="activity_id"><option value="">كل الأنشطة</option>{% for option in options.activities %}<option value="{{ option.id }}" {% if filters.activity_id == option.id %}selected{% endif %}>{{ option.name }}</option>{% endfor %}</select>
+<label for="from">من تاريخ</label><input id="from" type="date" name="date_from" value="{{ filters.date_from }}">
+<label for="to">إلى تاريخ</label><input id="to" type="date" name="date_to" value="{{ filters.date_to }}">
+<label for="status">حالة أمر التشغيل</label><select id="status" name="status">
+<option value="">كل الحالات القابلة للاحتساب</option>
+<option value="issued" {% if filters.status == 'issued' %}selected{% endif %}>مصدر</option>
+<option value="in_progress" {% if filters.status == 'in_progress' %}selected{% endif %}>قيد التنفيذ</option>
+<option value="completed" {% if filters.status == 'completed' %}selected{% endif %}>مكتمل</option>
+<option value="closed" {% if filters.status == 'closed' %}selected{% endif %}>مغلق</option>
+</select><button type="submit">تطبيق</button></form>
+<p>الفترة تصفّي أحداث الكمية والاستهلاك حسب وقت التسجيل UTC. المخطط المعروض هو المخطط الحالي. لا تُوزّع الكميات القديمة غير المؤرخة على الفترة.</p>
+<p>العملة: {{ center.currency }} — المخطط: {{ center.planned_cost }} — الفعلي: {{ center.actual_cost }}</p>
+<h2>{{ report_title }}</h2>
+{% if schedule_note %}<p>يعرض التقرير تواريخ الأنشطة المسجلة فقط. التواريخ الفارغة غير محددة، والمدد جهد بالساعات وليست مسارًا حرجًا محسوبًا.</p>{% endif %}
+<table><thead><tr>{% for label in columns %}<th>{{ label }}</th>{% endfor %}</tr></thead><tbody>{% for row in rows %}<tr>{% for value in row %}<td>{{ value }}</td>{% endfor %}</tr>{% empty %}<tr><td>لا توجد نتائج مطابقة.</td></tr>{% endfor %}</tbody></table>
+<h2>التكلفة بعملة المشروع</h2>
+<table><thead><tr><th>النشاط</th><th>المخطط</th><th>الفعلي</th><th>العملة</th></tr></thead><tbody>
+{% for row in costs %}<tr><td>{{ row.activity_code }}</td><td>{{ row.planned_cost }}</td><td>{{ row.actual_cost }}</td><td>{{ row.currency }}</td></tr>{% empty %}<tr><td colspan="4">لا توجد أنشطة مطابقة.</td></tr>{% endfor %}
+</tbody></table>
+<h2>الإنجاز</h2>
+<table><thead><tr><th>النشاط</th><th>الوحدة</th><th>الكمية المخططة</th><th>الكمية الفعلية</th><th>نسبة الإنجاز (0–1)</th></tr></thead><tbody>
+{% for row in progress %}<tr><td>{{ row.activity_code }}</td><td>{{ row.unit }}</td><td>{{ row.planned_quantity }}</td><td>{{ row.actual_quantity }}</td><td>{{ row.achievement|default_if_none:'غير محددة' }}</td></tr>{% empty %}<tr><td colspan="5">لا توجد أنشطة مطابقة.</td></tr>{% endfor %}
+</tbody></table>
+<p><a href="?{{ export_query }}&amp;download=json">تنزيل التقرير JSON</a></p>
+</section>
+{% endblock %}

@@ -1,0 +1,75 @@
+﻿<!-- ═══════════════════════════════════════════════════════════════
+     📦 مودال الجهة (إضافة/تعديل)
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="entityModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="entityModalTitle">🏢 جهة جديدة</h3>
+            <button class="modal-close" onclick="closeM('entityModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <form id="entityForm" onsubmit="event.preventDefault(); saveEntity();">
+                <input type="hidden" id="entityId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">اسم الجهة <span class="required">*</span></label>
+                        <input type="text" id="entityName" class="form-input" placeholder="أدخل اسم الجهة" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">الكود</label>
+                        <input type="text" id="entityCode" class="form-input" placeholder="كود مختصر">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">نوع الجهة</label>
+                        <select id="entityType" class="form-select">
+                            <option value="">اختر النوع...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">الجهة الأم</label>
+                        <div class="searchable-select" id="parentSelectWrapper">
+                            <input type="text" id="entityParentSearch" class="form-input" placeholder="ابحث عن جهة..." autocomplete="off" oninput="filterParentList()" onfocus="showParentList()">
+                            <input type="hidden" id="entityParent" value="">
+                            <div class="select-dropdown" id="parentDropdown" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">المسؤول</label>
+                        <input type="text" id="entityContact" class="form-input" placeholder="الاسم الكامل">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">الهاتف</label>
+                        <input type="text" id="entityPhone" class="form-input" placeholder="05xxxxxxxx">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">البريد الإلكتروني</label>
+                    <input type="email" id="entityEmail" class="form-input" placeholder="example@domain.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">العنوان</label>
+                    <textarea id="entityAddress" class="form-input form-textarea" rows="2" placeholder="العنوان التفصيلي"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">الحالة</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="entityStatus" value="true" checked> 🟢 نشطة</label>
+                        <label><input type="radio" name="entityStatus" value="false"> 🔴 غير نشطة</label>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="entityDeleteBtn" class="btn btn-danger" style="display:none; margin-left:auto;" onclick="deleteEntity()">🗑️ حذف</button>
+            <button type="button" class="btn btn-secondary" onclick="closeM('entityModal')">إلغاء</button>
+            <button type="button" class="btn btn-primary" onclick="saveEntity()">💾 حفظ</button>
+        </div>
+    </div>
+</div>
+
+
+

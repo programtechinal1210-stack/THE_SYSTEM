@@ -1,0 +1,474 @@
+/* ═══════════════════════════════════════════════════════════════
+   🔐 صفحة تسجيل الدخول - تصميم Glass Morphism عصري
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════
+   🎨 استيراد الخط
+   ═══════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════════
+   📦 إعادة تعيين كامل للصفحة
+   ═══════════════════════════════════════════════════════ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+body {
+    font-family: 'Tajawal', sans-serif;
+    background: #0f172a !important;
+    min-height: 100vh;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 1.5rem;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🌊 تأثيرات الخلفية الديناميكية
+   ═══════════════════════════════════════════════════════ */
+
+body::before {
+    content: "";
+    position: fixed;
+    width: 70%;
+    height: 70%;
+    background: radial-gradient(circle at 30% 40%, rgba(56, 189, 248, 0.15) 0%, transparent 50%);
+    top: -10%;
+    left: -10%;
+    border-radius: 50%;
+    z-index: 0;
+    animation: floatBg 12s infinite alternate ease-in-out;
+    pointer-events: none;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(circle at 70% 70%, rgba(168, 85, 247, 0.18) 0%, transparent 55%);
+    bottom: -5%;
+    right: -5%;
+    border-radius: 50%;
+    z-index: 0;
+    animation: floatBg2 15s infinite alternate ease-in-out;
+    pointer-events: none;
+}
+
+@keyframes floatBg {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(40px, 30px) scale(1.1); }
+}
+
+@keyframes floatBg2 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-30px, -40px) scale(1.15); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎴 بطاقة تسجيل الدخول - Glass Card
+   ═══════════════════════════════════════════════════════ */
+
+.login-card {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 460px;
+    background: rgba(255, 255, 255, 0.07) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 2.5rem;
+    padding: 2.8rem 2.2rem;
+    box-shadow: 0 30px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #f1f5f9;
+    transition: all 0.3s ease;
+    animation: cardEntry 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    margin: auto;
+}
+
+.login-card:hover {
+    box-shadow: 0 35px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.09) !important;
+}
+
+@keyframes cardEntry {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎨 رأس البطاقة
+   ═══════════════════════════════════════════════════════ */
+
+.card-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.logo-icon {
+    background: linear-gradient(135deg, #38bdf8, #a855f7);
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    margin: 0 auto 1.5rem;
+    font-size: 2.2rem;
+    color: white;
+    box-shadow: 0 15px 25px rgba(56, 189, 248, 0.3);
+    transform: rotate(0deg);
+    transition: transform 0.3s ease;
+}
+
+.logo-icon:hover {
+    transform: rotate(5deg) scale(1.03);
+}
+
+.card-header h1 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    background: linear-gradient(to left, #e2e8f0, #f8fafc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.4rem;
+}
+
+.card-header .sub-text {
+    color: #94a3b8;
+    font-weight: 400;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+}
+
+.card-header .sub-text i {
+    color: #38bdf8;
+    font-size: 0.9rem;
+}
+
+/* ═══════════════════════════════════════════════════════
+   📝 مجموعة الحقول
+   ═══════════════════════════════════════════════════════ */
+
+.input-group {
+    margin-bottom: 1.8rem;
+}
+
+.input-field {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.input-field input {
+    width: 100%;
+    padding: 1rem 3.2rem 1rem 1.5rem;
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 1.2rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #f1f5f9;
+    outline: none;
+    transition: all 0.25s ease;
+    font-family: 'Tajawal', sans-serif;
+    backdrop-filter: blur(5px);
+}
+
+.input-field input::placeholder {
+    color: #94a3b8;
+    font-weight: 400;
+    font-size: 0.95rem;
+}
+
+.input-field input:focus {
+    border-color: #a855f7;
+    box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.2);
+    background: rgba(15, 23, 42, 0.6);
+}
+
+/* أيقونة الحقل - يمين */
+.input-field .field-icon-right {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a78bfa;
+    font-size: 1.2rem;
+    transition: color 0.2s;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.input-field input:focus ~ .field-icon-right {
+    color: #c084fc;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🔐 حقل كلمة المرور
+   ═══════════════════════════════════════════════════════ */
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper input {
+    padding-left: 3.2rem;
+    padding-right: 3.2rem;
+}
+
+.password-wrapper .toggle-password {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #a78bfa;
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 2;
+    padding: 5px;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-wrapper .toggle-password:hover {
+    color: #c084fc;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🎯 خيارات إضافية
+   ═══════════════════════════════════════════════════════ */
+
+.options-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+    color: #cbd5e1;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.remember-me input[type="checkbox"] {
+    accent-color: #a855f7;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin: 0;
+    cursor: pointer;
+}
+
+.remember-me label {
+    cursor: pointer;
+    color: #cbd5e1;
+}
+
+.forgot-link {
+    color: #a78bfa;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.forgot-link:hover {
+    color: #c084fc;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🔘 زر تسجيل الدخول
+   ═══════════════════════════════════════════════════════ */
+
+.login-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #38bdf8, #a855f7);
+    border: none;
+    padding: 1rem;
+    border-radius: 1.2rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    letter-spacing: 0.5px;
+    box-shadow: 0 12px 25px rgba(56, 189, 248, 0.35);
+    transition: all 0.3s ease;
+    margin-top: 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    font-family: 'Tajawal', sans-serif;
+}
+
+.login-btn:hover {
+    background: linear-gradient(135deg, #7dd3fc, #c084fc);
+    box-shadow: 0 18px 30px rgba(168, 85, 247, 0.5);
+    transform: translateY(-2px);
+}
+
+.login-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 8px 18px rgba(56, 189, 248, 0.4);
+}
+
+.login-btn .btn-arrow {
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.login-btn:hover .btn-arrow {
+    transform: translateX(-4px);
+}
+
+/* حالة التحميل */
+.login-btn.loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.login-btn .spinner {
+    width: 22px;
+    height: 22px;
+    border: 2.5px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   📎 رابط التسجيل
+   ═══════════════════════════════════════════════════════ */
+
+.register-link {
+    text-align: center;
+    color: #94a3b8;
+    font-weight: 400;
+    margin-top: 2rem;
+}
+
+.register-link a {
+    color: #a78bfa;
+    text-decoration: none;
+    font-weight: 700;
+    margin-right: 0.25rem;
+    transition: color 0.2s;
+}
+
+.register-link a:hover {
+    color: #c084fc;
+    text-decoration: underline;
+}
+
+/* ═══════════════════════════════════════════════════════
+   🔔 رسائل النظام
+   ═══════════════════════════════════════════════════════ */
+
+.auth-messages {
+    margin-bottom: 1.5rem;
+}
+
+.auth-messages .message {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.auth-messages .message.success {
+    background: rgba(16, 185, 129, 0.15);
+    color: #6ee7b7;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.auth-messages .message.error {
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.auth-messages .message.info {
+    background: rgba(59, 130, 246, 0.15);
+    color: #93c5fd;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* رسائل خطأ الحقول */
+.field-error {
+    color: #fca5a5;
+    font-size: 0.8rem;
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   📱 تحسينات الجوال
+   ═══════════════════════════════════════════════════════ */
+
+@media (max-width: 480px) {
+    body {
+        padding: 1rem;
+    }
+    
+    .login-card {
+        padding: 2rem 1.5rem;
+        border-radius: 2rem;
+    }
+    
+    .card-header h1 {
+        font-size: 1.9rem;
+    }
+    
+    .logo-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.8rem;
+    }
+}

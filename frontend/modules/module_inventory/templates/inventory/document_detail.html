@@ -1,0 +1,68 @@
+{% if document %}
+<section class="inventory-document-detail" data-document-detail aria-labelledby="document-detail-title">
+  <div class="inventory-detail-toolbar">
+    <a class="inventory-detail-back" href="{{ base_url }}">← العودة إلى المستندات</a>
+    <div class="inventory-detail-actions">
+      {% if can_submit %}<form method="post">{% csrf_token %}<input type="hidden" name="warehouse_id" value="{{ selected_warehouse }}"><input type="hidden" name="document_id" value="{{ document.id }}"><button class="inventory-detail-button inventory-detail-button--secondary" name="command" value="submit">تقديم للمراجعة</button></form>{% endif %}
+      {% if can_approve %}<form method="post">{% csrf_token %}<input type="hidden" name="warehouse_id" value="{{ selected_warehouse }}"><input type="hidden" name="document_id" value="{{ document.id }}"><button class="inventory-detail-button inventory-detail-button--primary" name="command" value="approve">اعتماد المستند</button></form>{% endif %}
+      {% if can_post %}<form method="post">{% csrf_token %}<input type="hidden" name="warehouse_id" value="{{ selected_warehouse }}"><input type="hidden" name="document_id" value="{{ document.id }}"><input type="hidden" name="posting_key" value="{{ posting_key }}"><button class="inventory-detail-button inventory-detail-button--primary" name="command" value="post">ترحيل المستند</button></form>{% endif %}
+      {% if show_editor %}<a class="inventory-detail-button inventory-detail-button--secondary" href="{{ base_url }}&document={{ document.id }}">تعديل المسودة</a>{% endif %}
+    </div>
+  </div>
+
+  <header class="inventory-detail-hero">
+    <div>
+      <span class="inventory-detail-kicker">المستندات والعمليات / تفاصيل المستند</span>
+      <h1 id="document-detail-title">{{ document.document_no }}</h1>
+      <p>{{ document_type_label|default:document.document_type }} · أُنشئ في <bdi dir="ltr">{{ document.created_at|default:document.document_date }}</bdi></p>
+    </div>
+    <span class="inventory-detail-status inventory-detail-status--{{ document.status|lower }}">{{ document_status_label|default:document.status }}</span>
+  </header>
+
+  <dl class="inventory-detail-facts">
+    <div><dt>نوع المستند</dt><dd>{{ document_type_label|default:document.document_type }}</dd></div>
+    <div><dt>تاريخ المستند</dt><dd><bdi dir="ltr">{{ document.document_date }}</bdi></dd></div>
+    <div><dt>المخزن</dt><dd>{{ selected_warehouse_name|default:'المخزن المحدد' }}</dd></div>
+    <div><dt>المصدر / المستفيد</dt><dd>{% if document.beneficiary_name %}{{ document.beneficiary_name }}{% elif document.counterparty_reference %}{{ document.counterparty_reference }}{% elif document.source_type %}{{ document.source_type }}{% else %}غير محدد{% endif %}</dd></div>
+    <div><dt>المرجع المرتبط</dt><dd>{% if document.origin_document_no %}{{ document.origin_document_no }}{% elif document.reversal_original_document_no %}{{ document.reversal_original_document_no }}{% elif document.source_id %}<bdi dir="ltr">{{ document.source_id }}</bdi>{% else %}لا يوجد{% endif %}</dd></div>
+    <div><dt>عملة التقييم</dt><dd>{{ readiness.valuation_currency|default:'غير معروضة' }}</dd></div>
+  </dl>
+
+  <ol class="inventory-detail-steps" aria-label="مراحل المستند">
+    <li class="is-complete"><span>1</span><strong>مسودة</strong><small>{% if document.created_at %}<bdi dir="ltr">{{ document.created_at|slice:':16' }}</bdi>{% else %}تم الإنشاء{% endif %}</small></li>
+    <li class="{% if document.status != 'DRAFT' %}is-complete{% endif %}"><span>2</span><strong>مقدم للمراجعة</strong><small>{% if document.submitted_at %}<bdi dir="ltr">{{ document.submitted_at|slice:':16' }}</bdi>{% else %}لم يتم بعد{% endif %}</small></li>
+    <li class="{% if document.status == 'APPROVED' or document.status == 'POSTED' or document.status == 'CLOSED' %}is-complete{% endif %}"><span>3</span><strong>معتمد</strong><small>{% if document.approved_at %}<bdi dir="ltr">{{ document.approved_at|slice:':16' }}</bdi>{% else %}لم يتم بعد{% endif %}</small></li>
+    <li class="{% if document.status == 'POSTED' or document.status == 'CLOSED' %}is-complete{% endif %}"><span>4</span><strong>مرحّل</strong><small>{% if document.posted_at %}<bdi dir="ltr">{{ document.posted_at|slice:':16' }}</bdi>{% else %}لا أثر قبل الترحيل{% endif %}</small></li>
+  </ol>
+
+  <nav class="inventory-detail-tabs" role="tablist" aria-label="تفاصيل المستند">
+    <button role="tab" aria-selected="true" aria-controls="detail-panel-lines" data-document-tab="lines">بنود المستند <span>{{ document.lines|length }}</span></button>
+    <button role="tab" aria-selected="false" aria-controls="detail-panel-review" data-document-tab="review">الاعتمادات والمراجعة</button>
+    <button role="tab" aria-selected="false" aria-controls="detail-panel-impact" data-document-tab="impact">الأثر المخزني</button>
+    <button role="tab" aria-selected="false" aria-controls="detail-panel-related" data-document-tab="related">المستندات المرتبطة</button>
+    <button role="tab" aria-selected="false" aria-controls="detail-panel-history" data-document-tab="history">سجل الإجراءات</button>
+  </nav>
+
+  <section id="detail-panel-lines" class="inventory-detail-panel" data-document-panel="lines" role="tabpanel">
+    <div class="inventory-detail-panel-heading"><div><span>المحتوى التشغيلي</span><h2>بنود المستند</h2></div>{% if show_editor %}<a class="inventory-detail-button inventory-detail-button--primary" href="{{ base_url }}&document={{ document.id }}">إضافة بند</a>{% endif %}</div>
+    <div class="inventory-detail-table-wrap"><table><thead><tr><th>#</th><th>الصنف</th><th>الكمية</th><th>الوحدة</th><th>الموقع</th><th>التكلفة المصرح بها</th></tr></thead><tbody>{% for line in document.lines %}<tr><td>{{ line.line_no|default:forloop.counter }}</td><td><strong>{{ line.item_code|default:line.item_id }}</strong>{% if line.item_name %}<small>{{ line.item_name }}</small>{% endif %}</td><td><bdi dir="ltr">{{ line.quantity|default:line.base_quantity }}</bdi></td><td>{{ line.unit_name|default:line.unit_id|default:'الوحدة الأساسية' }}</td><td>{{ line.location_name|default:line.location_id|default:'دون موقع محدد' }}</td><td>{% if line.amount_valuation != None %}<bdi dir="ltr">{{ line.amount_valuation }} {{ readiness.valuation_currency }}</bdi>{% elif line.original_amount != None %}<bdi dir="ltr">{{ line.original_amount }} {{ line.transaction_currency|default:'' }}</bdi>{% else %}غير معروضة{% endif %}</td></tr>{% empty %}<tr><td colspan="6" class="inventory-detail-empty">لا توجد بنود مسجلة لهذا المستند.</td></tr>{% endfor %}</tbody></table></div>
+  </section>
+
+  <section id="detail-panel-review" class="inventory-detail-panel" data-document-panel="review" role="tabpanel" hidden>
+    <div class="inventory-detail-panel-heading"><div><span>فصل الصلاحيات</span><h2>الاعتمادات والمراجعة</h2></div></div>
+    <div class="inventory-detail-review-grid"><article><span>المنشئ</span><strong>{% if is_document_creator %}أنت{% else %}مستخدم النظام{% endif %}</strong></article><article><span>المراجع</span><strong>{{ document.decision_actor_name|default:'لم يعتمد بعد' }}</strong></article><article><span>قرار الاعتماد</span><strong>{% if document.approved_at %}<bdi dir="ltr">{{ document.approved_at|slice:':16' }}</bdi>{% else %}بانتظار القرار{% endif %}</strong></article></div>
+    {% if document.decision_reason %}<p class="inventory-detail-note">ملاحظة القرار: {{ document.decision_reason }}</p>{% else %}<p class="inventory-detail-empty">لا توجد ملاحظات مراجعة مسجلة.</p>{% endif %}
+  </section>
+
+  <section id="detail-panel-impact" class="inventory-detail-panel" data-document-panel="impact" role="tabpanel" hidden>
+    <div class="inventory-detail-panel-heading"><div><span>مصدر الحقيقة</span><h2>الأثر المخزني</h2></div></div>
+    {% if document.status == 'POSTED' or document.status == 'CLOSED' %}{% if document.reversal_legs %}<div class="inventory-detail-ledger">{% for leg in document.reversal_legs %}<div><strong>{{ leg.stock_status }}</strong><span>الكمية <bdi dir="ltr">{{ leg.quantity_delta }}</bdi></span>{% if leg.value_delta_valuation != None %}<span>القيمة <bdi dir="ltr">{{ leg.value_delta_valuation }} {{ readiness.valuation_currency }}</bdi></span>{% endif %}</div>{% endfor %}</div>{% else %}<p class="inventory-detail-empty">تم ترحيل المستند. تفاصيل قيود الدفتر لهذا النوع غير معادة ضمن عقد العرض الحالي.</p>{% endif %}{% else %}<p class="inventory-detail-empty">لا يوجد أثر مخزني مرحّل قبل نجاح الترحيل.</p>{% endif %}
+  </section>
+
+  <section id="detail-panel-related" class="inventory-detail-panel" data-document-panel="related" role="tabpanel" hidden><div class="inventory-detail-panel-heading"><div><span>الروابط الموثقة</span><h2>المستندات المرتبطة</h2></div></div>{% if document.posted_reversal %}<a class="inventory-detail-related" href="{{ base_url }}&document={{ document.posted_reversal.id }}"><strong>{{ document.posted_reversal.document_no }}</strong><span>مستند عكس مرحّل</span></a>{% elif document.reverses_document_id %}<a class="inventory-detail-related" href="{{ base_url }}&document={{ document.reverses_document_id }}"><strong>{{ document.reversal_original_document_no }}</strong><span>المستند الأصلي</span></a>{% else %}<p class="inventory-detail-empty">لا توجد مستندات مرتبطة يعيدها النظام لهذا المستند.</p>{% endif %}</section>
+
+  <section id="detail-panel-history" class="inventory-detail-panel" data-document-panel="history" role="tabpanel" hidden><div class="inventory-detail-panel-heading"><div><span>التتبع</span><h2>سجل الإجراءات</h2></div></div><ol class="inventory-detail-history"><li><strong>إنشاء المستند</strong><span><bdi dir="ltr">{{ document.created_at|default:document.document_date }}</bdi></span></li><li><strong>التقديم للمراجعة</strong><span>{% if document.submitted_at %}<bdi dir="ltr">{{ document.submitted_at }}</bdi>{% else %}لم يتم بعد{% endif %}</span></li><li><strong>الاعتماد</strong><span>{% if document.approved_at %}<bdi dir="ltr">{{ document.approved_at }}</bdi>{% else %}لم يتم بعد{% endif %}</span></li><li><strong>الترحيل</strong><span>{% if document.posted_at %}<bdi dir="ltr">{{ document.posted_at }}</bdi>{% else %}لم يتم بعد{% endif %}</span></li></ol></section>
+
+  {% include 'inventory/reversal.html' %}{% include 'inventory/document_lifecycle.html' %}
+</section>
+{% endif %}

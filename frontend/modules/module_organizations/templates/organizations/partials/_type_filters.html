@@ -1,0 +1,15 @@
+﻿<!-- ═══════════════════════════════════════════════════════════════
+     🔍 شريط فلترة أنواع الجهات
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="filter-bar">
+    <div class="filter-group" style="flex:1; min-width:200px;">
+        <label>بحث</label>
+        <input type="text" id="typeSearch" class="form-input" placeholder="اسم أو كود النوع..." oninput="filterEntityTypes()">
+    </div>
+    <button class="btn btn-secondary" onclick="resetTypeFilters()">
+        🔄 مسح
+    </button>
+    <button class="btn btn-primary" onclick="openTypeModal()">
+        ＋ نوع جديد
+    </button>
+</div>

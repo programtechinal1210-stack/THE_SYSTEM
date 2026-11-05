@@ -1,0 +1,634 @@
+/* Source: PM/static/css/soft_deletion.css; scoped to PM only. */
+@scope (.pm-reference) {
+
+/* ==========================================================================
+   SOFT-DELETION-04B-RECYCLE-BIN-UI
+   ========================================================================== */
+
+#panel-recycle-bin {
+    direction: rtl;
+}
+
+.sd-recycle-toolbar {
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:16px;
+}
+
+.sd-recycle-filters {
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+}
+
+.sd-recycle-filter {
+    min-height:36px;
+    padding:7px 13px;
+    border:1px solid #d8dee6;
+    border-radius:9px;
+    background:#fff;
+    color:#475467;
+    font-family:inherit;
+    font-size:.8rem;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.sd-recycle-filter.active {
+    background:#eef7f5;
+    color:#11675f;
+    border-color:#a9d5cf;
+}
+
+.sd-recycle-refresh {
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    min-height:36px;
+    padding:7px 13px;
+    border:1px solid #d8dee6;
+    border-radius:9px;
+    background:#fff;
+    color:#344054;
+    font-family:inherit;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.sd-recycle-summary {
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:11px 14px;
+    margin-bottom:16px;
+    border-radius:11px;
+    background:#f8fafc;
+    border:1px solid #e4e7ec;
+    color:#475467;
+    font-size:.82rem;
+}
+
+#sd-recycle-count {
+    display:inline-flex;
+    min-width:28px;
+    height:28px;
+    align-items:center;
+    justify-content:center;
+    border-radius:999px;
+    background:#11675f;
+    color:#fff;
+    font-weight:800;
+}
+
+.sd-recycle-list {
+    display:grid;
+    grid-template-columns:
+        repeat(auto-fit, minmax(310px, 1fr));
+    gap:14px;
+}
+
+.sd-recycle-card {
+    background:#fff;
+    border:1px solid #e4e7ec;
+    border-radius:14px;
+    padding:16px;
+    box-shadow:
+        0 3px 12px rgba(15,23,42,.05);
+    transition:
+        opacity .25s ease,
+        transform .25s ease;
+}
+
+.sd-recycle-card.sd-restored {
+    opacity:0;
+    transform:scale(.97);
+}
+
+.sd-recycle-card-head {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+}
+
+.sd-recycle-card h3 {
+    margin:8px 0 2px;
+    font-size:.95rem;
+    color:#101828;
+}
+
+.sd-entity-key {
+    font-size:.75rem;
+    color:#667085;
+}
+
+.sd-type-badge {
+    display:inline-flex;
+    align-items:center;
+    min-height:26px;
+    padding:4px 9px;
+    border-radius:999px;
+    background:#f2f4f7;
+    color:#475467;
+    font-size:.72rem;
+    font-weight:800;
+}
+
+.sd-restore-btn {
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    min-height:38px;
+    padding:8px 13px;
+    border:0;
+    border-radius:9px;
+    background:#11675f;
+    color:#fff;
+    font-family:inherit;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.sd-restore-btn:disabled {
+    opacity:.65;
+    cursor:wait;
+}
+
+.sd-recycle-meta {
+    display:grid;
+    gap:7px;
+    margin-top:15px;
+    padding-top:13px;
+    border-top:1px solid #edf0f2;
+}
+
+.sd-meta-row {
+    display:flex;
+    gap:8px;
+    font-size:.77rem;
+    color:#475467;
+}
+
+.sd-meta-label {
+    color:#667085;
+    font-weight:700;
+    white-space:nowrap;
+}
+
+.sd-recycle-card-foot {
+    margin-top:14px;
+}
+
+.sd-protection-note {
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    color:#9a6700;
+    font-size:.72rem;
+    font-weight:700;
+}
+
+.sd-recycle-empty,
+.sd-recycle-loading,
+.sd-recycle-error {
+    grid-column:1 / -1;
+    min-height:220px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    text-align:center;
+    border:1px dashed #d0d5dd;
+    border-radius:14px;
+    background:#fafbfc;
+    color:#667085;
+}
+
+.sd-recycle-empty i,
+.sd-recycle-loading i,
+.sd-recycle-error i {
+    font-size:1.6rem;
+}
+
+.sd-recycle-empty h3 {
+    margin:0;
+    color:#344054;
+    font-size:.95rem;
+}
+
+.sd-recycle-empty p {
+    margin:0;
+    font-size:.78rem;
+}
+
+/* END SOFT-DELETION-04B-RECYCLE-BIN-UI */
+
+/* ==========================================================================
+   SOFT-DELETION-05B-PERMANENT-DELETE-UI
+   ========================================================================== */
+
+.sd-recycle-actions {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+}
+
+.sd-permanent-delete-btn {
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    min-height:38px;
+    padding:8px 13px;
+    border:1px solid #f0b8b4;
+    border-radius:9px;
+    background:#fff5f4;
+    color:#b42318;
+    font-family:inherit;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.sd-permanent-delete-btn:hover:not(:disabled) {
+    background:#fee4e2;
+    border-color:#e99b95;
+}
+
+.sd-permanent-delete-btn:disabled {
+    opacity:.6;
+    cursor:wait;
+}
+
+.sd-permanent-overlay {
+    position:fixed;
+    inset:0;
+    z-index:130000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(15,23,42,.58);
+    backdrop-filter:blur(4px);
+    direction:rtl;
+}
+
+.sd-permanent-dialog {
+    width:min(590px, 95vw);
+    background:#fff;
+    border-radius:18px;
+    box-shadow:
+        0 28px 70px rgba(15,23,42,.3);
+    overflow:hidden;
+}
+
+.sd-permanent-head {
+    display:flex;
+    gap:13px;
+    align-items:flex-start;
+    padding:21px 22px 15px;
+    background:#fff7f6;
+    border-bottom:1px solid #f4d4d1;
+}
+
+.sd-permanent-head > i {
+    color:#b42318;
+    font-size:1.4rem;
+    margin-top:3px;
+}
+
+.sd-permanent-head h3 {
+    margin:0 0 5px;
+    color:#7a271a;
+    font-size:1rem;
+}
+
+.sd-permanent-head p {
+    margin:0;
+    color:#7a514b;
+    font-size:.79rem;
+    line-height:1.8;
+}
+
+.sd-permanent-body {
+    padding:20px 22px;
+}
+
+.sd-permanent-target {
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    margin-bottom:17px;
+    padding:12px 14px;
+    border:1px solid #eaecf0;
+    border-radius:10px;
+    background:#f9fafb;
+}
+
+.sd-permanent-target strong {
+    color:#101828;
+}
+
+.sd-permanent-target span {
+    color:#667085;
+    font-size:.78rem;
+}
+
+.sd-permanent-body label {
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-bottom:8px;
+    color:#344054;
+    font-size:.8rem;
+    font-weight:700;
+}
+
+.sd-permanent-body label b {
+    color:#b42318;
+}
+
+.sd-permanent-body input {
+    width:100%;
+    min-height:43px;
+    box-sizing:border-box;
+    padding:9px 12px;
+    border:1px solid #d0d5dd;
+    border-radius:9px;
+    font-family:inherit;
+    outline:none;
+}
+
+.sd-permanent-body input:focus {
+    border-color:#b42318;
+    box-shadow:
+        0 0 0 3px rgba(180,35,24,.08);
+}
+
+.sd-permanent-warning {
+    display:flex;
+    align-items:flex-start;
+    gap:8px;
+    margin-top:13px;
+    padding:10px 12px;
+    border-radius:9px;
+    background:#fffaeb;
+    color:#7a5a00;
+    font-size:.75rem;
+    line-height:1.7;
+}
+
+.sd-permanent-actions {
+    display:flex;
+    gap:10px;
+    justify-content:flex-end;
+    padding:15px 22px 20px;
+    border-top:1px solid #eaecf0;
+}
+
+.sd-permanent-actions button {
+    min-width:115px;
+    min-height:40px;
+    border-radius:9px;
+    font-family:inherit;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.sd-permanent-cancel {
+    border:1px solid #d0d5dd;
+    background:#fff;
+    color:#344054;
+}
+
+.sd-permanent-confirm-btn {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    border:0;
+    background:#b42318;
+    color:#fff;
+}
+
+.sd-permanent-confirm-btn:disabled {
+    background:#d0a09c;
+    cursor:not-allowed;
+}
+
+.sd-recycle-card.sd-permanently-deleted {
+    opacity:0;
+    transform:scale(.96);
+}
+
+.sd-protection-note {
+    display:none !important;
+}
+
+/* END SOFT-DELETION-05B-PERMANENT-DELETE-UI */
+
+/* ==========================================================================
+   SOFT-DELETION-09-RECOVERY-UX
+   ========================================================================== */
+
+.sd09-success-overlay {
+    position:fixed;
+    inset:0;
+    z-index:140000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(15,23,42,.52);
+    backdrop-filter:blur(4px);
+    direction:rtl;
+    animation:sd09FadeIn .18s ease;
+}
+
+.sd09-success-overlay.sd09-closing {
+    opacity:0;
+    transition:opacity .18s ease;
+}
+
+.sd09-success-card {
+    width:min(640px, 96vw);
+    display:flex;
+    gap:18px;
+    padding:24px;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:20px;
+    box-shadow:
+        0 28px 80px rgba(15,23,42,.28);
+    animation:sd09Rise .22s ease;
+}
+
+.sd09-success-icon {
+    flex:0 0 54px;
+    width:54px;
+    height:54px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background:#e8f7f2;
+    color:#087f5b;
+    font-size:1.3rem;
+}
+
+.sd09-success-content {
+    flex:1 1 auto;
+    min-width:0;
+}
+
+.sd09-success-content h3 {
+    margin:0 0 6px;
+    color:#101828;
+    font-size:1.05rem;
+}
+
+.sd09-success-content > p {
+    margin:0 0 16px;
+    color:#667085;
+    font-size:.82rem;
+    line-height:1.8;
+}
+
+.sd09-path-box {
+    padding:12px 13px;
+    border:1px solid #dfe5eb;
+    border-radius:11px;
+    background:#f8fafc;
+}
+
+.sd09-path-label {
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin-bottom:7px;
+    color:#475467;
+    font-size:.76rem;
+    font-weight:800;
+}
+
+.sd09-path-value {
+    direction:ltr;
+    text-align:left;
+    color:#1d2939;
+    font-family:
+        Consolas,
+        "Courier New",
+        monospace;
+    font-size:.76rem;
+    line-height:1.6;
+    overflow-wrap:anywhere;
+    user-select:text;
+}
+
+.sd09-success-actions {
+    display:flex;
+    flex-wrap:wrap;
+    gap:9px;
+    margin-top:16px;
+}
+
+.sd09-success-actions button {
+    min-height:39px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    padding:8px 13px;
+    border-radius:9px;
+    font-family:inherit;
+    font-size:.78rem;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.sd09-copy-path-btn {
+    border:1px solid #cfd8e3;
+    background:#fff;
+    color:#344054;
+}
+
+.sd09-open-folder-btn {
+    border:1px solid #a9d5cf;
+    background:#edf8f5;
+    color:#11675f;
+}
+
+.sd09-close-success-btn {
+    border:0;
+    background:#11675f;
+    color:#fff;
+}
+
+.sd09-success-actions button:hover:not(:disabled) {
+    transform:translateY(-1px);
+}
+
+.sd09-success-actions button:disabled {
+    opacity:.65;
+    cursor:wait;
+}
+
+.sd09-action-status {
+    min-height:20px;
+    margin-top:10px;
+    font-size:.74rem;
+    font-weight:700;
+}
+
+.sd09-action-status.success {
+    color:#087f5b;
+}
+
+.sd09-action-status.error {
+    color:#b42318;
+}
+
+@keyframes sd09FadeIn {
+    from { opacity:0; }
+    to   { opacity:1; }
+}
+
+@keyframes sd09Rise {
+    from {
+        opacity:0;
+        transform:translateY(8px) scale(.985);
+    }
+    to {
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+}
+
+@media (max-width:640px) {
+    .sd09-success-card {
+        padding:18px;
+        gap:12px;
+    }
+
+    .sd09-success-icon {
+        flex-basis:44px;
+        width:44px;
+        height:44px;
+    }
+
+    .sd09-success-actions {
+        flex-direction:column;
+    }
+
+    .sd09-success-actions button {
+        width:100%;
+    }
+}
+
+/* END SOFT-DELETION-09-RECOVERY-UX */
+
+}

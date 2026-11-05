@@ -1,0 +1,29 @@
+<section class="dw-timeline" aria-labelledby="dw-timeline-title">
+  <header class="dw-timeline-heading">
+    <div>
+      <span class="dw-eyebrow">عرض الجدولة</span>
+      <h3 id="dw-timeline-title">تواريخ الأنشطة المخططة</h3>
+      <p>يعرض التواريخ المسجلة في الخطة فقط؛ لا تُنشأ تواريخ أو مدد تلقائياً.</p>
+    </div>
+    {% if timeline.bars %}<div class="dw-timeline-range" aria-label="نطاق التواريخ المخططة"><bdi dir="ltr">{{ timeline.start|date:"Y-m-d" }}</bdi><i aria-hidden="true"></i><bdi dir="ltr">{{ timeline.end|date:"Y-m-d" }}</bdi></div>{% endif %}
+  </header>
+
+  {% if timeline.bars %}
+  <div class="dw-timeline-legend" aria-label="مفتاح المخطط"><span><i aria-hidden="true"></i>مدة مخططة</span></div>
+  <div class="dw-timeline-list">
+    {% for bar in timeline.bars %}
+    <article class="dw-timeline-row" data-schedule-chart-row data-schedule-code="{{ bar.activity_code }}">
+      <div class="dw-timeline-activity"><span class="dw-timeline-index">{{ forloop.counter|stringformat:'02d' }}</span><div><strong>{{ bar.name }}</strong><small><bdi dir="ltr">{{ bar.start|date:"Y-m-d" }}</bdi><span aria-hidden="true"> — </span><bdi dir="ltr">{{ bar.end|date:"Y-m-d" }}</bdi></small></div></div>
+      <div class="dw-timeline-track" role="img" aria-label="{{ bar.name }}: من {{ bar.start|date:'Y-m-d' }} إلى {{ bar.end|date:'Y-m-d' }}"><span class="dw-timeline-bar" style="inset-inline-start:{{ bar.left }}%;width:{{ bar.width }}%"></span></div>
+    </article>
+    {% endfor %}
+    <div class="dw-timeline-no-results" data-schedule-chart-no-results hidden>لا توجد أنشطة تطابق البحث.</div>
+  </div>
+  {% else %}
+  <div class="dw-timeline-empty"><span aria-hidden="true"><i class="fa-regular fa-calendar"></i></span><div><strong>لا توجد أنشطة مؤرخة بعد</strong><p>أدخل تاريخي البداية والنهاية للنشاط من قسم هيكل المشروع ليظهر هنا.</p></div></div>
+  {% endif %}
+
+  {% if timeline.missing %}
+  <aside class="dw-timeline-missing" role="status"><strong>أنشطة تحتاج إلى تواريخ مكتملة</strong><p>أكمل بداية ونهاية النشاط حتى يظهر ضمن المخطط.</p><ul>{% for activity in timeline.missing %}<li>{{ activity }}</li>{% endfor %}</ul></aside>
+  {% endif %}
+</section>

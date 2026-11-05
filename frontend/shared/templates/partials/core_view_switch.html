@@ -1,0 +1,8 @@
+<div class="core-view-toolbar" hidden>
+  <div><strong>طريقة العرض</strong><small>اختر العرض الأنسب لك؛ يُحفظ اختيارك في هذا المتصفح.</small></div>
+  <div class="core-view-options" role="group" aria-label="طريقة عرض البيانات">
+    <button type="button" data-view="cards" aria-pressed="true">{% include 'partials/core_icon.html' with icon='grid' %} بطاقات</button>
+    <button type="button" data-view="list" aria-pressed="false">{% include 'partials/core_icon.html' with icon='audit' %} سجلات</button>
+    {% if section == 'units' %}<button type="button" data-view="tree" aria-pressed="false">{% include 'partials/core_icon.html' with icon='organizations' %} شجرة</button>{% else %}<button type="button" data-view="compact" aria-pressed="false">عرض مكثّف</button>{% endif %}
+  </div>
+</div>

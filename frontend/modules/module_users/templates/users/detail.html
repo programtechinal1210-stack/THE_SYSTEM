@@ -1,0 +1,13 @@
+﻿{% extends "base.html" %}
+{% block title %}{{ user.full_name }} - تفاصيل المستخدم{% endblock %}
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <div class="flex items-center gap-2 mb-6"><a href="{% url 'users:list' %}" class="text-purple-600 hover:underline">المستخدمين</a><i class="fas fa-chevron-left text-xs text-gray-400"></i><span class="text-gray-800 font-medium">{{ user.full_name }}</span></div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2"><div class="bg-white rounded-lg shadow p-6"><h1 class="text-2xl font-bold text-gray-800">{{ user.full_name }}</h1><p class="text-sm text-gray-500">@{{ user.username }}</p>
+        <div class="grid grid-cols-2 gap-4 mt-4"><div><p class="text-sm text-gray-500">البريد الإلكتروني</p><p>{{ user.email }}</p></div><div><p class="text-sm text-gray-500">رقم الجوال</p><p>{{ user.phone|default:"غير محدد" }}</p></div><div><p class="text-sm text-gray-500">الدور</p><p><span class="badge badge-purple">{{ user.role }}</span></p></div><div><p class="text-sm text-gray-500">الجهة</p><p>{{ user.organization_name|default:"غير محدد" }}</p></div><div><p class="text-sm text-gray-500">المنصب</p><p>{{ user.position|default:"غير محدد" }}</p></div><div><p class="text-sm text-gray-500">الحالة</p><p>{% include "users/partials/_status_badge.html" with is_active=user.is_active %}</p></div></div></div></div>
+        <div class="space-y-4"><div class="bg-white rounded-lg shadow p-6"><h3 class="font-semibold">الإجراءات</h3><div class="flex flex-wrap gap-2 mt-2"><a href="{% url 'users:edit' user.id %}" class="btn btn-warning btn-sm"><i class="fas fa-edit ml-1"></i>تعديل</a></div></div>
+        <div class="bg-white rounded-lg shadow p-6"><h3 class="font-semibold">إحصائيات</h3><ul class="mt-2 space-y-1"><li class="flex justify-between"><span class="text-gray-500">المعاملات</span><span>{{ total_cases|default:0 }}</span></li><li class="flex justify-between"><span class="text-gray-500">المهام</span><span>{{ total_tasks|default:0 }}</span></li></ul></div></div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% load static %}
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UDE-02 Core Bootstrap Lab</title>
+  <link rel="stylesheet" href="{% static 'css/ude/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/ude/themes.css' %}">
+  <style>
+    body{margin:0;padding:2rem;background:var(--ude-color-canvas);color:var(--ude-color-text);font-family:var(--ude-font-family-sans)}
+    [data-ude-root]{max-width:50rem;margin:auto;padding:2rem;background:var(--ude-color-surface-raised);border:1px solid var(--ude-color-border);border-radius:var(--ude-radius-lg)}
+    code{direction:ltr;unicode-bidi:embed}
+  </style>
+</head>
+<body>
+  {{ ude_bootstrap|json_script:"ude-theme-bootstrap" }}
+  <main data-ude-root aria-labelledby="title">
+    <h1 id="title">مختبر Server-Side Theme Bootstrap — UDE-02</h1>
+    <p>صفحة تجريبية معزولة. لا تعرض Bearer Token ولا تكتب تفضيلات.</p>
+    <p id="state" role="status">جاري تطبيق نتيجة Core...</p>
+    <dl><dt>المصدر</dt><dd id="source"></dd><dt>Profile</dt><dd id="profile"></dd></dl>
+  </main>
+  <script src="{% static 'ude/theme-resolver-v1.1.0.js' %}"></script>
+  <script>
+    (function () {
+      var bootstrap = JSON.parse(document.getElementById('ude-theme-bootstrap').textContent);
+      var result = UDEThemeResolver.resolve({settings: bootstrap.settings}, {
+        source: bootstrap.source,
+        matchMedia: window.matchMedia.bind(window)
+      });
+      UDEThemeResolver.apply(result, document, document.documentElement);
+      document.getElementById('source').textContent = bootstrap.source;
+      document.getElementById('profile').textContent = result.profile;
+      document.getElementById('state').textContent = bootstrap.error ? 'تم استخدام المظهر الآمن: ' + bootstrap.error : 'تم تطبيق نتيجة Core الفعلية';
+    }());
+  </script>
+</body>
+</html>

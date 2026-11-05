@@ -1,0 +1,3 @@
+{% if href or first_project %}<a class="report-card" href="{% if href %}{{ href }}{% else %}{{ first_project.href }}?report={{ report }}{% endif %}">{% else %}<div class="report-card report-card-disabled" aria-disabled="true">{% endif %}
+<span class="report-card-visual {{ tone }}" aria-hidden="true"><i class="fa-solid {{ icon }}"></i></span><span class="report-card-body"><strong>{{ title }}</strong><small>{{ description }}</small></span><span class="report-card-action">عرض التقرير <i class="fa-solid fa-arrow-left"></i></span>
+{% if href or first_project %}</a>{% else %}</div>{% endif %}

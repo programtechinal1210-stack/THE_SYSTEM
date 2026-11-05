@@ -1,0 +1,38 @@
+{
+  "schema": "ude.color-palettes.v1",
+  "version": "1.0.0",
+  "default": "navy",
+  "semantic_tokens_unchanged": ["--ude-color-success", "--ude-color-warning", "--ude-color-danger"],
+  "palettes": {
+    "navy": {
+      "name_ar": "الكحلي المؤسسي",
+      "light": {"--ude-color-canvas":"#ffffff","--ude-color-surface":"#f8fafc","--ude-color-surface-raised":"#ffffff","--ude-color-text":"#111827","--ude-color-text-secondary":"#374151","--ude-color-text-muted":"#4b5563","--ude-color-border":"#9ca3af","--ude-color-brand":"#1d4ed8","--ude-color-brand-strong":"#1e3a8a","--ude-color-accent":"#115e59","--ude-color-focus":"#1d4ed8","--ude-color-on-brand":"#ffffff"},
+      "dark": {"--ude-color-canvas":"#111827","--ude-color-surface":"#1f2937","--ude-color-surface-raised":"#273449","--ude-color-text":"#f9fafb","--ude-color-text-secondary":"#e5e7eb","--ude-color-text-muted":"#d1d5db","--ude-color-border":"#9ca3af","--ude-color-brand":"#93c5fd","--ude-color-brand-strong":"#bfdbfe","--ude-color-accent":"#5eead4","--ude-color-focus":"#bfdbfe","--ude-color-on-brand":"#172554"}
+    },
+    "royal-blue": {
+      "name_ar": "الأزرق الملكي",
+      "light": {"--ude-color-canvas":"#ffffff","--ude-color-surface":"#eff6ff","--ude-color-surface-raised":"#ffffff","--ude-color-text":"#111827","--ude-color-text-secondary":"#1e3a8a","--ude-color-text-muted":"#374151","--ude-color-border":"#93c5fd","--ude-color-brand":"#1e40af","--ude-color-brand-strong":"#1e3a8a","--ude-color-accent":"#2563eb","--ude-color-focus":"#1d4ed8","--ude-color-on-brand":"#ffffff"},
+      "dark": {"--ude-color-canvas":"#0b1220","--ude-color-surface":"#111c33","--ude-color-surface-raised":"#172554","--ude-color-text":"#f8fafc","--ude-color-text-secondary":"#dbeafe","--ude-color-text-muted":"#bfdbfe","--ude-color-border":"#60a5fa","--ude-color-brand":"#93c5fd","--ude-color-brand-strong":"#bfdbfe","--ude-color-accent":"#60a5fa","--ude-color-focus":"#dbeafe","--ude-color-on-brand":"#172554"}
+    },
+    "emerald": {
+      "name_ar": "الأخضر الزمردي",
+      "light": {"--ude-color-canvas":"#ffffff","--ude-color-surface":"#ecfdf5","--ude-color-surface-raised":"#ffffff","--ude-color-text":"#102a22","--ude-color-text-secondary":"#064e3b","--ude-color-text-muted":"#365b50","--ude-color-border":"#86efac","--ude-color-brand":"#047857","--ude-color-brand-strong":"#065f46","--ude-color-accent":"#059669","--ude-color-focus":"#047857","--ude-color-on-brand":"#ffffff"},
+      "dark": {"--ude-color-canvas":"#071a14","--ude-color-surface":"#0d2b21","--ude-color-surface-raised":"#123c2e","--ude-color-text":"#f0fdf4","--ude-color-text-secondary":"#d1fae5","--ude-color-text-muted":"#a7f3d0","--ude-color-border":"#34d399","--ude-color-brand":"#6ee7b7","--ude-color-brand-strong":"#a7f3d0","--ude-color-accent":"#5eead4","--ude-color-focus":"#a7f3d0","--ude-color-on-brand":"#064e3b"}
+    },
+    "modern-purple": {
+      "name_ar": "البنفسجي العصري",
+      "light": {"--ude-color-canvas":"#ffffff","--ude-color-surface":"#faf5ff","--ude-color-surface-raised":"#ffffff","--ude-color-text":"#21152f","--ude-color-text-secondary":"#4c1d95","--ude-color-text-muted":"#5b4b6b","--ude-color-border":"#c4b5fd","--ude-color-brand":"#6d28d9","--ude-color-brand-strong":"#4c1d95","--ude-color-accent":"#7c3aed","--ude-color-focus":"#6d28d9","--ude-color-on-brand":"#ffffff"},
+      "dark": {"--ude-color-canvas":"#160d24","--ude-color-surface":"#25123d","--ude-color-surface-raised":"#32185a","--ude-color-text":"#faf5ff","--ude-color-text-secondary":"#ede9fe","--ude-color-text-muted":"#ddd6fe","--ude-color-border":"#a78bfa","--ude-color-brand":"#c4b5fd","--ude-color-brand-strong":"#ddd6fe","--ude-color-accent":"#c084fc","--ude-color-focus":"#ede9fe","--ude-color-on-brand":"#4c1d95"}
+    },
+    "turquoise": {
+      "name_ar": "الفيروزي",
+      "light": {"--ude-color-canvas":"#ffffff","--ude-color-surface":"#ecfeff","--ude-color-surface-raised":"#ffffff","--ude-color-text":"#12303a","--ude-color-text-secondary":"#164e63","--ude-color-text-muted":"#3f6370","--ude-color-border":"#67e8f9","--ude-color-brand":"#0f766e","--ude-color-brand-strong":"#134e4a","--ude-color-accent":"#0891b2","--ude-color-focus":"#0e7490","--ude-color-on-brand":"#ffffff"},
+      "dark": {"--ude-color-canvas":"#071b20","--ude-color-surface":"#0c2f35","--ude-color-surface-raised":"#10464d","--ude-color-text":"#ecfeff","--ude-color-text-secondary":"#cffafe","--ude-color-text-muted":"#a5f3fc","--ude-color-border":"#22d3ee","--ude-color-brand":"#5eead4","--ude-color-brand-strong":"#99f6e4","--ude-color-accent":"#67e8f9","--ude-color-focus":"#cffafe","--ude-color-on-brand":"#134e4a"}
+    },
+    "burgundy": {
+      "name_ar": "العنابي",
+      "light": {"--ude-color-canvas":"#ffffff","--ude-color-surface":"#fff1f2","--ude-color-surface-raised":"#ffffff","--ude-color-text":"#2d1118","--ude-color-text-secondary":"#881337","--ude-color-text-muted":"#69434c","--ude-color-border":"#fda4af","--ude-color-brand":"#9f1239","--ude-color-brand-strong":"#881337","--ude-color-accent":"#be123c","--ude-color-focus":"#9f1239","--ude-color-on-brand":"#ffffff"},
+      "dark": {"--ude-color-canvas":"#210b12","--ude-color-surface":"#38111d","--ude-color-surface-raised":"#50152a","--ude-color-text":"#fff1f2","--ude-color-text-secondary":"#ffe4e6","--ude-color-text-muted":"#fecdd3","--ude-color-border":"#fb7185","--ude-color-brand":"#fda4af","--ude-color-brand-strong":"#fecdd3","--ude-color-accent":"#fb7185","--ude-color-focus":"#ffe4e6","--ude-color-on-brand":"#881337"}
+    }
+  }
+}

@@ -1,0 +1,1 @@
+﻿<div class="bg-white rounded-lg shadow p-6"><h3 class="font-semibold mb-3">آخر النشاطات</h3><ul class="space-y-2">{% for case in user_cases %}<li class="text-sm flex justify-between"><span>{{ case.subject|truncatechars:30 }}</span><span class="text-gray-500">{{ case.created_at }}</span></li>{% empty %}<li class="text-gray-500 text-sm">لا توجد نشاطات</li>{% endfor %}</ul></div>

@@ -1,0 +1,18 @@
+﻿<div>
+    {% if alerts %}
+        {% for a in alerts %}
+        <div class="alert-item {% if not a.is_active %}inactive{% endif %}">
+            <div class="alert-info">
+                <span class="badge {% if a.severity_threshold == 'critical' %}badge-danger{% elif a.severity_threshold == 'warning' %}badge-warning{% else %}badge-info{% endif %}">{{ a.severity_threshold|default:"info" }}</span>
+                <span class="alert-name">{{ a.name|default:"تنبيه" }}</span>
+            </div>
+            <div class="alert-meta">
+                <span class="badge badge-secondary">{{ a.module|default:"--" }}</span>
+                <span style="font-size:11px;">{{ a.trigger_count|default:0 }} مرة</span>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p style="text-align:center;padding:40px;">لا توجد تنبيهات</p>
+    {% endif %}
+</div>

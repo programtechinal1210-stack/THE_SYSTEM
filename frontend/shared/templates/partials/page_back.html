@@ -1,0 +1,29 @@
+{% if request.path != '/' %}{% if request.path|slice:':6' != '/auth/' %}
+<nav class="page-back-nav" aria-label="العودة إلى الصفحة السابقة">
+ <a href="{{ core_back_url|default:'/' }}" class="btn btn-secondary page-back-link" data-core-back-link data-fallback-url="{{ core_back_url|default:'/' }}" title="العودة إلى الصفحة السابقة"><span class="page-back-icon" aria-hidden="true">{% include 'partials/core_icon.html' with icon='arrow' %}</span><span>رجوع</span></a>
+</nav>
+<script>
+(function () {
+    'use strict';
+    var link = document.querySelector('[data-core-back-link]');
+    if (!link || link.dataset.backReady) return;
+    link.dataset.backReady = 'true';
+    link.addEventListener('click', function (event) {
+        var fallback = link.dataset.fallbackUrl || '/';
+        var previous = document.referrer;
+        try {
+            var previousUrl = previous ? new URL(previous, window.location.origin) : null;
+            var blocked = previousUrl && /\/(auth|delete|logout|action|export)(\/|$)/.test(previousUrl.pathname);
+            if (previousUrl && previousUrl.origin === window.location.origin && previousUrl.pathname !== window.location.pathname && !blocked && window.history.length > 1) {
+                event.preventDefault();
+                window.history.back();
+            } else {
+                link.setAttribute('href', fallback);
+            }
+        } catch (error) {
+            link.setAttribute('href', fallback);
+        }
+    });
+})();
+</script>
+{% endif %}{% endif %}

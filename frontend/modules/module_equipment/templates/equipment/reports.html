@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load static %}
+{% block module_token_bridge %}<link rel="stylesheet" href="{% static 'module_equipment/core-token-bridge.css' %}?v=20261024">{% endblock %}
+{% block title %}تقارير المعدات{% endblock %}
+{% block content %}
+<main class="container-fluid py-4 equipment-legacy-page" dir="rtl">
+  <header class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+    <div>
+      <h1>تحليلات المعدات والتكاليف</h1>
+      <p class="text-muted">الفترة {{ report.start_date }} إلى {{ report.end_date }} — تُعرض القيم المخزنية المرحّلة بعملة تقييمها دون دمج عملات.</p>
+    </div>
+    <div class="report-actions d-flex gap-2">
+      <button class="btn btn-outline-secondary" type="button" onclick="window.print()">طباعة</button>
+      {% if can_export %}
+      <a class="btn btn-primary" href="{% url 'equipment:reports-export' %}?{{ export_query }}">تصدير Excel</a>
+      {% endif %}
+    </div>
+  </header>
+  <form method="get" class="report-actions report-filters card card-body mb-4">
+    <div class="report-filter-field">
+      <label class="form-label" for="report-start">من تاريخ</label>
+      <input class="form-control" id="report-start" name="start_date" type="date" required value="{{ report.start_date }}">
+    </div>
+    <div class="report-filter-field">
+      <label class="form-label" for="report-end">إلى تاريخ</label>
+      <input class="form-control" id="report-end" name="end_date" type="date" required value="{{ report.end_date }}">
+    </div>
+    <div class="report-filter-field">
+      <label class="form-label" for="report-asset">المعدة (اختياري)</label>
+      <select class="form-select" id="report-asset" name="asset_id">
+        <option value="">كل المعدات</option>
+        {% for asset in report.asset_options %}
+        <option value="{{ asset.id }}"{% if params.asset_id == asset.id %} selected{% endif %}>{{ asset.asset_code }} — {{ asset.asset_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="report-filter-field"><button class="btn btn-outline-primary" type="submit">تطبيق الفلاتر</button></div>
+  </form>
+  <section class="row g-3 mb-4" aria-label="مؤشرات التقرير">
+    <div class="col-md-4"><article class="card h-100"><div class="card-body"><h2 class="h6">المعدات ضمن النطاق</h2><strong>{{ report.summary.asset_count }}</strong></div></article></div>
+    <div class="col-md-4"><article class="card h-100"><div class="card-body"><h2 class="h6">ساعات التشغيل المتحققة</h2><strong>{{ report.summary.working_hours }}</strong><small class="d-block text-muted">{{ report.summary.verified_operations }} سجل تشغيل</small></div></article></div>
+    <div class="col-md-4"><article class="card h-100"><div class="card-body"><h2 class="h6">حركات الوقود / القطع</h2><strong>{{ report.summary.fuel_events }} / {{ report.summary.parts_installed }}+{{ report.summary.parts_removed }}</strong></div></article></div>
+  </section>
+  <section class="card mb-4"><div class="card-body">
+    <h2 class="h5">المعدات وفترات التشغيل</h2>
+    <div class="table-responsive"><table class="table table-sm">
+      <thead><tr><th>الرمز</th><th>المعدة</th><th>الفئة</th><th>العداد</th><th>التشغيل المتحقق</th><th>عمل (د)</th><th>خمول (د)</th><th>توقف (د)</th></tr></thead>
+      <tbody>{% for row in report.assets %}<tr><td>{{ row.asset_code }}</td><td>{{ row.asset_name }}</td><td>{{ row.category_name }}</td><td>{{ row.meter_type_locked }} / {{ row.meter_unit_locked }}</td><td>{{ row.verified_operations }}</td><td>{{ row.working_minutes }}</td><td>{{ row.idle_minutes }}</td><td>{{ row.downtime_minutes }}</td></tr>{% empty %}<tr><td colspan="8">لا توجد معدات مطابقة.</td></tr>{% endfor %}</tbody>
+    </table></div>
+  </div></section>
+  <section class="card mb-4"><div class="card-body">
+    <h2 class="h5">الوقود المصروف والمستهلك</h2>
+    <p class="small text-muted">الصرف لا يعني الاستهلاك؛ كل قيمة معروضة حسب نوع الطاقة ووحدتها ولا تُقارن وحدات مختلفة.</p>
+    <div class="table-responsive"><table class="table table-sm">
+      <thead><tr><th>المعدة</th><th>الحركة</th><th>الطاقة</th><th>الوحدة</th><th>عدد الحركات</th><th>الكمية</th></tr></thead>
+      <tbody>{% for row in report.fuel %}<tr><td>{{ row.asset_id }}</td><td>{{ row.event_type }}</td><td>{{ row.energy_type }}</td><td>{{ row.unit }}</td><td>{{ row.event_count }}</td><td>{{ row.quantity }}</td></tr>{% empty %}<tr><td colspan="6">لا توجد حركات وقود متحققة ضمن الفترة.</td></tr>{% endfor %}</tbody>
+    </table></div>
+  </div></section>
+  <section class="card mb-4"><div class="card-body">
+    <h2 class="h5">مقارنة الفئات المتجانسة</h2>
+    <div class="table-responsive"><table class="table table-sm">
+      <thead><tr><th>الفئة</th><th>نوع العداد</th><th>الوحدة</th><th>معدات</th><th>تشغيل متحقق</th><th>عمل (د)</th></tr></thead>
+      <tbody>{% for row in report.category_comparison %}<tr><td>{{ row.category_name }}</td><td>{{ row.meter_type }}</td><td>{{ row.meter_unit }}</td><td>{{ row.asset_count }}</td><td>{{ row.verified_operations }}</td><td>{{ row.working_minutes }}</td></tr>{% empty %}<tr><td colspan="6">لا توجد مجموعة مقارنة.</td></tr>{% endfor %}</tbody>
+    </table></div>
+  </div></section>
+  {% if can_view_costs %}
+  <section class="card mb-4"><div class="card-body">
+    <h2 class="h5">قيم حركة Inventory (ليست تكلفة تشغيل كاملة)</h2>
+    {% if report.cost_coverage %}<p class="small text-muted">التغطية: {{ report.cost_coverage.status }}؛ الصيانة: {{ report.cost_coverage.maintenance_costs }}؛ تحويل العملات: {{ report.cost_coverage.currency_conversion }}.</p>{% endif %}
+    <div class="table-responsive"><table class="table table-sm">
+      <thead><tr><th>المعدة</th><th>العملة</th><th>صرف الوقود</th><th>إرجاع الوقود</th><th>صرف القطع</th><th>إرجاع القطع</th><th>الصافي المخزني</th></tr></thead>
+      <tbody>{% for row in report.costs %}<tr><td>{{ row.asset_id }}</td><td>{{ row.currency }}</td><td>{{ row.fuel_issue_value }}</td><td>{{ row.fuel_return_value }}</td><td>{{ row.part_issue_value }}</td><td>{{ row.part_return_value }}</td><td>{{ row.net_inventory_value }}</td></tr>{% empty %}<tr><td colspan="7">لا تتوفر قيم Inventory مرحّلة ضمن الفترة والنطاق.</td></tr>{% endfor %}</tbody>
+    </table></div>
+  </div></section>
+  {% endif %}
+  <section class="card"><div class="card-body"><h2 class="h5">حدود البيانات والرؤى</h2><ul>{% for insight in report.insights %}<li>{{ insight }}</li>{% endfor %}</ul></div></section>
+</main>
+<style>
+  .report-filters {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem 1rem;align-items:end}
+  .report-filter-field {min-width:0}
+  .report-filter-field label {position:static;display:block;margin-bottom:.35rem}
+  .report-filter-field .form-control,.report-filter-field .form-select,.report-filter-field .btn {width:100%;min-width:0}
+  @media(max-width:767px) {.report-filters {grid-template-columns:minmax(0,1fr)}}
+  @media print {.report-actions,nav,footer {display:none!important} body {background:#fff} .card {break-inside:avoid} main {max-width:none!important}}
+</style>
+{% endblock %}

@@ -1,0 +1,92 @@
+﻿<!-- ============================================================
+     بطاقات الإحصائيات - 6 بطاقات
+     يتم تحديثها عبر HTMX أو JavaScript
+     ============================================================ -->
+<div class="stats-grid">
+    <!-- إجمالي السجلات -->
+    <div class="stat-card blue">
+        <div class="stat-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+        </div>
+        <div class="stat-info">
+            <div class="stat-label">إجمالي السجلات</div>
+            <div class="stat-value" id="statTotalActions">0</div>
+            <div class="stat-change" id="statTotalChange">--</div>
+        </div>
+    </div>
+
+    <!-- المستخدمون النشطون -->
+    <div class="stat-card green">
+        <div class="stat-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4-4v2"/><circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
+            </svg>
+        </div>
+        <div class="stat-info">
+            <div class="stat-label">مستخدمون نشطون</div>
+            <div class="stat-value" id="statUniqueUsers">0</div>
+            <div class="stat-change" id="statUsersChange">--</div>
+        </div>
+    </div>
+
+    <!-- متابعات معلقة -->
+    <div class="stat-card orange">
+        <div class="stat-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
+                <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+            </svg>
+        </div>
+        <div class="stat-info">
+            <div class="stat-label">متابعات معلقة</div>
+            <div class="stat-value" id="statPendingFollowups">0</div>
+            <div class="stat-change" id="statFollowupChange">--</div>
+        </div>
+    </div>
+
+    <!-- حالات شاذة -->
+    <div class="stat-card red">
+        <div class="stat-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+        </div>
+        <div class="stat-info">
+            <div class="stat-label">حالات شاذة</div>
+            <div class="stat-value" id="statOpenAnomalies">0</div>
+            <div class="stat-change" id="statAnomalyChange">--</div>
+        </div>
+    </div>
+
+    <!-- متوسط وقت التنفيذ -->
+    <div class="stat-card purple">
+        <div class="stat-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+        </div>
+        <div class="stat-info">
+            <div class="stat-label">متوسط وقت التنفيذ</div>
+            <div class="stat-value" id="statAvgDuration">0ms</div>
+            <div class="stat-change" id="statDurationChange">--</div>
+        </div>
+    </div>
+
+    <!-- عمليات التصدير -->
+    <div class="stat-card teal">
+        <div class="stat-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+        </div>
+        <div class="stat-info">
+            <div class="stat-label">عمليات التصدير</div>
+            <div class="stat-value" id="statTotalExports">0</div>
+            <div class="stat-change" id="statExportChange">--</div>
+        </div>
+    </div>
+</div>

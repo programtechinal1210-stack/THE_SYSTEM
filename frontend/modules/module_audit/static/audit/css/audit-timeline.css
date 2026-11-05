@@ -1,0 +1,104 @@
+﻿/* ============================================================
+   audit-timeline.css - أنماط الخط الزمني للنشاطات
+   ============================================================ */
+
+.activity-timeline {
+    position: relative;
+    padding-right: 24px;
+}
+
+.activity-timeline::before {
+    content: '';
+    position: absolute;
+    right: 8px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: var(--border-color);
+    border-radius: 1px;
+}
+
+.timeline-item {
+    position: relative;
+    padding-right: 18px;
+    padding-bottom: 14px;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-dot {
+    position: absolute;
+    right: 0;
+    top: 6px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--bg-card);
+    box-shadow: 0 0 0 2px var(--audit-primary-light);
+    z-index: 1;
+}
+
+.timeline-dot.blue { box-shadow: 0 0 0 2px #3b82f6; background: #3b82f6; }
+.timeline-dot.green { box-shadow: 0 0 0 2px #22c55e; background: #22c55e; }
+.timeline-dot.orange { box-shadow: 0 0 0 2px #f59e0b; background: #f59e0b; }
+.timeline-dot.red { box-shadow: 0 0 0 2px #ef4444; background: #ef4444; }
+
+.timeline-content {
+    background: rgba(0,0,0,0.015);
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+}
+
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.timeline-header .user-name {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--text-primary);
+}
+
+.timeline-header .time-badge {
+    font-size: 10px;
+    color: var(--text-muted);
+    background: rgba(0,0,0,0.03);
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+.action-text {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.action-text strong {
+    color: var(--text-primary);
+}
+
+.entity-name {
+    color: var(--audit-primary-light);
+    font-weight: 500;
+}
+
+.action-details {
+    font-size: 11px;
+    color: var(--text-muted);
+    background: rgba(0,0,0,0.02);
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin-top: 6px;
+    line-height: 1.4;
+}
+
+/* صف حرج في التايملاين */
+.timeline-item.critical .timeline-content {
+    background: rgba(239, 68, 68, 0.03);
+    border-color: rgba(239, 68, 68, 0.15);
+}

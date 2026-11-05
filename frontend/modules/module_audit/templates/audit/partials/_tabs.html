@@ -1,0 +1,59 @@
+﻿<!-- ============================================================
+     التبويبات - 7 تبويبات رئيسية
+     ============================================================ -->
+<div class="tabs-modern" id="mainTabs">
+    <button class="tab active" data-tab="dashboard" hx-get="/audit/dashboard/" hx-target="#tab-dashboard" hx-trigger="click once">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        <span>لوحة التدقيق</span>
+    </button>
+
+    <button class="tab" data-tab="logs" hx-get="/audit/logs/" hx-target="#tab-logs" hx-trigger="click once">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        <span>سجل التدقيق</span>
+        <span class="tab-badge" id="logsCount">{{ audit_count|default:0 }}</span>
+    </button>
+
+    <button class="tab" data-tab="followups" hx-get="/audit/followups/" hx-target="#tab-followups" hx-trigger="click once">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+        </svg>
+        <span>المتابعات</span>
+        <span class="tab-badge" id="followupsCount">{{ followup_count|default:0 }}</span>
+    </button>
+
+    <button class="tab" data-tab="execution" hx-get="/audit/execution/" hx-target="#tab-execution" hx-trigger="click once">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+        </svg>
+        <span>سجل التنفيذ</span>
+    </button>
+
+    <button class="tab" data-tab="anomalies" hx-get="/audit/anomalies/" hx-target="#tab-anomalies" hx-trigger="click once">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span>الحالات الشاذة</span>
+        <span class="tab-badge" id="anomaliesCount">{{ anomaly_count|default:0 }}</span>
+    </button>
+
+    <button class="tab" data-tab="alerts" hx-get="/audit/alerts/" hx-target="#tab-alerts" hx-trigger="click once">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
+        </svg>
+        <span>التنبيهات</span>
+        <span class="tab-badge" id="alertsCount">{{ alert_count|default:0 }}</span>
+    </button>
+
+    <button class="tab" data-tab="exports" hx-get="/audit/exports/" hx-target="#tab-exports" hx-trigger="click once">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        <span>التصدير</span>
+    </button>
+</div>

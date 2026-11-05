@@ -1,0 +1,82 @@
+{% if mode == 'movements' %}
+<section class="inventory-movements" aria-labelledby="movements-title">
+  <div class="inventory-movements__topline">
+    <a href="/inventory/">← العودة إلى المخازن والمواد</a>
+    <span>قيود دفتر الحركات المرحلة ضمن نطاق الجهة والمخزن</span>
+  </div>
+
+  <header class="inventory-movements__hero">
+    <div>
+      <span class="inventory-movements__eyebrow">المخازن والمواد</span>
+      <h1 id="movements-title">دفتر الحركات المخزنية</h1>
+      <p>متابعة حركات دخول وخروج وتحويل المواد وربطها بالمستندات المرحلة.</p>
+    </div>
+    <span class="inventory-movements__hero-icon" aria-hidden="true">↔</span>
+  </header>
+
+  {% if movement_error %}<p class="inventory-movements__notice" role="alert">{{ movement_error }}</p>{% endif %}
+
+  {% if not selected_warehouse %}
+    <div class="inventory-movements__empty" role="status">
+      <span aria-hidden="true">▤</span>
+      <h2>لا يوجد مخزن محدد</h2>
+      <p>اختر مخزناً ضمن جهة العمل الحالية لعرض القيود المرحلة.</p>
+    </div>
+  {% else %}
+    <div class="inventory-movements__summary" aria-label="ملخص الحركات">
+      <article><span>عدد الحركات</span><strong>{{ movement_summary.movement_count|default:'0' }}</strong><small>ضمن الفلاتر الحالية</small></article>
+      <article><span>المستندات المرحلة</span><strong>{{ movement_summary.document_count|default:'0' }}</strong><small>مستندات أصلية فريدة</small></article>
+      <article class="is-positive"><span>الأصناف المتحركة</span><strong>{{ movement_summary.item_count|default:'0' }}</strong><small>دون جمع وحدات مختلفة</small></article>
+    </div>
+
+    <form method="get" class="inventory-movements__filters" aria-label="تصفية دفتر الحركات">
+      <input type="hidden" name="mode" value="movements">
+      <input type="hidden" name="warehouse_id" value="{{ selected_warehouse }}">
+      <label class="inventory-movements__search">⌕<span class="sr-only">البحث</span><input name="movement_search" value="{{ movement_search }}" placeholder="ابحث باسم الصنف أو الرمز أو رقم المستند"></label>
+      <label>نوع الحركة<select name="movement_type"><option value="">كل الأنواع</option>{% for movement in movement_types %}<option value="{{ movement.value }}" {% if movement.value == movement_type %}selected{% endif %}>{{ movement.label }}</option>{% endfor %}</select></label>
+      <label>من تاريخ<input type="date" name="movement_from" value="{{ movement_from }}"></label>
+      <label>إلى تاريخ<input type="date" name="movement_to" value="{{ movement_to }}"></label>
+      <button class="inventory-movements__button" type="submit">تطبيق</button>
+      <a class="inventory-movements__reset" href="{{ base_url }}">إعادة ضبط</a>
+    </form>
+
+    <div class="inventory-movements__toolbar">
+      <div><strong>قائمة دفتر الحركات</strong><span>القيود المرحلة فعلياً فقط</span></div>
+      {% if can_export_movements %}<button class="inventory-movements__export" type="button" data-movements-export>تصدير النتائج ↓</button>{% endif %}
+    </div>
+
+    {% if movement_summary.movement_count %}
+      <div class="inventory-movements__table-wrap">
+        <table class="inventory-movements__table">
+          <caption class="sr-only">دفتر الحركات المخزنية</caption>
+          <thead><tr><th>#</th><th>التاريخ</th><th>رقم المستند</th><th>الصنف</th><th>نوع الحركة</th><th>المخزن / الموقع</th><th>وارد</th><th>صادر</th><th>الرصيد بعد الحركة</th><th>الحالة</th><th>الإجراءات</th></tr></thead>
+          <tbody>
+            {% for row in records %}
+              <tr data-movement-row>
+                <td data-label="#"><span class="inventory-movements__seq">{{ row.ledger_seq }}</span></td>
+                <td data-label="التاريخ"><time datetime="{{ row.posted_at|default:'' }}">{{ row.posted_at|default:'—' }}</time></td>
+                <td data-label="رقم المستند">{% if row.document_id %}<a class="inventory-movements__document" href="{{ base_url }}&document={{ row.document_id }}">{{ row.document_no }}</a>{% else %}<span>مرجع غير متاح</span>{% endif %}</td>
+                <td data-label="الصنف"><strong>{{ row.item_name }}</strong><small>{{ row.item_code|default:'بدون رمز' }}</small></td>
+                <td data-label="نوع الحركة"><span class="inventory-movements__type inventory-movements__type--{{ row.direction }}">{{ row.movement_type_label }}</span><small>{% if row.direction == 'in' %}وارد{% elif row.direction == 'out' %}صادر{% else %}بدون تغير كمي{% endif %}</small></td>
+                <td data-label="المخزن / الموقع"><strong>{{ selected_warehouse_name|default:'المخزن الحالي' }}</strong><small>{{ row.location_name }}</small></td>
+                <td data-label="وارد" class="qty qty--in">{% if row.direction == 'in' %}+{{ row.quantity_delta }}{% else %}—{% endif %}<small>{{ row.unit_name }}</small></td>
+                <td data-label="صادر" class="qty qty--out">{% if row.direction == 'out' %}{{ row.quantity_delta }}{% else %}—{% endif %}<small>{{ row.unit_name }}</small></td>
+                <td data-label="الرصيد بعد الحركة" class="qty qty--balance">{{ row.new_qty|default:'غير متاح' }}<small>{{ row.unit_name }}</small></td>
+                <td data-label="الحالة"><span class="inventory-movements__status">مرحّل</span></td>
+                <td data-label="الإجراءات"><details class="inventory-movements__details"><summary>عرض</summary><div><p><b>القيد:</b> {{ row.ledger_seq }}</p><p><b>الرصيد قبل:</b> {{ row.prev_qty|default:'غير متاح' }} {{ row.unit_name }}</p><p><b>الرصيد بعد:</b> {{ row.new_qty|default:'غير متاح' }} {{ row.unit_name }}</p>{% if row.value_delta_valuation %}<p><b>تغير القيمة:</b> {{ row.value_delta_valuation }} {{ readiness.valuation_currency }}</p>{% endif %}{% if row.document_id %}<a href="{{ base_url }}&document={{ row.document_id }}">فتح المستند الأصلي</a>{% endif %}</div></details></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <nav class="inventory-movements__pagination" aria-label="ترقيم صفحات دفتر الحركات">
+        {% if page_number > 1 %}<a href="{{ base_url }}&movement_search={{ movement_search|urlencode }}&movement_type={{ movement_type|urlencode }}&movement_from={{ movement_from }}&movement_to={{ movement_to }}&page={{ page_number|add:'-1' }}">السابق</a>{% endif %}
+        <span>صفحة {{ page_number }} من {{ page_count }}</span>
+        {% if page_number < page_count %}<a href="{{ base_url }}&movement_search={{ movement_search|urlencode }}&movement_type={{ movement_type|urlencode }}&movement_from={{ movement_from }}&movement_to={{ movement_to }}&page={{ page_number|add:'1' }}">التالي</a>{% endif %}
+      </nav>
+    {% else %}
+      <div class="inventory-movements__empty inventory-movements__empty--compact" role="status"><span aria-hidden="true">⌁</span><h2>لا توجد حركات مطابقة</h2><p>غيّر البحث أو الفلاتر، أو تحقق من وجود مستندات مرحلة ضمن هذا المخزن.</p></div>
+    {% endif %}
+  {% endif %}
+</section>
+{% endif %}

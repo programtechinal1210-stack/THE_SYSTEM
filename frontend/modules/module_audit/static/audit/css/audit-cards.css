@@ -1,0 +1,301 @@
+﻿/* ============================================================
+   audit-cards.css - أنماط البطاقات
+   ============================================================ */
+
+/* ===== بطاقات الإحصائيات ===== */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    border-radius: var(--audit-radius-lg);
+    padding: 16px;
+    box-shadow: var(--audit-shadow-sm);
+    border: 1px solid var(--border-color);
+    border-right: 4px solid var(--audit-primary-light);
+    transition: var(--audit-transition);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--audit-shadow-md);
+}
+
+.stat-card .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.stat-card.blue .stat-icon { background: rgba(59, 130, 246, 0.1); }
+.stat-card.green .stat-icon { background: rgba(34, 197, 94, 0.1); }
+.stat-card.orange .stat-icon { background: rgba(245, 158, 11, 0.1); }
+.stat-card.red .stat-icon { background: rgba(239, 68, 68, 0.1); }
+.stat-card.purple .stat-icon { background: rgba(139, 92, 246, 0.1); }
+.stat-card.teal .stat-icon { background: rgba(20, 184, 166, 0.1); }
+
+.stat-card.blue { border-right-color: #3b82f6; }
+.stat-card.green { border-right-color: #22c55e; }
+.stat-card.orange { border-right-color: #f59e0b; }
+.stat-card.red { border-right-color: #ef4444; }
+.stat-card.purple { border-right-color: #8b5cf6; }
+.stat-card.teal { border-right-color: #14b8a6; }
+
+.stat-card .stat-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.stat-card .stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.stat-card .stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-top: 2px;
+}
+
+.stat-card .stat-change {
+    font-size: 10px;
+    margin-top: 2px;
+}
+
+.stat-card .stat-change.up { color: #22c55e; }
+.stat-card .stat-change.down { color: #ef4444; }
+
+/* ===== بطاقة الشذوذ ===== */
+.anomaly-card {
+    background: var(--bg-card);
+    border-radius: var(--audit-radius-lg);
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border-color);
+    border-right: 4px solid var(--audit-warning);
+    transition: var(--audit-transition);
+}
+
+.anomaly-card.critical {
+    border-right-color: var(--audit-danger);
+    background: rgba(239, 68, 68, 0.02);
+}
+
+.anomaly-card.warning {
+    border-right-color: var(--audit-warning);
+    background: rgba(245, 158, 11, 0.02);
+}
+
+.anomaly-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.anomaly-type {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.anomaly-date {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.anomaly-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+
+.anomaly-description {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.anomaly-meta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.anomaly-evidence {
+    margin-bottom: 10px;
+}
+
+.anomaly-evidence summary {
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--audit-primary-light);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.evidence-content {
+    background: rgba(0,0,0,0.02);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 6px;
+}
+
+.anomaly-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* ===== عنصر التنبيه ===== */
+.alert-item {
+    background: var(--bg-card);
+    border-radius: var(--audit-radius-lg);
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-color);
+    transition: var(--audit-transition);
+}
+
+.alert-item.inactive {
+    opacity: 0.6;
+}
+
+.alert-main {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.alert-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.alert-icon.critical { background: #fee2e2; color: #b91c1c; }
+.alert-icon.warning { background: #fef3c7; color: #b45309; }
+.alert-icon.info { background: #dbeafe; color: #1d4ed8; }
+
+.alert-info {
+    flex: 1;
+}
+
+.alert-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.alert-description {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.alert-details {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.detail-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+}
+
+.detail-label {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.alert-channels {
+    margin-bottom: 8px;
+}
+
+.channels-list {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+}
+
+.channel-badge {
+    font-size: 11px;
+    background: rgba(0,0,0,0.03);
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+.alert-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 10px;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.alert-actions {
+    display: flex;
+    gap: 4px;
+    justify-content: flex-end;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-color);
+}
+
+.alert-footer {
+    margin-top: 8px;
+}

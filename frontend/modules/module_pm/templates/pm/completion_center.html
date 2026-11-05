@@ -1,0 +1,73 @@
+{% extends "pm/reference_base.html" %}
+{% load static %}
+{% block title %}مركز الاكتمال والاستلام — إدارة المشاريع{% endblock %}
+{% block extra_head %}{{ block.super }}<link rel="stylesheet" href="{% static 'pm/completion.css' %}?v=20261018-v1">{% endblock %}
+{% block pm_content %}
+<main class="pm-completion" aria-labelledby="completion-center-title">
+    <nav class="completion-breadcrumb" aria-label="مسار التنقل">
+        <a href="/pm/">إدارة المشاريع</a><span>/</span><strong>الاكتمال والاستلام</strong>
+    </nav>
+    <header class="completion-hero">
+        <div>
+            <span class="completion-eyebrow">مراجعة وإغلاق المشروع</span>
+            <h1 id="completion-center-title">مركز الاكتمال والاستلام</h1>
+            <p>تابع الاكتمال التنفيذي منفصلاً عن المراجعة والاستلام والإغلاق الرسمي.</p>
+        </div>
+        <span class="completion-hero-mark" aria-hidden="true">✓</span>
+    </header>
+
+    <section class="completion-kpis" aria-label="ملخص مركز الاكتمال">
+        <article><span>المشاريع ضمن نطاقك</span><strong>{{ total_projects }}</strong></article>
+        <article><span>مشاريع بها أعمال مكتملة تنفيذياً</span><strong>{{ total_ready }}</strong></article>
+        <article><span>ملاحظات قيد المتابعة</span><strong>{{ total_open_issues }}</strong></article>
+        <article><span>مغلقة رسمياً</span><strong>{{ total_closed }}</strong></article>
+    </section>
+
+    <section class="completion-project-section" aria-labelledby="completion-projects-title">
+        <div class="completion-section-head">
+            <div><h2 id="completion-projects-title">المشاريع</h2><p>افتح مساحة المشروع لمراجعة الأعمال والأدلة والقرارات.</p></div>
+            <label class="completion-search">
+                <span class="visually-hidden">ابحث عن مشروع</span>
+                <input id="completion-search" type="search" placeholder="اسم المشروع أو رمزه" autocomplete="off">
+            </label>
+        </div>
+        <div class="completion-project-grid" id="completion-project-list">
+            {% for project in projects %}
+            <article class="completion-project-card" data-completion-project>
+                <div class="completion-card-head">
+                    <div><span class="completion-code">{{ project.project_code }}</span><h3>{{ project.name }}</h3></div>
+                    <span class="completion-badge {% if project.project_closed %}is-green{% elif project.closeable %}is-blue{% else %}is-neutral{% endif %}">
+                        {{ project.close_status }}
+                    </span>
+                </div>
+                <div class="completion-card-progress">
+                    <div class="completion-card-progress-head">
+                        <span>الاكتمال التنفيذي</span>
+                        <strong>{{ project.executively_complete }} / {{ project.activity_count }}</strong>
+                    </div>
+                    <div class="completion-progress-track" role="progressbar" aria-label="الأنشطة المكتملة تنفيذياً" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ project.completion_percent }}">
+                        <span style="width:{{ project.completion_percent }}%"></span>
+                    </div>
+                </div>
+                <dl class="completion-card-facts">
+                    <div><dt>اجتازت المراجعة</dt><dd>{{ project.reviews_complete }}</dd></div>
+                    <div><dt>تم استلامها</dt><dd>{{ project.accepted }}</dd></div>
+                    <div><dt>الملاحظات المفتوحة</dt><dd>{{ project.open_issues }}</dd></div>
+                </dl>
+                <div class="completion-card-footer">
+                    {% if project.closeable %}<span class="completion-ready-label">مستوفٍ لشروط الإغلاق</span>{% else %}<span class="completion-muted-label">يحتاج إلى استكمال خطوات الدورة</span>{% endif %}
+                    <a class="completion-button" href="{{ project.report_href }}">عرض التقرير <span aria-hidden="true">↗</span></a>
+                    <a class="completion-button completion-button-primary" href="{{ project.href }}">فتح مساحة الاكتمال <span aria-hidden="true">←</span></a>
+                </div>
+            </article>
+            {% empty %}
+            <div class="completion-empty">
+                <h2>لا توجد مشاريع متاحة</h2>
+                <p>لا توجد مشاريع ضمن نطاق صلاحية الاكتمال، أو لا تملك صلاحية الاطلاع على المركز.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+{% endblock %}
+{% block extra_js %}{{ block.super }}<script src="{% static 'pm/completion.js' %}?v=20261018-v1" defer></script>{% endblock %}

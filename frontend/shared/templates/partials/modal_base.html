@@ -1,0 +1,19 @@
+﻿<div id="modalOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+    <div id="modalContent" class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between p-4 border-b border-gray-200">
+            <h3 id="modalTitle" class="text-lg font-semibold">{% block modal_title %}{% endblock %}</h3>
+            <button id="modalClose" class="p-1 hover:bg-gray-100 rounded-lg"><i class="fas fa-times text-gray-500"></i></button>
+        </div>
+        <div id="modalBody" class="p-4">{% block modal_body %}{% endblock %}</div>
+        <div id="modalFooter" class="flex justify-end gap-2 p-4 border-t border-gray-200">{% block modal_footer %}<button id="modalCancel" class="btn btn-outline">إلغاء</button><button id="modalConfirm" class="btn btn-primary">تأكيد</button>{% endblock %}</div>
+    </div>
+</div>
+<script>
+function openModal(title, bodyHtml, confirmText="تأكيد", cancelText="إلغاء") {
+    const overlay=document.getElementById("modalOverlay"), titleEl=document.getElementById("modalTitle"), bodyEl=document.getElementById("modalBody"), confirmBtn=document.getElementById("modalConfirm"), cancelBtn=document.getElementById("modalCancel"), closeBtn=document.getElementById("modalClose");
+    titleEl.textContent=title; bodyEl.innerHTML=bodyHtml; confirmBtn.textContent=confirmText; cancelBtn.textContent=cancelText; overlay.classList.remove("hidden");
+    const closeModal=function(){overlay.classList.add("hidden");};
+    closeBtn.onclick=closeModal; cancelBtn.onclick=closeModal; overlay.onclick=function(e){if(e.target===overlay)closeModal();};
+    return new Promise((resolve)=>{confirmBtn.onclick=function(){closeModal();resolve(true);}; cancelBtn.onclick=function(){closeModal();resolve(false);};});
+}
+</script>

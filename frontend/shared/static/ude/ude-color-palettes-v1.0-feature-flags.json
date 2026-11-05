@@ -1,0 +1,13 @@
+{
+  "schema": "ude.feature-flags.v1",
+  "package": "UDE-COLOR-PALETTES",
+  "version": "1.0.0",
+  "default_enabled": true,
+  "production_load": false,
+  "settings_surface": true,
+  "pilot_user_ids": [],
+  "pilot_usernames": ["admin"],
+  "required_permission": "core.settings.view",
+  "legacy_untouched": true,
+  "rollback": "remove-palette-assets-and-disable-flag"
+}

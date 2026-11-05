@@ -1,0 +1,20 @@
+{% if document.decision_reason %}
+<p>آخر إجراء إداري: {% if document.decision_action == 'reject' %}رفض{% elif document.decision_action == 'cancel' %}إلغاء{% else %}إعادة للمراجعة{% endif %} — {{ document.decision_actor_name }} · {{ document.decision_at }}</p>
+<p>{{ document.decision_reason }}</p>
+{% endif %}
+{% if document.status == 'CLOSED' %}
+<p role="status">مغلق إداريًا؛ الأثر المرحل محفوظ. {{ document.closed_actor_name }} · {{ document.closed_at }}</p>
+<p>{{ document.closed_reason }}</p>
+{% endif %}
+{% if has_lifecycle_actions %}
+<form method="post" data-document-decision>{% csrf_token %}
+<input type="hidden" name="warehouse_id" value="{{ selected_warehouse }}"><input type="hidden" name="document_id" value="{{ document.id }}">
+<label>سبب القرار<textarea name="decision_reason" minlength="3" maxlength="2000" required>{{ decision_reason }}</textarea></label>
+<div class="core-actions">
+{% if lifecycle.reject %}<button class="btn" name="command" value="reject">رفض المستند</button>{% endif %}
+{% if lifecycle.cancel %}<button class="btn" name="command" value="cancel">إلغاء قبل الترحيل</button>{% endif %}
+{% if lifecycle.revise %}<button class="btn" name="command" value="revise">إعادة إلى المسودة للمراجعة</button>{% endif %}
+{% if lifecycle.close %}<button class="btn" name="command" value="close">إقفال إداري مع حفظ الأثر</button>{% endif %}
+</div>
+</form>
+{% endif %}

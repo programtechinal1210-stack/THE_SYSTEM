@@ -1,0 +1,86 @@
+﻿/* ============================================================
+   audit-tabs.css - أنماط التبويبات
+   ============================================================ */
+
+.tabs-modern {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-card);
+    padding: 6px;
+    border-radius: var(--audit-radius-lg);
+    box-shadow: var(--audit-shadow-sm);
+    margin-bottom: 22px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    border: 1px solid var(--border-color);
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+
+.tabs-modern::-webkit-scrollbar {
+    height: 4px;
+}
+
+.tabs-modern::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.tabs-modern::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 10px;
+}
+
+.tabs-modern .tab {
+    padding: 8px 18px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: transparent;
+    transition: var(--audit-transition);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+    font-family: inherit;
+}
+
+.tabs-modern .tab svg {
+    flex-shrink: 0;
+}
+
+.tabs-modern .tab:hover {
+    background: rgba(59, 130, 246, 0.06);
+    color: var(--audit-primary-light);
+}
+
+.tabs-modern .tab.active {
+    background: linear-gradient(135deg, var(--audit-primary), #2d6a9f);
+    color: white;
+    box-shadow: 0 4px 12px rgba(26, 75, 122, 0.3);
+}
+
+.tabs-modern .tab .tab-badge {
+    background: rgba(255,255,255,0.2);
+    padding: 1px 8px;
+    border-radius: 30px;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.tabs-modern .tab.active .tab-badge {
+    background: rgba(255,255,255,0.3);
+    color: white;
+}
+
+/* ===== أنماط الوضع الفاتح ===== */
+[data-theme="light"] .tabs-modern {
+    background: white;
+}
+
+[data-theme="light"] .tabs-modern .tab.active {
+    background: var(--audit-primary);
+    color: white;
+}

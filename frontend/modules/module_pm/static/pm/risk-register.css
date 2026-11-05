@@ -1,0 +1,254 @@
+.risk-register{--risk-blue:#1769d2;--risk-navy:#12355b;--risk-line:#e3ebf5;--risk-muted:#71859c;max-width:1440px;margin:0 auto;padding:20px 0 48px;color:#17385d}.risk-project-head,.risk-toolbar,.risk-layout{display:flex;gap:18px;align-items:center;justify-content:space-between}.risk-project-head{padding:20px 22px;background:linear-gradient(135deg,#fff,#f1f7ff);border:1px solid var(--risk-line);border-radius:16px}.risk-project-identity{display:flex;gap:14px;align-items:center}.risk-project-mark{display:grid;place-items:center;width:52px;height:52px;border-radius:14px;background:#e8f2ff;color:var(--risk-blue);font-size:24px}.risk-project-head h2{margin:3px 0 5px;font-size:22px}.risk-project-head p,.risk-project-meta span,.risk-project-meta strong{font-size:12px;color:var(--risk-muted)}.risk-project-meta{display:grid;grid-template-columns:auto auto;gap:5px 18px;text-align:right}.risk-project-meta strong{color:var(--risk-navy)}.risk-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}.risk-summary-card{padding:15px 17px;background:#fff;border:1px solid var(--risk-line);border-radius:13px;box-shadow:0 6px 18px #1c4d7d0c}.risk-summary-card span,.risk-summary-card small{display:block;color:var(--risk-muted);font-size:12px}.risk-summary-card strong{display:block;margin:5px 0;font-size:25px;color:var(--risk-navy)}.risk-summary-card.high{border-top:3px solid #e55563}.risk-summary-card.medium{border-top:3px solid #ecaa35}.risk-summary-card.low{border-top:3px solid #42aa8a}.risk-toolbar{padding:12px 14px;background:#fff;border:1px solid var(--risk-line);border-radius:13px;flex-wrap:wrap}.risk-toolbar-main,.risk-toolbar-secondary,.risk-row-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.risk-action,.risk-icon-action{display:inline-flex;align-items:center;gap:7px;border:0;border-radius:8px;padding:10px 13px;text-decoration:none;font:inherit;cursor:pointer}.risk-action.primary{background:var(--risk-blue);color:#fff}.risk-search{display:flex;align-items:center;gap:8px;padding:0 10px;border:1px solid #d7e2ef;border-radius:8px;color:var(--risk-muted)}.risk-search input{border:0!important;width:260px!important;padding:10px 0!important;outline:0}.risk-filter{width:auto!important;min-width:130px!important;padding:10px!important;border-color:#d7e2ef!important}.risk-icon-action{background:#f3f7fc;color:#315b83}.risk-layout{align-items:stretch;margin-top:16px}.risk-table-card{flex:1;min-width:0;background:#fff;border:1px solid var(--risk-line);border-radius:15px;overflow:hidden}.risk-table-scroll{overflow-x:auto}.risk-table{min-width:940px!important}.risk-table th{padding:13px 12px!important;background:#eef5fc!important;color:#4f6b87!important;font-size:12px;white-space:nowrap}.risk-table td{padding:13px 12px!important;vertical-align:middle!important;font-size:12px}.risk-table td:nth-child(2){min-width:220px}.risk-name,.risk-table td small{display:block}.risk-date,.risk-table td small{margin-top:4px;color:var(--risk-muted)}.risk-code{color:var(--risk-blue);font-weight:700}.risk-level-link{display:block;color:#2b67a7;font-weight:700}.risk-severity,.risk-status{display:inline-block;padding:5px 10px;border-radius:6px;font-weight:700}.risk-severity.high{background:#ffe4e7;color:#bd3446}.risk-severity.medium{background:#fff1d6;color:#a76513}.risk-severity.low{background:#e0f5ed;color:#187256}.risk-status.active{background:#e8f2ff;color:#2866ad}.risk-status.closed{background:#edf0f3;color:#657589}.risk-row-actions a,.risk-row-actions button{display:grid;place-items:center;width:31px;height:30px;padding:0!important;margin:0!important;border:1px solid #d7e3f0!important;background:#f5f9fd!important;color:#2d71c3!important;border-radius:7px;text-decoration:none}.risk-row-actions .risk-details-btn{width:auto;padding:0 9px!important;background:#e9f3ff!important;font-weight:700}.risk-row-actions .danger{color:#c24754!important}.risk-table-footer{display:flex;justify-content:space-between;padding:12px 16px;color:var(--risk-muted);font-size:11px}.risk-details-panel{position:relative;width:330px;flex:0 0 330px;background:#fbfdff;border:1px solid #cfe0f2;border-radius:15px;padding:22px;box-shadow:0 8px 24px #1a4b7812}.risk-details-panel[hidden]{display:none}.risk-details-close{position:absolute;top:12px;left:12px;border:0;background:#edf3f9;border-radius:7px;font-size:20px;width:30px;height:30px;color:#44617b;cursor:pointer}.risk-details-content{padding-top:18px}.risk-details-content h3{margin:7px 0;font-size:18px}.risk-detail-action{padding:13px 0;border-bottom:1px solid var(--risk-line)}.risk-detail-action span{display:block;color:var(--risk-muted);font-size:11px;margin-bottom:5px}.risk-detail-action strong{display:block;line-height:1.7}.risk-empty{height:190px;text-align:center!important;color:var(--risk-muted)}.risk-empty>*{display:block;margin:8px auto}.risk-empty i{font-size:28px;color:#8cb3dd}.risk-empty .risk-action{display:inline-flex}.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}@media(max-width:900px){.risk-layout{display:block}.risk-details-panel{width:100%;margin-top:14px}.risk-summary{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.risk-register{padding:10px 0 30px}.risk-project-head{align-items:flex-start;flex-direction:column;padding:16px}.risk-project-meta{width:100%;border-top:1px solid var(--risk-line);padding-top:12px}.risk-summary{gap:8px}.risk-summary-card{padding:12px}.risk-summary-card strong{font-size:21px}.risk-toolbar{align-items:stretch}.risk-toolbar-main,.risk-toolbar-secondary{width:100%}.risk-search{flex:1}.risk-search input{width:100%!important}.risk-filter{flex:1;min-width:0!important}.risk-icon-action{flex:1;justify-content:center}.risk-table-footer{align-items:flex-start;gap:8px;flex-direction:column}.risk-details-panel{padding:18px}.pm-operations{padding-inline:8px}}@media print{.risk-toolbar,.risk-details-panel,.pm-reference>header,.pm-reference>nav,.risk-project-meta{display:none!important}.risk-register{padding:0}.risk-table-card{border:0}.risk-table{min-width:0!important}}
+@media (max-width:600px){.risk-toolbar-main{display:grid;grid-template-columns:1fr 1fr;width:100%}.risk-search{grid-column:1 / -1;width:100%;min-width:0}.risk-search input{min-width:0;width:100%!important}.risk-filter{width:100%!important;min-width:0!important}}
+.pm-operations:has(.risk-register)>.pm-breadcrumbs,.pm-operations:has(.risk-register)>.pl-topbar,.pm-operations:has(.risk-register)>h1,.pm-operations:has(.risk-register)>.pl-main-tabs{display:none!important}
+body:has(.risk-register){background:#f4f6f8;color:#1c343d}
+body:has(.risk-register) .page-content{padding:16px 18px 28px;background:#f4f6f8}
+body:has(.risk-register) .pm-reference{background:transparent;color:#1c343d}
+body:has(.risk-register) .pm-operations{min-height:calc(100vh - 108px);padding:0 0 28px;background:#f4f6f8;color:#1c343d}
+.risk-register{width:100%;max-width:none;margin:0;padding:8px 0 32px}
+.risk-project-head{background:linear-gradient(115deg,#f1f7ff,#fff 82%);border-color:#dce8f5;box-shadow:0 4px 16px #18365308}
+.risk-project-meta{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px 12px;width:min(680px,58%);text-align:right}
+.risk-project-fact{display:grid;gap:3px;min-width:0;padding:8px 10px;border-inline-start:1px solid #dce8f5}
+.risk-project-fact span{font-size:11px;color:#647991}
+.risk-project-fact strong{overflow:hidden;color:#1c343d;font-size:12px;text-overflow:ellipsis;white-space:nowrap}
+.risk-summary{grid-template-columns:repeat(4,minmax(0,1fr));margin:12px 0}
+.risk-summary-card{box-shadow:0 4px 14px #18365308}
+.risk-toolbar{box-shadow:0 4px 14px #18365308}
+.risk-table-card{box-shadow:0 5px 18px #18365308}
+@media(max-width:1050px){.risk-project-head{align-items:flex-start;flex-direction:column}.risk-project-meta{width:100%}}
+@media(max-width:600px){body:has(.risk-register) .page-content{padding:10px 8px 20px}.risk-project-meta{grid-template-columns:repeat(2,minmax(0,1fr));width:100%}.risk-project-fact{border-inline-start:0;border-bottom:1px solid #e7eef6}.risk-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* The shared workspace adds its own content-area/page-content gutters. Keep the
+   standalone risk register aligned with the full PM workspace width. */
+body:has(.risk-register) .content-area{width:100%;max-width:none;padding:0}
+/* The shared shell marks its page gutters !important; this scoped override is
+   intentional because the measured root cause is that shared rule. */
+body:has(.risk-register) .page-content{padding:16px 14px 28px !important}
+body:has(.risk-register) .pm-inline-form-trigger{display:none}
+/* Stronger action affordances: keep the existing PM palette but increase
+   contrast, hit area, and keyboard/focus visibility. */
+body:has(.risk-register) .risk-icon-action{min-height:40px;border:1px solid #9fb7cf;background:#fff;color:#12355b;font-size:13px;font-weight:700;box-shadow:0 2px 5px #12355b12}
+body:has(.risk-register) .risk-icon-action i{width:18px;color:#1769d2;text-align:center}
+body:has(.risk-register) .risk-icon-action:hover,body:has(.risk-register) .risk-icon-action:focus-visible{border-color:#1769d2;background:#eef6ff;color:#0d4f9a}
+body:has(.risk-register) .risk-row-actions a,body:has(.risk-register) .risk-row-actions button{min-width:38px;width:38px;height:36px;border-color:#8fb4d9!important;background:#eef6ff!important;color:#075cbf!important;font-size:13px;font-weight:700;box-shadow:0 2px 5px #12355b12}
+body:has(.risk-register) .risk-row-actions .risk-details-btn{min-width:82px;width:auto;padding-inline:12px!important}
+body:has(.risk-register) .risk-row-actions a:hover,body:has(.risk-register) .risk-row-actions button:hover,body:has(.risk-register) .risk-row-actions a:focus-visible,body:has(.risk-register) .risk-row-actions button:focus-visible{border-color:#1769d2!important;background:#dcecff!important;color:#064b99!important}
+body:has(.risk-register) .risk-row-actions .danger{color:#b42335!important;border-color:#e2a6ae!important;background:#fff1f2!important}
+body:has(.risk-register) .risk-details-close{border:1px solid #8fb4d9;background:#e8f2ff;color:#075cbf;font-weight:800;line-height:1;box-shadow:0 2px 5px #12355b12}
+body:has(.risk-register) .risk-details-close:hover,body:has(.risk-register) .risk-details-close:focus-visible{border-color:#1769d2;background:#d6e9ff;color:#064b99}
+
+/* Readability and responsive table sizing for the standalone risk register. */
+.risk-project-head p,
+.risk-project-meta span,
+.risk-project-fact span { font-size: 13px; line-height: 1.55; }
+.risk-project-fact strong { font-size: 14px; }
+.risk-summary-card span,
+.risk-summary-card small { font-size: 14px; line-height: 1.5; }
+.risk-table { width: 100% !important; min-width: 860px !important; table-layout: fixed; }
+.risk-table th { font-size: 14px !important; line-height: 1.45; white-space: normal; }
+.risk-table td { font-size: 14px !important; line-height: 1.5; overflow-wrap: anywhere; }
+.risk-table td:nth-child(2) { min-width: 0 !important; }
+.risk-table th:nth-child(1), .risk-table td:nth-child(1) { width: 8%; }
+.risk-table th:nth-child(2), .risk-table td:nth-child(2) { width: 21%; }
+.risk-table th:nth-child(3), .risk-table td:nth-child(3) { width: 12%; }
+.risk-table th:nth-child(4), .risk-table td:nth-child(4) { width: 12%; }
+.risk-table th:nth-child(5), .risk-table td:nth-child(5) { width: 9%; }
+.risk-table th:nth-child(6), .risk-table td:nth-child(6) { width: 7%; }
+.risk-table th:nth-child(7), .risk-table td:nth-child(7) { width: 9%; }
+.risk-table th:nth-child(8), .risk-table td:nth-child(8) { width: 9%; }
+.risk-table th:nth-child(9), .risk-table td:nth-child(9) { width: 13%; }
+.risk-table-footer { font-size: 13px; line-height: 1.5; }
+.risk-empty { height: 170px; }
+.risk-empty > strong { color: #274b70; font-size: 17px; }
+.risk-empty > span { max-width: 620px; color: #526b85; font-size: 14px; line-height: 1.65; }
+
+html[data-theme="dark"] body:has(.risk-register),
+html[data-theme="dark"] body:has(.risk-register) .page-content,
+html[data-theme="dark"] body:has(.risk-register) .pm-operations {
+    background: #0c1626 !important;
+    color: #e2eaf5;
+}
+html[data-theme="dark"] body:has(.risk-register) .pm-reference { color: #e2eaf5; }
+html[data-theme="dark"] .risk-register {
+    --risk-navy: #e3edfa;
+    --risk-line: #344964;
+    --risk-muted: #b1c1d4;
+    color: #e2eaf5;
+}
+html[data-theme="dark"] .risk-project-head {
+    border-color: #344964;
+    background: linear-gradient(115deg, #1b2c43, #17263a 82%);
+    box-shadow: 0 5px 18px #0005;
+}
+html[data-theme="dark"] .risk-project-mark { background: #243d5c; color: #8cbaff; }
+html[data-theme="dark"] .risk-project-meta strong,
+html[data-theme="dark"] .risk-project-fact strong,
+html[data-theme="dark"] .risk-empty > strong { color: #e2edfc; }
+html[data-theme="dark"] .risk-project-meta span,
+html[data-theme="dark"] .risk-project-fact span,
+html[data-theme="dark"] .risk-summary-card span,
+html[data-theme="dark"] .risk-summary-card small,
+html[data-theme="dark"] .risk-empty > span { color: #b1c1d4; }
+html[data-theme="dark"] .risk-summary-card,
+html[data-theme="dark"] .risk-toolbar,
+html[data-theme="dark"] .risk-table-card {
+    border-color: #344964;
+    background: #17263a;
+    color: #e2eaf5;
+    box-shadow: 0 5px 18px #0004;
+}
+html[data-theme="dark"] .risk-summary-card strong { color: #e3edfa; }
+html[data-theme="dark"] .risk-search { border-color: #506782; color: #bfd0e4; }
+html[data-theme="dark"] .risk-search input { background: transparent !important; color: #edf4ff; }
+html[data-theme="dark"] .risk-search input::placeholder { color: #a8bad0; }
+html[data-theme="dark"] .risk-filter {
+    border-color: #506782 !important;
+    background: #20344d !important;
+    color: #e4eefc !important;
+}
+html[data-theme="dark"] .risk-icon-action {
+    border-color: #506782;
+    background: #20344d;
+    color: #e1ecfb;
+}
+html[data-theme="dark"] .risk-icon-action:hover,
+html[data-theme="dark"] .risk-icon-action:focus-visible {
+    border-color: #73aaff;
+    background: #2b4a6d;
+    color: #fff;
+}
+html[data-theme="dark"] .risk-table th {
+    border-color: #344964;
+    background: #223750 !important;
+    color: #dce9f9 !important;
+}
+html[data-theme="dark"] .risk-table td {
+    border-color: #344964;
+    background: #17263a;
+    color: #e1eaf6;
+}
+html[data-theme="dark"] .risk-table tbody tr:nth-child(even) td { background: #1b2d44; }
+html[data-theme="dark"] .risk-table tbody tr:hover td { background: #294362; }
+html[data-theme="dark"] .risk-date,
+html[data-theme="dark"] .risk-table td small,
+html[data-theme="dark"] .risk-table-footer { color: #b1c1d4; }
+html[data-theme="dark"] .risk-code,
+html[data-theme="dark"] .risk-level-link { color: #91bdff; }
+html[data-theme="dark"] .risk-details-panel {
+    border-color: #405a78;
+    background: #192b42;
+    color: #e3edfa;
+}
+html[data-theme="dark"] .risk-detail-action { border-color: #40536d; }
+html[data-theme="dark"] .risk-detail-action span { color: #b1c1d4; }
+
+@media (max-width: 900px) {
+    .risk-table { min-width: 860px !important; }
+}
+
+/* Keep the add-risk form independent from the page layout inside the dialog. */
+.pm-reference .pm-reference-dialog.pm-dialog-form-open > .pm-dialog-close {
+    position: absolute;
+    inset-block-start: 12px;
+    inset-inline-end: 12px;
+    float: none;
+    z-index: 5;
+}
+.pm-reference .pm-reference-dialog.pm-dialog-form-open > [data-dialog-content] {
+    width: 100%;
+    min-width: 0;
+}
+.pm-reference .pm-reference-dialog.pm-dialog-form-open form.risk-create-form {
+    display: grid;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    box-sizing: border-box;
+    gap: 14px;
+    margin: 0;
+    padding: clamp(16px, 2.4vw, 24px);
+    border: 1px solid var(--pm-ui-border);
+    border-radius: 14px;
+    background: var(--pm-ui-bg) !important;
+    color: var(--pm-ui-text);
+    box-shadow: none;
+}
+.pm-reference .pm-reference-dialog.pm-dialog-form-open .risk-create-form .pm-operation-form-heading h2 {
+    color: var(--pm-ui-text);
+}
+.pm-reference .pm-reference-dialog.pm-dialog-form-open .risk-create-form .pm-operation-form-heading p,
+.pm-reference .pm-reference-dialog.pm-dialog-form-open .risk-create-form .pm-form-kicker {
+    color: var(--pm-ui-muted);
+}
+.pm-reference .pm-reference-dialog.pm-dialog-form-open .risk-create-form .pm-form-section {
+    min-width: 0;
+    padding: 18px;
+    background: var(--pm-ui-muted-bg);
+}
+.pm-reference .pm-reference-dialog.pm-dialog-form-open .risk-create-form .pm-form-section legend {
+    float: none;
+    width: auto;
+    margin: 0;
+    padding-inline: 8px;
+    color: var(--pm-ui-text);
+}
+.pm-reference .pm-reference-dialog.pm-dialog-form-open .risk-create-form .pm-form-actions {
+    position: static;
+    z-index: auto;
+    margin: 0;
+    padding: 12px 0 0;
+    background: transparent;
+}
+
+/* Let the risk register consume the workspace height instead of ending early
+   and leaving an unused band below the list on desktop screens. */
+body:has(.risk-register) .page-content,
+body:has(.risk-register) .content-area,
+body:has(.risk-register) .pm-reference,
+body:has(.risk-register) .pm-operations,
+body:has(.risk-register) .risk-register {
+    min-width: 0;
+    width: 100%;
+    max-width: none;
+}
+body:has(.risk-register) .page-content,
+body:has(.risk-register) .content-area,
+body:has(.risk-register) .pm-reference,
+body:has(.risk-register) .pm-operations,
+body:has(.risk-register) .risk-register {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+}
+body:has(.risk-register) .content-area,
+body:has(.risk-register) .pm-reference,
+body:has(.risk-register) .pm-operations,
+body:has(.risk-register) .risk-register {
+    min-height: 0;
+}
+body:has(.risk-register) .risk-layout {
+    flex: 1 1 auto;
+    min-height: 250px;
+}
+body:has(.risk-register) .risk-table-card {
+    display: flex;
+    flex-direction: column;
+}
+body:has(.risk-register) .risk-table-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+body:has(.risk-register) .risk-table {
+    height: 100%;
+}
+@media (max-width: 900px) {
+    body:has(.risk-register) .page-content,
+    body:has(.risk-register) .content-area,
+    body:has(.risk-register) .pm-reference,
+    body:has(.risk-register) .pm-operations,
+    body:has(.risk-register) .risk-register {
+        flex: initial;
+    }
+    body:has(.risk-register) .risk-layout {
+        min-height: 0;
+    }
+}

@@ -1,0 +1,222 @@
+﻿<!-- ═══════════════════════════════════════════════════════════════
+   🔔 تبويب: إعدادات الإشعارات - مع إدارة الإشعارات
+   ═══════════════════════════════════════════════════════════════ -->
+
+<div class="settings-content" id="tab-notifications">
+    
+    <div class="stats-mini">
+        <div class="stat-item"><span>🔔</span><div><div class="stat-num" id="statTotalNotifs">0</div><div class="stat-lbl">إجمالي الإشعارات</div></div></div>
+        <div class="stat-item"><span>📨</span><div><div class="stat-num" id="statUnreadNotifs">0</div><div class="stat-lbl">غير مقروءة</div></div></div>
+        <div class="stat-item"><span>📧</span><div><div class="stat-num">1</div><div class="stat-lbl">بريد إلكتروني</div></div></div>
+    </div>
+
+    <!-- 🃏 إدارة الإشعارات -->
+    <div style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;margin-bottom:1.5rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.8rem;">
+            <div style="font-size:1.1rem;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:0.5rem;">
+                📋 إدارة الإشعارات
+            </div>
+            <div style="display:flex;gap:0.5rem;">
+                <button class="btn btn-primary btn-sm" onclick="openModal('sendNotificationModal')">
+                    ✉️ إرسال إشعار
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="markAllRead()">
+                    ✅ تحديد الكل مقروء
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="loadNotifList()">
+                    🔄 تحديث
+                </button>
+            </div>
+        </div>
+
+        <!-- فلتر سريع -->
+        <div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;">
+            <button class="filter-chip active" onclick="filterNotifs('all', this)">الكل</button>
+            <button class="filter-chip" onclick="filterNotifs('unread', this)">غير مقروءة</button>
+            <button class="filter-chip" onclick="filterNotifs('case_referred', this)">📨 إحالات</button>
+            <button class="filter-chip" onclick="filterNotifs('task_assigned', this)">✅ مهام</button>
+            <button class="filter-chip" onclick="filterNotifs('directive_issued', this)">📢 توجيهات</button>
+        </div>
+
+        <!-- قائمة الإشعارات -->
+        <div id="notifListContainer" style="max-height:400px;overflow-y:auto;">
+            <div style="text-align:center;padding:2rem;color:var(--text-muted);">جاري تحميل الإشعارات...</div>
+        </div>
+    </div>
+
+    <!-- 🃏 إعدادات الإشعارات -->
+    <div style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;">
+        <div style="font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:1.5rem;padding-bottom:0.8rem;border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:0.6rem;">
+            <span>⚙️</span> إعدادات الإشعارات
+            <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted);">تخصيص الإشعارات والتنبيهات</span>
+        </div>
+
+        <div class="form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            
+            <div class="form-group" style="grid-column:1/-1;">
+                <label>📢 الإشعارات العامة</label>
+                <div style="display:flex;flex-direction:column;gap:0.5rem;padding-top:0.3rem;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid var(--border-color);">
+                        <span style="font-size:0.85rem;">📨 إشعارات الإحالات</span>
+                        <label class="toggle-switch"><input type="checkbox" checked id="notify_referral"><span class="slider"></span></label>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid var(--border-color);">
+                        <span style="font-size:0.85rem;">✅ إشعارات إكمال المهام</span>
+                        <label class="toggle-switch"><input type="checkbox" checked id="notify_task_complete"><span class="slider"></span></label>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid var(--border-color);">
+                        <span style="font-size:0.85rem;">⏰ إشعارات المهام المتأخرة</span>
+                        <label class="toggle-switch"><input type="checkbox" checked id="notify_overdue"><span class="slider"></span></label>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid var(--border-color);">
+                        <span style="font-size:0.85rem;">📢 إشعارات التوجيهات الجديدة</span>
+                        <label class="toggle-switch"><input type="checkbox" id="notify_directive"><span class="slider"></span></label>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;">
+                        <span style="font-size:0.85rem;">💬 إشعارات الردود</span>
+                        <label class="toggle-switch"><input type="checkbox" checked id="notify_response"><span class="slider"></span></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>📧 إشعارات البريد الإلكتروني</label>
+                <div style="display:flex;align-items:center;gap:0.8rem;padding-top:0.3rem;">
+                    <label class="toggle-switch"><input type="checkbox" checked id="notify_email"><span class="slider"></span></label>
+                    <span style="font-size:0.85rem;color:#10b981;">مفعل</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>📱 إشعارات الجوال</label>
+                <div style="display:flex;align-items:center;gap:0.8rem;padding-top:0.3rem;">
+                    <label class="toggle-switch"><input type="checkbox" id="notify_mobile"><span class="slider"></span></label>
+                    <span style="font-size:0.85rem;color:var(--text-muted);">معطل</span>
+                </div>
+            </div>
+
+            <div class="form-group" style="grid-column:1/-1;">
+                <label>⏱️ تذكير المهام المتأخرة</label>
+                <div style="display:flex;gap:0.8rem;align-items:center;">
+                    <select id="notify_reminder_freq" style="flex:1;">
+                        <option value="daily" selected>يومياً</option>
+                        <option value="weekly">أسبوعياً</option>
+                    </select>
+                    <input type="time" value="08:00" style="width:120px;" id="notify_reminder_time">
+                </div>
+            </div>
+
+        </div>
+
+        <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-color);">
+            <button class="btn btn-secondary" onclick="resetTab('notifications')">↺ إعادة تعيين</button>
+            <button class="btn btn-primary" onclick="saveSettings('notifications')">💾 حفظ الإعدادات</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- أزرار الفلتر -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<style>
+    .filter-chip {
+        padding: 0.35rem 0.8rem; border: 1px solid var(--border-color); border-radius: 2rem;
+        background: transparent; color: var(--text-muted); cursor: pointer; font-size: 0.75rem;
+        font-family: 'Tajawal', sans-serif; transition: all 0.2s; white-space: nowrap;
+    }
+    .filter-chip:hover, .filter-chip.active { background: var(--gradient-2); color: white; border-color: var(--gradient-2); }
+    
+    .notif-row { display: flex; gap: 0.8rem; padding: 0.7rem 0.8rem; border-bottom: 1px solid var(--border-light); cursor: pointer; transition: all 0.2s; align-items: flex-start; }
+    .notif-row:hover { background: var(--bg-card-hover); }
+    .notif-row.unread { background: rgba(56,189,248,0.03); border-right: 3px solid var(--gradient-1); }
+    .notif-row .n-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+    .notif-row .n-content { flex: 1; min-width: 0; }
+    .notif-row .n-title { font-weight: 600; font-size: 0.85rem; }
+    .notif-row .n-text { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .notif-row .n-time { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .notif-row .n-actions { display: flex; gap: 0.3rem; flex-shrink: 0; }
+    .notif-row .n-btn { background: none; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.2rem; border-radius: 0.3rem; transition: all 0.2s; }
+    .notif-row .n-btn:hover { background: var(--bg-card-hover); }
+</style>
+
+<script>
+var allNotifs = [];
+var currentFilter = 'all';
+
+async function loadNotifList() {
+    try {
+        var r = await fetch('/settings/api/notifications/?limit=100');
+        var d = await r.json();
+        allNotifs = d.notifications || [];
+        renderNotifList();
+        updateNotifStats();
+    } catch(e) {
+        document.getElementById('notifListContainer').innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-muted);">❌ فشل تحميل الإشعارات</div>';
+    }
+}
+
+function renderNotifList() {
+    var container = document.getElementById('notifListContainer');
+    var filtered = currentFilter === 'all' ? allNotifs : 
+                   currentFilter === 'unread' ? allNotifs.filter(function(n) { return !n.is_read; }) :
+                   allNotifs.filter(function(n) { return n.type === currentFilter; });
+    
+    if (filtered.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-muted);">🎉 لا توجد إشعارات</div>';
+        return;
+    }
+    
+    var icons = { task_assigned:'🆕', task_completed:'🎉', task_overdue:'⚠️', case_referred:'📨', directive_issued:'📢', response_added:'💬', action_assigned:'⚡' };
+    
+    container.innerHTML = filtered.map(function(n) {
+        var time = new Date(n.created_at).toLocaleString('ar-SA');
+        return '<div class="notif-row ' + (n.is_read ? '' : 'unread') + '">' +
+            '<div class="n-icon">' + (icons[n.type] || '🔔') + '</div>' +
+            '<div class="n-content" onclick="readNotif(\'' + n.id + '\')">' +
+                '<div class="n-title">' + (n.title || '') + '</div>' +
+                '<div class="n-text">' + (n.content || '') + '</div>' +
+                '<div class="n-time">' + time + '</div>' +
+            '</div>' +
+            '<div class="n-actions">' +
+                (!n.is_read ? '<button class="n-btn" onclick="event.stopPropagation();readNotif(\'' + n.id + '\')" title="تحديد كمقروء">✓</button>' : '') +
+                '<button class="n-btn" onclick="event.stopPropagation();deleteNotif(\'' + n.id + '\')" title="حذف" style="color:#ef4444;">🗑</button>' +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+function filterNotifs(filter, el) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
+    if (el) el.classList.add('active');
+    renderNotifList();
+}
+
+async function readNotif(id) {
+    try { await fetch('/settings/api/notifications/read/' + id + '/'); loadNotifList(); if (typeof updateNotificationBadge === 'function') updateNotificationBadge(); } catch(e) {}
+}
+
+async function deleteNotif(id) {
+    if (!confirm('🗑️ حذف هذا الإشعار؟')) return;
+    try { await fetch('/settings/api/notifications/read/' + id + '/'); loadNotifList(); } catch(e) {}
+}
+
+function updateNotifStats() {
+    document.getElementById('statTotalNotifs').textContent = allNotifs.length;
+    document.getElementById('statUnreadNotifs').textContent = allNotifs.filter(function(n) { return !n.is_read; }).length;
+}
+
+// تحميل عند فتح التبويب
+var notifTabObserver = new MutationObserver(function() {
+    var tab = document.getElementById('tab-notifications');
+    if (tab && tab.classList.contains('active') && allNotifs.length === 0) {
+        loadNotifList();
+    }
+});
+var tabNotif = document.getElementById('tab-notifications');
+if (tabNotif) notifTabObserver.observe(tabNotif, { attributes: true, attributeFilter: ['class'] });
+
+// تحميل أولي
+loadNotifList();
+</script>

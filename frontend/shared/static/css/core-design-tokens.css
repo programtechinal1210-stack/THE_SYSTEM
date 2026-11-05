@@ -1,0 +1,101 @@
+﻿/* THE_SYSTEM shared visual contract. Legacy names remain available as backing values. */
+:root {
+  --ds-brand: var(--brand-color, var(--primary-600, #2766e9));
+  --ds-brand-strong: var(--primary-700, #1d4ed8);
+  --ds-accent: var(--accent, #0f766e);
+  --ds-canvas: var(--bg-primary, #f2f5fa);
+  --ds-surface: var(--bg-secondary, #fff);
+  --ds-surface-raised: var(--bg-elevated, #fff);
+  /* Surfaces stay neutral; the active palette is reserved for identity and
+     stateful interaction. Modules should consume these semantic roles rather
+     than assigning palette colours to large containers. */
+  --ds-surface-muted: var(--bg-tertiary, #f1f5f9);
+  --ds-surface-input: var(--bg-input, var(--ds-surface-raised));
+  --ds-surface-hover: var(--bg-card-hover, var(--ds-surface-muted));
+  --ds-text: var(--text-primary, #0f172a);
+  --ds-text-secondary: var(--text-secondary, #334155);
+  --ds-text-muted: var(--text-muted, #64748b);
+  --ds-text-on-brand: var(--text-inverse, #fff);
+  --ds-border: var(--border-color, #d1d5db);
+  --ds-border-subtle: var(--border-light, #e2e8f0);
+  --ds-border-focus: var(--info, var(--ds-brand));
+  --ds-interactive: var(--ds-brand);
+  --ds-interactive-hover: var(--accent-hover, var(--ds-brand-strong));
+  --ds-success: var(--success, #15803d);
+  --ds-warning: var(--warning, #a16207);
+  --ds-danger: var(--danger, #b91c1c);
+  --ds-info: var(--info, #0369a1);
+  --ds-font-family: var(--font-family, "Tajawal", "IBM Plex Sans Arabic", sans-serif);
+  /* The Core root size (16–24px) scales this hierarchy throughout the shell. */
+  --text-xs: .75rem;
+  --text-sm: .875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --ds-font-size: var(--text-base);
+  --ds-font-caption: var(--text-xs);
+  --ds-font-secondary: var(--text-sm);
+  --ds-font-heading: var(--text-xl);
+  --ds-font-weight-base: 400;
+  --ds-font-weight-normal: var(--ds-font-weight-base);
+  --ds-font-weight-medium: 500;
+  --ds-font-weight-semibold: 600;
+  --ds-font-weight-bold: 700;
+  --ds-font-weight-extra: 800;
+  --ds-font-weight-black: 900;
+  --ds-space-1: .25rem;
+  --ds-space-2: .5rem;
+  --ds-space-3: .75rem;
+  --ds-space-4: 1rem;
+  --ds-space-6: 1.5rem;
+  --ds-space-8: 2rem;
+  --ds-control-height: 2.75rem;
+  --ds-radius-sm: var(--radius-sm, .5rem);
+  --ds-radius-md: var(--radius-md, .75rem);
+  --ds-radius-lg: var(--radius-lg, 1rem);
+  --ds-shadow-card: var(--shadow-card, 0 1px 3px rgb(15 23 42 / .12));
+  --ds-focus-ring: 0 0 0 3px color-mix(in srgb, var(--ds-brand) 30%, transparent);
+  --ds-density-factor: 1;
+  /* Public aliases for module compatibility layers. These always resolve from Core. */
+  --color-primary: var(--ds-brand);
+  --color-primary-strong: var(--ds-brand-strong);
+  --color-accent: var(--ds-accent);
+  --color-canvas: var(--ds-canvas);
+  --color-surface: var(--ds-surface);
+  --color-surface-raised: var(--ds-surface-raised);
+  --color-surface-muted: var(--ds-surface-muted);
+  --color-surface-input: var(--ds-surface-input);
+  --color-surface-hover: var(--ds-surface-hover);
+  --color-text: var(--ds-text);
+  --color-text-muted: var(--ds-text-muted);
+  --color-text-on-brand: var(--ds-text-on-brand);
+  --color-border: var(--ds-border);
+  --color-border-subtle: var(--ds-border-subtle);
+  --color-border-focus: var(--ds-border-focus);
+  --font-family-base: var(--ds-font-family);
+  --control-height: var(--ds-control-height);
+}
+:root[data-density="compact"] { --ds-density-factor: .82; --ds-control-height: 2.35rem; }
+/* Palette values are projected into the legacy variables used by existing
+   modules. The dark variants keep the same semantic palette while preserving
+   contrast and status colours. */
+:root[data-theme="light"][data-core-palette="navy"] { --brand-color:#1d4ed8; --primary-500:#1d4ed8; --primary-600:#1d4ed8; --primary-700:#1e3a8a; --accent:#115e59; --bg-primary:#f8fafc; --bg-secondary:#ffffff; --bg-elevated:#ffffff; --bg-card:#ffffff; --bg-input:#ffffff; --bg-tertiary:#f1f5f9; --text-primary:#111827; --text-secondary:#374151; --text-muted:#4b5563; --border-color:#cbd5e1; --border-light:#e2e8f0; --info:#1d4ed8;  --core-palette-canvas:#f8fafc; --core-palette-surface:#ffffff; --core-palette-raised:#ffffff; --core-palette-text:#111827; --core-palette-secondary:#374151; --core-palette-muted:#4b5563; --core-palette-border:#cbd5e1; --core-palette-brand:#1d4ed8; --core-palette-strong:#1e3a8a; --core-palette-accent:#115e59; --core-palette-focus:#1d4ed8; }
+:root[data-theme="light"][data-core-palette="royal-blue"] { --brand-color:#1e40af; --primary-500:#1e40af; --primary-600:#1e40af; --primary-700:#1e3a8a; --accent:#2563eb; --bg-primary:#f8fafc; --bg-secondary:#ffffff; --bg-elevated:#ffffff; --bg-card:#ffffff; --bg-input:#ffffff; --bg-tertiary:#f1f5f9; --text-primary:#111827; --text-secondary:#1e3a8a; --text-muted:#374151; --border-color:#cbd5e1; --border-light:#e2e8f0; --info:#1d4ed8;  --core-palette-canvas:#f8fafc; --core-palette-surface:#ffffff; --core-palette-raised:#ffffff; --core-palette-text:#111827; --core-palette-secondary:#1e3a8a; --core-palette-muted:#374151; --core-palette-border:#cbd5e1; --core-palette-brand:#1e40af; --core-palette-strong:#1e3a8a; --core-palette-accent:#2563eb; --core-palette-focus:#1d4ed8; }
+:root[data-theme="light"][data-core-palette="emerald"] { --brand-color:#047857; --primary-500:#047857; --primary-600:#047857; --primary-700:#065f46; --accent:#059669; --bg-primary:#f8fafc; --bg-secondary:#ffffff; --bg-elevated:#ffffff; --bg-card:#ffffff; --bg-input:#ffffff; --bg-tertiary:#f1f5f9; --text-primary:#102a22; --text-secondary:#064e3b; --text-muted:#365b50; --border-color:#cbd5e1; --border-light:#e2e8f0; --info:#047857;  --core-palette-canvas:#f8fafc; --core-palette-surface:#ffffff; --core-palette-raised:#ffffff; --core-palette-text:#102a22; --core-palette-secondary:#064e3b; --core-palette-muted:#365b50; --core-palette-border:#cbd5e1; --core-palette-brand:#047857; --core-palette-strong:#065f46; --core-palette-accent:#059669; --core-palette-focus:#047857; }
+:root[data-theme="light"][data-core-palette="modern-purple"] { --brand-color:#6d28d9; --primary-500:#6d28d9; --primary-600:#6d28d9; --primary-700:#4c1d95; --accent:#7c3aed; --bg-primary:#f8fafc; --bg-secondary:#ffffff; --bg-elevated:#ffffff; --bg-card:#ffffff; --bg-input:#ffffff; --bg-tertiary:#f1f5f9; --text-primary:#21152f; --text-secondary:#4c1d95; --text-muted:#5b4b6b; --border-color:#cbd5e1; --border-light:#e2e8f0; --info:#6d28d9;  --core-palette-canvas:#f8fafc; --core-palette-surface:#ffffff; --core-palette-raised:#ffffff; --core-palette-text:#21152f; --core-palette-secondary:#4c1d95; --core-palette-muted:#5b4b6b; --core-palette-border:#cbd5e1; --core-palette-brand:#6d28d9; --core-palette-strong:#4c1d95; --core-palette-accent:#7c3aed; --core-palette-focus:#6d28d9; }
+:root[data-theme="light"][data-core-palette="turquoise"] { --brand-color:#0f766e; --primary-500:#0f766e; --primary-600:#0f766e; --primary-700:#134e4a; --accent:#0891b2; --bg-primary:#f8fafc; --bg-secondary:#ffffff; --bg-elevated:#ffffff; --bg-card:#ffffff; --bg-input:#ffffff; --bg-tertiary:#f1f5f9; --text-primary:#12303a; --text-secondary:#164e63; --text-muted:#3f6370; --border-color:#cbd5e1; --border-light:#e2e8f0; --info:#0e7490;  --core-palette-canvas:#f8fafc; --core-palette-surface:#ffffff; --core-palette-raised:#ffffff; --core-palette-text:#12303a; --core-palette-secondary:#164e63; --core-palette-muted:#3f6370; --core-palette-border:#cbd5e1; --core-palette-brand:#0f766e; --core-palette-strong:#134e4a; --core-palette-accent:#0891b2; --core-palette-focus:#0e7490; }
+:root[data-theme="light"][data-core-palette="burgundy"] { --brand-color:#9f1239; --primary-500:#9f1239; --primary-600:#9f1239; --primary-700:#881337; --accent:#be123c; --bg-primary:#f8fafc; --bg-secondary:#ffffff; --bg-elevated:#ffffff; --bg-card:#ffffff; --bg-input:#ffffff; --bg-tertiary:#f1f5f9; --text-primary:#2d1118; --text-secondary:#881337; --text-muted:#69434c; --border-color:#cbd5e1; --border-light:#e2e8f0; --info:#9f1239;  --core-palette-canvas:#f8fafc; --core-palette-surface:#ffffff; --core-palette-raised:#ffffff; --core-palette-text:#2d1118; --core-palette-secondary:#881337; --core-palette-muted:#69434c; --core-palette-border:#cbd5e1; --core-palette-brand:#9f1239; --core-palette-strong:#881337; --core-palette-accent:#be123c; --core-palette-focus:#9f1239; }
+:root[data-theme="dark"][data-core-palette="navy"] { --brand-color:#93c5fd; --primary-500:#93c5fd; --primary-600:#93c5fd; --primary-700:#bfdbfe; --accent:#5eead4; --bg-primary:#0f172a; --bg-secondary:#1e293b; --bg-elevated:#273449; --bg-card:#273449; --bg-input:#273449; --bg-tertiary:#172033; --text-primary:#f9fafb; --text-secondary:#e5e7eb; --text-muted:#d1d5db; --border-color:#475569; --border-light:#64748b; --info:#bfdbfe;  --core-palette-canvas:#0f172a; --core-palette-surface:#1e293b; --core-palette-raised:#273449; --core-palette-text:#f9fafb; --core-palette-secondary:#e5e7eb; --core-palette-muted:#d1d5db; --core-palette-border:#475569; --core-palette-brand:#93c5fd; --core-palette-strong:#bfdbfe; --core-palette-accent:#5eead4; --core-palette-focus:#bfdbfe; }
+:root[data-theme="dark"][data-core-palette="royal-blue"] { --brand-color:#93c5fd; --primary-500:#93c5fd; --primary-600:#93c5fd; --primary-700:#bfdbfe; --accent:#60a5fa; --bg-primary:#0f172a; --bg-secondary:#1e293b; --bg-elevated:#273449; --bg-card:#273449; --bg-input:#273449; --bg-tertiary:#172033; --text-primary:#f8fafc; --text-secondary:#dbeafe; --text-muted:#bfdbfe; --border-color:#475569; --border-light:#64748b; --info:#dbeafe;  --core-palette-canvas:#0f172a; --core-palette-surface:#1e293b; --core-palette-raised:#273449; --core-palette-text:#f8fafc; --core-palette-secondary:#dbeafe; --core-palette-muted:#bfdbfe; --core-palette-border:#475569; --core-palette-brand:#93c5fd; --core-palette-strong:#bfdbfe; --core-palette-accent:#60a5fa; --core-palette-focus:#dbeafe; }
+:root[data-theme="dark"][data-core-palette="emerald"] { --brand-color:#6ee7b7; --primary-500:#6ee7b7; --primary-600:#6ee7b7; --primary-700:#a7f3d0; --accent:#5eead4; --bg-primary:#0f172a; --bg-secondary:#1e293b; --bg-elevated:#273449; --bg-card:#273449; --bg-input:#273449; --bg-tertiary:#172033; --text-primary:#f0fdf4; --text-secondary:#d1fae5; --text-muted:#a7f3d0; --border-color:#475569; --border-light:#64748b; --info:#a7f3d0;  --core-palette-canvas:#0f172a; --core-palette-surface:#1e293b; --core-palette-raised:#273449; --core-palette-text:#f0fdf4; --core-palette-secondary:#d1fae5; --core-palette-muted:#a7f3d0; --core-palette-border:#475569; --core-palette-brand:#6ee7b7; --core-palette-strong:#a7f3d0; --core-palette-accent:#5eead4; --core-palette-focus:#a7f3d0; }
+:root[data-theme="dark"][data-core-palette="modern-purple"] { --brand-color:#c4b5fd; --primary-500:#c4b5fd; --primary-600:#c4b5fd; --primary-700:#ddd6fe; --accent:#c084fc; --bg-primary:#0f172a; --bg-secondary:#1e293b; --bg-elevated:#273449; --bg-card:#273449; --bg-input:#273449; --bg-tertiary:#172033; --text-primary:#faf5ff; --text-secondary:#ede9fe; --text-muted:#ddd6fe; --border-color:#475569; --border-light:#64748b; --info:#ede9fe;  --core-palette-canvas:#0f172a; --core-palette-surface:#1e293b; --core-palette-raised:#273449; --core-palette-text:#faf5ff; --core-palette-secondary:#ede9fe; --core-palette-muted:#ddd6fe; --core-palette-border:#475569; --core-palette-brand:#c4b5fd; --core-palette-strong:#ddd6fe; --core-palette-accent:#c084fc; --core-palette-focus:#ede9fe; }
+:root[data-theme="dark"][data-core-palette="turquoise"] { --brand-color:#5eead4; --primary-500:#5eead4; --primary-600:#5eead4; --primary-700:#99f6e4; --accent:#67e8f9; --bg-primary:#0f172a; --bg-secondary:#1e293b; --bg-elevated:#273449; --bg-card:#273449; --bg-input:#273449; --bg-tertiary:#172033; --text-primary:#ecfeff; --text-secondary:#cffafe; --text-muted:#a5f3fc; --border-color:#475569; --border-light:#64748b; --info:#cffafe;  --core-palette-canvas:#0f172a; --core-palette-surface:#1e293b; --core-palette-raised:#273449; --core-palette-text:#ecfeff; --core-palette-secondary:#cffafe; --core-palette-muted:#a5f3fc; --core-palette-border:#475569; --core-palette-brand:#5eead4; --core-palette-strong:#99f6e4; --core-palette-accent:#67e8f9; --core-palette-focus:#cffafe; }
+:root[data-theme="dark"][data-core-palette="burgundy"] { --brand-color:#fda4af; --primary-500:#fda4af; --primary-600:#fda4af; --primary-700:#fecdd3; --accent:#fb7185; --bg-primary:#0f172a; --bg-secondary:#1e293b; --bg-elevated:#273449; --bg-card:#273449; --bg-input:#273449; --bg-tertiary:#172033; --text-primary:#fff1f2; --text-secondary:#ffe4e6; --text-muted:#fecdd3; --border-color:#475569; --border-light:#64748b; --info:#ffe4e6;  --core-palette-canvas:#0f172a; --core-palette-surface:#1e293b; --core-palette-raised:#273449; --core-palette-text:#fff1f2; --core-palette-secondary:#ffe4e6; --core-palette-muted:#fecdd3; --core-palette-border:#475569; --core-palette-brand:#fda4af; --core-palette-strong:#fecdd3; --core-palette-accent:#fb7185; --core-palette-focus:#ffe4e6; }
+.core-shell { color: var(--ds-text); background-color: var(--ds-canvas); font-family: var(--ds-font-family); font-weight: var(--ds-font-weight-base); }
+.core-shell :where(button, input, select, textarea) { font-family: inherit; }
+.core-shell :where(button, a, input, select, textarea):focus-visible { outline: none; box-shadow: var(--ds-focus-ring); }
+@media (max-width: 768px) { :root { --ds-space-8: 1.25rem; } }
+

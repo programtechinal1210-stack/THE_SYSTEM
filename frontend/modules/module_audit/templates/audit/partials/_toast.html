@@ -1,0 +1,380 @@
+﻿<!-- ============================================================
+     حاوية الإشعارات المنبثقة (Toast Notifications)
+     ============================================================ -->
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true">
+    {# يتم إنشاء الإشعارات ديناميكياً عبر JavaScript #}
+</div>
+
+<!-- قالب إشعار (يستخدمه JavaScript) -->
+<template id="toastTemplate">
+    <div class="toast toast-{type}" role="alert">
+        <div class="toast-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path class="toast-icon-success" d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+                <polyline class="toast-icon-success" points="22 4 12 14.01 9 11.01"/>
+                <circle class="toast-icon-error" cx="12" cy="12" r="10"/>
+                <line class="toast-icon-error" x1="15" y1="9" x2="9" y2="15"/>
+                <line class="toast-icon-error" x1="9" y1="9" x2="15" y2="15"/>
+                <path class="toast-icon-warning" d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                <line class="toast-icon-warning" x1="12" y1="9" x2="12" y2="13"/>
+                <line class="toast-icon-warning" x1="12" y1="17" x2="12.01" y2="17"/>
+                <circle class="toast-icon-info" cx="12" cy="12" r="10"/>
+                <line class="toast-icon-info" x1="12" y1="16" x2="12" y2="12"/>
+                <line class="toast-icon-info" x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+        </div>
+        <div class="toast-body">
+            <div class="toast-title">{title}</div>
+            <div class="toast-message">{message}</div>
+        </div>
+        <button class="toast-close" onclick="this.parentElement.remove()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+        <div class="toast-progress"></div>
+    </div>
+</template>
+
+<style>
+    /* ============================================================
+       أنماط Toast (مضمنة للتوافق مع HTMX)
+       ============================================================ */
+    .toast-container {
+        position: fixed;
+        bottom: 24px;
+        left: 24px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 420px;
+        pointer-events: none;
+    }
+
+    .toast {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 14px 18px;
+        border-radius: 14px;
+        background: var(--bg-card, rgba(255,255,255,0.98));
+        backdrop-filter: blur(20px);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        border: 1px solid var(--border-color, rgba(0,0,0,0.06));
+        pointer-events: auto;
+        animation: toastSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        overflow: hidden;
+        min-width: 320px;
+    }
+
+    .toast.toast-success {
+        border-right: 4px solid #22c55e;
+    }
+    .toast.toast-error {
+        border-right: 4px solid #ef4444;
+    }
+    .toast.toast-warning {
+        border-right: 4px solid #f59e0b;
+    }
+    .toast.toast-info {
+        border-right: 4px solid #3b82f6;
+    }
+
+    .toast-icon {
+        flex-shrink: 0;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .toast-success .toast-icon {
+        background: #dcfce7;
+        color: #15803d;
+    }
+    .toast-error .toast-icon {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+    .toast-warning .toast-icon {
+        background: #fef3c7;
+        color: #b45309;
+    }
+    .toast-info .toast-icon {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    /* إظهار/إخفاء الأيقونات حسب النوع */
+    .toast-success .toast-icon-success { display: block; }
+    .toast-success .toast-icon-error,
+    .toast-success .toast-icon-warning,
+    .toast-success .toast-icon-info { display: none; }
+
+    .toast-error .toast-icon-error { display: block; }
+    .toast-error .toast-icon-success,
+    .toast-error .toast-icon-warning,
+    .toast-error .toast-icon-info { display: none; }
+
+    .toast-warning .toast-icon-warning { display: block; }
+    .toast-warning .toast-icon-success,
+    .toast-warning .toast-icon-error,
+    .toast-warning .toast-icon-info { display: none; }
+
+    .toast-info .toast-icon-info { display: block; }
+    .toast-info .toast-icon-success,
+    .toast-info .toast-icon-error,
+    .toast-info .toast-icon-warning { display: none; }
+
+    .toast-body {
+        flex: 1;
+        min-width: 0;
+    }
+    .toast-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text-primary, #0f172a);
+        margin-bottom: 2px;
+    }
+    .toast-message {
+        font-size: 13px;
+        color: var(--text-muted, #64748b);
+        line-height: 1.4;
+    }
+
+    .toast-close {
+        flex-shrink: 0;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-muted, #94a3b8);
+        padding: 4px;
+        border-radius: 6px;
+        transition: 0.2s;
+    }
+    .toast-close:hover {
+        background: rgba(0,0,0,0.05);
+        color: var(--text-primary, #0f172a);
+    }
+
+    .toast-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        border-radius: 0 0 0 14px;
+        animation: toastProgress 5s linear forwards;
+    }
+    .toast-success .toast-progress { background: #22c55e; }
+    .toast-error .toast-progress { background: #ef4444; }
+    .toast-warning .toast-progress { background: #f59e0b; }
+    .toast-info .toast-progress { background: #3b82f6; }
+
+    @keyframes toastSlideIn {
+        from {
+            opacity: 0;
+            transform: translateX(60px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
+    }
+
+    @keyframes toastSlideOut {
+        from {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(60px) scale(0.95);
+        }
+    }
+
+    @keyframes toastProgress {
+        from { width: 100%; }
+        to { width: 0%; }
+    }
+
+    .toast.removing {
+        animation: toastSlideOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* استجابة الجوال */
+    @media (max-width: 480px) {
+        .toast-container {
+            left: 12px;
+            right: 12px;
+            bottom: 16px;
+            max-width: none;
+        }
+        .toast {
+            min-width: auto;
+        }
+    }
+</style>
+
+<script>
+    /**
+     * نظام الإشعارات المنبثقة (Toast Notifications)
+     * 
+     * الاستخدام:
+     *   showToast('تم الحفظ بنجاح', 'success');
+     *   showToast('حدث خطأ ما', 'error');
+     *   showToast('تنبيه: موعد التسليم غداً', 'warning');
+     *   showToast('جاري التحميل...', 'info');
+     * 
+     * الخيارات:
+     *   showToast(message, type, { duration: 5000, title: '', closable: true });
+     */
+
+    function showToast(message, type = 'info', options = {}) {
+        const {
+            duration = 5000,
+            title = '',
+            closable = true
+        } = options;
+
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        // عناوين افتراضية حسب النوع
+        const defaultTitles = {
+            'success': '✅ تم بنجاح',
+            'error': '❌ خطأ',
+            'warning': '⚠️ تنبيه',
+            'info': 'ℹ️ معلومات'
+        };
+
+        // إنشاء الإشعار
+        const toast = document.createElement('div');
+        toast.className = 	oast toast-;
+        toast.setAttribute('role', 'alert');
+        
+        // استخدام القالب أو الإنشاء المباشر
+        const template = document.getElementById('toastTemplate');
+        if (template) {
+            let html = template.innerHTML;
+            html = html.replace(/\{type\}/g, type);
+            html = html.replace(/\{title\}/g, title || defaultTitles[type] || '');
+            html = html.replace(/\{message\}/g, message);
+            toast.innerHTML = html;
+        } else {
+            // إنشاء مباشر بدون قالب
+            const iconMap = {
+                'success': <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
+                'error': <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>,
+                'warning': <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+                'info': <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            };
+            
+            toast.innerHTML = 
+                <div class="toast-icon"></div>
+                <div class="toast-body">
+                    <div class="toast-title"></div>
+                    <div class="toast-message"></div>
+                </div>
+                
+                <div class="toast-progress"></div>
+            ;
+        }
+
+        // إضافة الإشعار للحاوية
+        container.appendChild(toast);
+
+        // إزالة تلقائية بعد المدة
+        const timeout = setTimeout(() => {
+            removeToast(toast);
+        }, duration);
+
+        // تخزين timeout في العنصر
+        toast._timeout = timeout;
+
+        // حدث النقر للإغلاق المبكر
+        toast.addEventListener('click', (e) => {
+            if (e.target.closest('.toast-close')) {
+                clearTimeout(toast._timeout);
+                removeToast(toast);
+            }
+        });
+
+        // إيقاف المؤقت عند التحويم
+        toast.addEventListener('mouseenter', () => {
+            clearTimeout(toast._timeout);
+            const progress = toast.querySelector('.toast-progress');
+            if (progress) progress.style.animationPlayState = 'paused';
+        });
+
+        toast.addEventListener('mouseleave', () => {
+            const progress = toast.querySelector('.toast-progress');
+            if (progress) progress.style.animationPlayState = 'running';
+            toast._timeout = setTimeout(() => {
+                removeToast(toast);
+            }, duration);
+        });
+
+        return toast;
+    }
+
+    function removeToast(toast) {
+        if (!toast || toast.classList.contains('removing')) return;
+        
+        toast.classList.add('removing');
+        
+        toast.addEventListener('animationend', () => {
+            if (toast.parentElement) {
+                toast.remove();
+            }
+        }, { once: true });
+        
+        // Fallback في حالة عدم تشغيل animationend
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.remove();
+            }
+        }, 350);
+    }
+
+    // دوال مساعدة
+    function showSuccessToast(message, title = '') {
+        return showToast(message, 'success', { title });
+    }
+
+    function showErrorToast(message, title = '') {
+        return showToast(message, 'error', { title, duration: 7000 });
+    }
+
+    function showWarningToast(message, title = '') {
+        return showToast(message, 'warning', { title });
+    }
+
+    function showInfoToast(message, title = '') {
+        return showToast(message, 'info', { title });
+    }
+
+    // الاستماع لأحداث HTMX للعرض التلقائي
+    document.addEventListener('htmx:afterRequest', function(evt) {
+        // يمكن تفعيل الإشعارات التلقائية من الخادم عبر HX-Trigger
+        const triggers = evt.detail.xhr.getResponseHeader('HX-Trigger');
+        if (triggers) {
+            try {
+                const data = JSON.parse(triggers);
+                if (data.showToast) {
+                    showToast(
+                        data.showToast.message || '',
+                        data.showToast.type || 'info',
+                        data.showToast.options || {}
+                    );
+                }
+            } catch(e) {
+                // تجاهل أخطاء parsing
+            }
+        }
+    });
+
+    console.log('🍞 نظام الإشعارات المنبثقة جاهز!');
+</script>

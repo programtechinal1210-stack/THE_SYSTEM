@@ -1,0 +1,26 @@
+{% load static %}
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UDE-03 Preferences Lab</title>
+  <link rel="stylesheet" href="{% static 'css/ude/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/ude/themes.css' %}">
+  <style>body{margin:0;padding:2rem;background:var(--ude-color-canvas);color:var(--ude-color-text);font-family:var(--ude-font-family-sans)}main{max-width:52rem;margin:auto;padding:2rem;background:var(--ude-color-surface-raised);border:1px solid var(--ude-color-border);border-radius:var(--ude-radius-lg)}pre{white-space:pre-wrap;overflow-wrap:anywhere;direction:ltr}</style>
+</head>
+<body>
+  {{ ude_profile|json_script:"ude-user-profile" }}
+  <main aria-labelledby="title"><h1 id="title">UDE-03 Preferences Lab</h1>
+    <p id="status" role="status">مختبر معزول؛ لا تُرسل بيانات اعتماد إلى المتصفح.</p>
+    <pre id="profile"></pre>
+  </main>
+  <script src="{% static 'ude/user-preferences-v1.1.0.js' %}"></script>
+  <script>
+    (function(){var node=document.getElementById('ude-user-profile');var profile=JSON.parse(node.textContent||'{}');
+      document.getElementById('profile').textContent=JSON.stringify(profile,null,2);
+      if(profile.error) document.getElementById('status').textContent='تعذر قراءة Core: '+profile.error;
+      else document.getElementById('status').textContent='تم تحميل تفضيلات Core الفعلية؛ token التزامن لا يمثل سرًا ولا يتضمن اعتمادًا.';
+    }());
+  </script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "schema": "ude.feature-flags.v1",
+  "package": "UDE-04",
+  "default_enabled": false,
+  "production_load": false,
+  "lab_route": "/ude-04/lab/",
+  "rollback": "remove-lab-route-and-ude-04-assets"
+}

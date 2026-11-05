@@ -1,0 +1,40 @@
+﻿<!-- ═══════════════════════════════════════════════════════════════
+   📐 قسم: الخطوط - نوع وحجم مع معاينة مباشرة
+   ═══════════════════════════════════════════════════════════════ -->
+
+<div style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;margin-bottom:1.5rem;">
+    <div style="font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:1.2rem;">
+        📐 الخطوط
+        <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted);">اختيار نوع وحجم الخط</span>
+    </div>
+
+    <!-- 🆕 معاينة مباشرة -->
+    <div id="fontPreview" style="background:var(--bg-primary);border:2px dashed var(--border-color);border-radius:1rem;padding:1.5rem;margin-bottom:1.5rem;text-align:center;transition:all 0.4s;">
+        <div style="font-size:2.5rem;font-weight:900;margin-bottom:0.5rem;line-height:1.2;" id="previewHeading">نظام إدارة المكتب الحكومي</div>
+        <div style="font-size:1.2rem;font-weight:500;margin-bottom:0.3rem;opacity:0.8;" id="previewSubtext">Government Office Management System</div>
+        <div style="font-size:0.9rem;opacity:0.6;" id="previewSample">الأبجدية العربية: أ ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن هـ و ي</div>
+        <div style="font-size:0.85rem;opacity:0.5;margin-top:0.3rem;direction:ltr;" id="previewLatin">ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789</div>
+    </div>
+
+    <!-- 🆕 اختيار نوع الخط -->
+    <div style="margin-bottom:1.5rem;">
+        <div style="font-weight:600;color:var(--text-primary);margin-bottom:0.8rem;">🔤 نوع الخط</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.6rem;" id="fontFamilyGrid">
+            <!-- يتم التوليد تلقائياً -->
+        </div>
+    </div>
+
+    <!-- 📏 حجم الخط - بطريقة عصرية -->
+    <div>
+        <div style="font-weight:600;color:var(--text-primary);margin-bottom:0.8rem;">📏 حجم الخط</div>
+        <div style="display:flex;align-items:center;gap:1rem;background:var(--bg-primary);border-radius:1rem;padding:1rem;">
+            <span style="font-size:0.75rem;">A</span>
+            <input type="range" id="fontSizeSlider" min="0" max="100" value="50" oninput="setFontSizeSlider(this.value)" style="flex:1;accent-color:var(--gradient-2);">
+            <span style="font-size:1.5rem;">A</span>
+            <span style="font-weight:700;color:var(--gradient-2);min-width:60px;text-align:center;font-size:0.9rem;" id="fontSizeLabel">متوسط</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:0.3rem;font-size:0.7rem;color:var(--text-muted);">
+            <span>صغير</span><span>متوسط</span><span>كبير</span><span>كبير جداً</span>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,212 @@
+{% load static %}
+<!doctype html>
+<html lang="ar" dir="rtl" data-paper-size="a4" data-print-mode="record" data-bulk-print="{% if bulk_print %}true{% else %}false{% endif %}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>أمر التشغيل {{ item.work_order_code }} — {{ project.name }}</title>
+  <link rel="stylesheet" href="{% static 'pm/work-order-print.css' %}?v=20261024-bulk-orders-v1">
+</head>
+<body>
+  <nav class="print-toolbar" aria-label="أدوات الطباعة">
+    <div class="toolbar-title"><span class="toolbar-kicker">إدارة المشاريع</span><strong>{% if bulk_print %}طباعة مجموعة أوامر{% else %}أمر التشغيل{% endif %}</strong><span class="toolbar-code" dir="ltr">{% if bulk_print %}{{ print_orders|length }} أوامر{% else %}{{ item.work_order_code }}{% endif %}</span></div>
+    <div class="print-toolbar-actions">
+      <label for="print-mode">نوع المستند</label>
+      <select id="print-mode" aria-label="نوع نسخة الطباعة">
+        <option value="record" selected>البيانات المسجلة</option>
+        <option value="field">نموذج ميداني فارغ</option>
+      </select>
+      <label for="paper-size">حجم الورق</label>
+      <select id="paper-size" aria-label="حجم الورق"><option value="a4" selected>A4</option><option value="a5">A5</option></select>
+      <button type="button" class="button button-primary" onclick="window.print()">طباعة / PDF</button>
+      <button type="button" class="button" onclick="window.close()">إغلاق</button>
+    </div>
+  </nav>
+
+  {% for print_doc in print_orders %}
+  {% with item=print_doc.item events=print_doc.events consumptions=print_doc.consumptions print_activity=print_doc.print_activity print_assignee=print_doc.print_assignee print_status_label=print_doc.print_status_label print_planned_quantity=print_doc.print_planned_quantity print_actual_quantity=print_doc.print_actual_quantity print_remaining_quantity=print_doc.print_remaining_quantity print_quantity_variance=print_doc.print_quantity_variance print_currency=print_doc.print_currency print_risks=print_doc.print_risks can_view_risks=print_doc.can_view_risks %}
+  <main class="print-sheet">
+    <div class="print-sheet-content">
+    <header class="document-header">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true"><span>PM</span><i></i></div>
+        <div class="document-brand"><strong>THE_SYSTEM</strong><span>إدارة المشاريع والتنفيذ</span></div>
+      </div>
+      <div class="document-title">
+        <span data-mode-copy="record">سجل أمر تشغيل</span><span data-mode-copy="field" hidden>نموذج ميداني لأمر التشغيل</span>
+        <h1 dir="ltr">{{ item.work_order_code }}</h1>
+        <b class="status status-{{ item.status }}">{{ print_status_label }}</b>
+      </div>
+      <div class="header-index"><span>وثيقة تنفيذ</span><strong>WO</strong><small dir="ltr">{{ project.project_code|default:'PM' }}</small></div>
+    </header>
+
+    <section class="document-intro" aria-label="تعريف أمر التشغيل">
+      <div><span class="eyebrow">المشروع</span><h2>{{ project.name }}</h2><small dir="ltr">{{ project.project_code|default:'—' }}</small></div>
+      <div class="intro-divider" aria-hidden="true"></div>
+      <div><span class="eyebrow">النشاط</span><h2>{{ print_activity.name|default:'غير متاح' }}</h2><small>{{ print_activity.phase_name|default:'—' }}{% if print_activity.task_name %} · {{ print_activity.task_name }}{% endif %}</small></div>
+      <div class="intro-unit"><span class="eyebrow">العملة</span><strong>{{ print_currency|default:'—' }}</strong></div>
+    </section>
+
+    <section class="document-section" aria-labelledby="order-data-title">
+      <div class="section-heading"><span class="section-number">01</span><div><h2 id="order-data-title">بيانات الأمر</h2><p>معلومات تعريفية محفوظة في سجل المشروع.</p></div></div>
+      <dl class="info-grid">
+        <div><dt>رمز النشاط</dt><dd dir="ltr">{{ print_activity.activity_code|default:'—' }}</dd></div>
+        <div><dt>المكلّف بالتنفيذ</dt><dd>{{ print_assignee|default:'غير معيّن' }}</dd></div>
+        <div><dt>تاريخ ووقت الإصدار</dt><dd class="date-value" dir="ltr">{{ item.issue_date|default:'—' }}</dd></div>
+        <div><dt>البداية المخططة</dt><dd class="date-value" dir="ltr">{{ item.planned_start_date|default:print_activity.planned_start_date|default:'—' }}</dd></div>
+        <div><dt>الحالة</dt><dd><span class="status status-{{ item.status }}">{{ print_status_label }}</span></dd></div>
+        <div><dt>اعتماد التنفيذ</dt><dd>{% if item.approved_by %}<span class="approval-state is-approved">معتمد إلكترونيًا</span>{% if item.approved_at %}<small class="approval-date" dir="ltr">{{ item.approved_at }}</small>{% endif %}{% else %}<span class="approval-state">بانتظار الاعتماد</span>{% endif %}</dd></div>
+      </dl>
+    </section>
+
+    <section class="document-section" aria-labelledby="planned-title">
+      <div class="section-heading"><span class="section-number">02</span><div><h2 id="planned-title">نطاق العمل المخطط</h2><p>الخطة المعتمدة للنشاط المرتبط بهذا الأمر.</p></div></div>
+      <div class="metric-grid planned-grid">
+        <article class="metric metric-primary"><span>الكمية المخططة</span><strong>{{ print_planned_quantity }} <small>{{ print_activity.unit|default:'—' }}</small></strong></article>
+        <article class="metric"><span>البداية المخططة</span><strong class="date-value" dir="ltr">{{ item.planned_start_date|default:print_activity.planned_start_date|default:'—' }}</strong></article>
+        <article class="metric"><span>النهاية المخططة</span><strong class="date-value" dir="ltr">{{ print_activity.planned_end_date|default:'—' }}</strong></article>
+      </div>
+    </section>
+
+    <section class="document-section record-section" data-print-section="record" aria-labelledby="actual-title">
+      <div class="section-heading"><span class="section-number">03</span><div><h2 id="actual-title">التنفيذ الفعلي</h2><p>القيم أدناه معروضة من سجلات التنفيذ والاستهلاك الحالية.</p></div></div>
+      <div class="metric-grid actual-grid">
+        <article class="metric metric-actual"><span>الكمية المنفذة</span><strong>{{ print_actual_quantity }} <small>{{ print_activity.unit|default:'—' }}</small></strong></article>
+        <article class="metric"><span>المتبقي من المخطط</span><strong>{{ print_remaining_quantity }} <small>{{ print_activity.unit|default:'—' }}</small></strong></article>
+        <article class="metric metric-cost"><span>التكلفة الفعلية</span><strong>{{ item.actual_cost|default:'0' }} <small>{{ print_currency }}</small></strong><small class="metric-note">مشتقة من الاستهلاكات المسجلة</small></article>
+        {% if item.completion_date %}<article class="metric"><span>تاريخ الاكتمال</span><strong class="date-value" dir="ltr">{{ item.completion_date }}</strong></article>{% endif %}
+        {% if item.closure_date %}<article class="metric"><span>تاريخ الإغلاق</span><strong class="date-value" dir="ltr">{{ item.closure_date }}</strong></article>{% endif %}
+      </div>
+      <div class="comparison-table-wrap">
+        <table class="comparison-table">
+          <caption>ملخص الكمية</caption>
+          <thead><tr><th scope="col">البند</th><th scope="col">المخطط</th><th scope="col">الفعلي المسجل</th><th scope="col">المتبقي</th></tr></thead>
+          <tbody><tr><th scope="row">حجم العمل ({{ print_activity.unit|default:'—' }})</th><td>{{ print_planned_quantity }}</td><td>{{ print_actual_quantity }}</td><td>{{ print_remaining_quantity }}</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="document-section record-section" data-print-section="record" aria-labelledby="quantity-history-title">
+      <div class="section-heading"><span class="section-number">04</span><div><h2 id="quantity-history-title">سجل دفعات الإنجاز</h2><p>كل صف يمثل حدث كمية محفوظًا في سجل التنفيذ.</p></div></div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th scope="col">التاريخ والوقت</th><th scope="col">الكمية المضافة</th><th scope="col">الإجمالي بعد التسجيل</th><th scope="col">ملاحظة</th></tr></thead>
+          <tbody>
+            {% for event in events %}<tr><td class="date-value" dir="ltr">{{ event.recorded_at|default:'—' }}</td><td>{{ event.delta }} {{ print_activity.unit|default:'' }}</td><td>{{ event.after_quantity }} {{ print_activity.unit|default:'' }}</td><td>{{ event.notes|default:'—' }}</td></tr>
+            {% empty %}<tr><td colspan="4" class="empty-row">لا توجد دفعات إنجاز مسجلة لهذا الأمر.</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="document-section record-section" data-print-section="record" aria-labelledby="consumption-title">
+      <div class="section-heading"><span class="section-number">05</span><div><h2 id="consumption-title">الاستهلاكات والتكلفة</h2><p>التكلفة المحوّلة لكل سجل وفق لقطة سعر الصرف المحفوظة معه.</p></div></div>
+      <div class="table-wrap">
+        <table class="data-table consumption-table">
+          <thead><tr><th scope="col">رمز السجل</th><th scope="col">المورد / المادة</th><th scope="col">الكمية</th><th scope="col">سعر الوحدة</th><th scope="col">العملة</th><th scope="col">التكلفة بعملة المشروع</th></tr></thead>
+          <tbody>
+            {% for consumption in consumptions %}<tr><td dir="ltr">{{ consumption.consumption_code|default:'—' }}</td><td><strong>{{ consumption.item_name }}</strong>{% if consumption.item_type %}<small>{{ consumption.item_type }}</small>{% endif %}</td><td>{{ consumption.quantity }} {{ consumption.unit|default:'' }}</td><td>{{ consumption.unit_price }}</td><td dir="ltr">{{ consumption.currency }}</td><td><strong>{{ consumption.cost|default:'—' }} {{ print_currency }}</strong></td></tr>
+            {% empty %}<tr><td colspan="6" class="empty-row">لا توجد استهلاكات مسجلة لهذا الأمر.</td></tr>{% endfor %}
+          </tbody>
+          <tfoot><tr><th colspan="5" scope="row">إجمالي التكلفة الفعلية</th><td>{{ item.actual_cost|default:'0' }} {{ print_currency }}</td></tr></tfoot>
+        </table>
+      </div>
+    </section>
+
+    {% if item.notes %}<section class="document-section notes-section record-section" data-print-section="record" aria-labelledby="notes-title"><div class="section-heading"><span class="section-number">06</span><div><h2 id="notes-title">ملاحظات الأمر</h2><p>النص المحفوظ على سجل أمر التشغيل.</p></div></div><p>{{ item.notes|linebreaksbr }}</p></section>{% endif %}
+
+    {% if can_view_risks %}
+    <section class="document-section record-section risk-section" data-print-section="record" aria-labelledby="activity-risks-title">
+      <div class="section-heading"><span class="section-number">07</span><div><h2 id="activity-risks-title">مخاطر النشاط وإجراءات المعالجة</h2><p>المخاطر المسجلة على هذا النشاط تحديدًا، مع الإجراء التصحيحي والمسؤول.</p></div></div>
+      {% if print_risks %}
+      <div class="risk-list">
+        {% for risk in print_risks %}
+        <article class="risk-card">
+          <header class="risk-card-header">
+            <div><span class="risk-code" dir="ltr">{{ risk.risk_code|default:'خطر' }}</span><strong>{{ risk.description|default:'—' }}</strong></div>
+            <span class="risk-status risk-status-{{ risk.status|default:'unknown' }}">{{ risk.print_status_label }}</span>
+          </header>
+          <div class="risk-facts">
+            {% if risk.classification %}<span><b>التصنيف</b>{{ risk.classification }}</span>{% endif %}
+            <span><b>الاحتمال</b>{{ risk.probability|default:'0' }}%</span>
+            <span><b>الأثر</b>{{ risk.impact|default:'—' }} / 5</span>
+            {% if risk.print_owner_name %}<span><b>المسؤول</b>{{ risk.print_owner_name }}</span>{% endif %}
+            {% if risk.discovery_date %}<span><b>تاريخ الرصد</b><time dir="ltr">{{ risk.discovery_date }}</time></span>{% endif %}
+          </div>
+          <div class="risk-action"><span>الإجراء التصحيحي / الوقائي</span><p>{% if risk.corrective_action %}{{ risk.corrective_action|linebreaksbr }}{% else %}لم يُسجل إجراء تصحيحي لهذا الخطر.{% endif %}</p></div>
+        </article>
+        {% endfor %}
+      </div>
+      {% else %}<p class="risk-empty">لا توجد مخاطر مرتبطة بهذا النشاط.</p>{% endif %}
+    </section>
+    {% endif %}
+
+    <section class="document-section field-section" data-print-section="field" aria-labelledby="field-title" hidden>
+      <div class="section-heading"><span class="section-number">03</span><div><h2 id="field-title">نموذج تسجيل ميداني</h2><p>خانات فارغة للتعبئة الورقية فقط؛ لا تحفظ بيانات في النظام.</p></div></div>
+      <div class="field-entry-grid">
+        <div><span>الكمية المنفذة</span><b></b><small>{{ print_activity.unit|default:'—' }}</small></div>
+        <div><span>تاريخ ووقت بدء التنفيذ</span><b></b></div>
+        <div><span>تاريخ ووقت انتهاء التنفيذ</span><b></b></div>
+        <div><span>المواد / الموارد المستخدمة وكمياتها</span><b class="field-entry-long"></b></div>
+        <div><span>ملاحظات التنفيذ أو المعوقات</span><b class="field-entry-long"></b></div>
+        <div><span>الإجراء التصحيحي</span><b class="field-entry-long"></b></div>
+      </div>
+      <div class="signature-grid"><div><span>المنفذ</span><b></b><small>الاسم والتوقيع والتاريخ</small></div><div><span>مدير المشروع / المشرف</span><b></b><small>الاسم والتوقيع والتاريخ</small></div></div>
+    </section>
+
+    <footer class="document-footer"><div><strong>THE_SYSTEM</strong><span data-mode-copy="record">نسخة عرض من بيانات أمر التشغيل المسجلة.</span><span data-mode-copy="field" hidden>نموذج ورقي؛ تعبئته لا تسجّل البيانات في النظام.</span></div><div><span>تاريخ الطباعة</span><time dir="ltr">{% now "Y-m-d H:i" %}</time></div></footer>
+    </div>
+  </main>
+  {% endwith %}
+  {% endfor %}
+  <script>
+    const modeSelect = document.getElementById('print-mode');
+    const paperSelect = document.getElementById('paper-size');
+    paperSelect.addEventListener('change', event => {
+      document.documentElement.dataset.paperSize = event.target.value;
+    });
+    modeSelect.addEventListener('change', event => {
+      const mode = event.target.value;
+      document.documentElement.dataset.printMode = mode;
+      document.querySelectorAll('[data-print-section]').forEach(section => {
+        section.hidden = section.dataset.printSection !== mode;
+      });
+      document.querySelectorAll('[data-mode-copy]').forEach(copy => {
+        copy.hidden = copy.dataset.modeCopy !== mode;
+      });
+    });
+    const printSheets = [...document.querySelectorAll('.print-sheet')];
+    function fitSheetToOnePage() {
+      printSheets.forEach(printSheet => {
+        const printContent = printSheet.querySelector('.print-sheet-content');
+        if (!printContent) return;
+        printContent.style.transform = 'none';
+        printContent.style.transformOrigin = 'top right';
+        printContent.style.width = '100%';
+        const styles = getComputedStyle(printSheet);
+        const availableHeight = printSheet.clientHeight
+          - parseFloat(styles.paddingTop) - parseFloat(styles.paddingBottom);
+        const scale = Math.min(1, availableHeight / printContent.scrollHeight);
+        printContent.style.width = `${100 / scale}%`;
+        printContent.style.height = `${availableHeight / scale}px`;
+        printContent.style.transform = `scale(${scale})`;
+      });
+    }
+    function resetPrintSheet() {
+      printSheets.forEach(printSheet => {
+        const printContent = printSheet.querySelector('.print-sheet-content');
+        if (!printContent) return;
+        for (const property of ['transform', 'transformOrigin', 'width', 'height']) printContent.style[property] = '';
+      });
+    }
+    window.addEventListener('beforeprint', fitSheetToOnePage);
+    window.addEventListener('afterprint', resetPrintSheet);
+    document.addEventListener('keydown', event => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'p') {
+        event.preventDefault();
+        window.print();
+      }
+    });
+  </script>
+</body>
+</html>

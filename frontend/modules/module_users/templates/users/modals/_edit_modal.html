@@ -1,0 +1,67 @@
+﻿<!-- ===== مودال: تعديل مستخدم ===== -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-user-edit"></i> تعديل مستخدم</h2>
+<button class="close-btn" onclick="document.getElementById('editModal').classList.remove('active')">&times;</button>        </div>
+        <div class="modal-body">
+            <div style="background:var(--bg-card);border-radius:1rem;padding:1rem;margin-bottom:1.2rem;border-right:4px solid var(--user-warning);">
+                <div style="font-weight:700;color:var(--text-primary);" id="editUserInfo">تعديل المستخدم</div>
+                <div style="font-size:0.8rem;color:var(--text-muted);">قم بتعديل بيانات المستخدم ثم اضغط تحديث</div>
+            </div>
+            <form id="editUserForm" onsubmit="return false;">
+                <input type="hidden" id="editUserId">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>الاسم الكامل <span class="required">*</span></label>
+                        <input type="text" id="editFullName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>اسم المستخدم <span class="required">*</span></label>
+                        <input type="text" id="editUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>البريد الإلكتروني <span class="required">*</span></label>
+                        <input type="email" id="editEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>الدور <span class="required">*</span></label>
+                      <select id="addRole" required>
+    <option value="">اختر الدور...</option>
+</select>
+                    </div>
+                    <div class="form-group">
+                        <label>الجهة <span class="required">*</span></label>
+                      <select id="addOrganization" required>
+    <option value="">اختر الجهة...</option>
+</select>
+                    </div>
+                    <div class="form-group">
+                        <label>المسمى الوظيفي</label>
+                        <input type="text" id="editPosition">
+                    </div>
+                    <div class="form-group">
+                        <label>رقم الجوال</label>
+                        <input type="tel" id="editPhone">
+                    </div>
+                    <div class="form-group">
+                        <label>الحالة</label>
+                        <select id="editStatus">
+                            <option value="نشط">🟢 نشط</option>
+                            <option value="غير نشط">🔴 غير نشط</option>
+                            <option value="معلق">⏸️ معلق</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="document.getElementById('editModal').classList.remove('active')">
+                <i class="fas fa-times"></i> إلغاء
+            </button>
+          <button class="btn btn-warning" onclick="updateUserAjax()">
+    <i class="fas fa-save"></i> تحديث
+</button>
+        </div>
+    </div>
+</div>

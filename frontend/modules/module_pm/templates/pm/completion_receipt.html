@@ -1,0 +1,32 @@
+{% load static %}
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>محضر استلام — {{ activity.name }}</title>
+    <link rel="stylesheet" href="{% static 'pm/completion.css' %}?v=20261018-v1">
+</head>
+<body class="completion-receipt-page">
+    <main class="completion-receipt">
+        <header><span>THE_SYSTEM · إدارة المشاريع</span><h1>محضر استلام أعمال</h1><p>محضر إلكتروني مولّد من قرار الاستلام المسجل في سجل النظام.</p></header>
+        <dl>
+            <div><dt>المشروع</dt><dd>{{ project.name }} · {{ project.project_code }}</dd></div>
+            <div><dt>المرحلة</dt><dd>{{ activity.phase_name }}</dd></div>
+            <div><dt>المهمة</dt><dd>{{ activity.task_name }}</dd></div>
+            <div><dt>النشاط</dt><dd>{{ activity.name }} · {{ activity.activity_code }}</dd></div>
+            <div><dt>نوع الاستلام</dt><dd>{{ event.metadata.acceptance_type }}</dd></div>
+            <div><dt>النتيجة</dt><dd>مقبول</dd></div>
+            <div><dt>مرجع المحضر</dt><dd>{{ event.metadata.reference|default:'—' }}</dd></div>
+            <div><dt>الكمية المخططة</dt><dd>{{ activity.planned_quantity }} {{ activity.unit }}</dd></div>
+            <div><dt>الكمية الفعلية وقت العرض</dt><dd>{{ activity.actual_quantity }} {{ activity.unit }}</dd></div>
+            <div><dt>المستلم/المعتمد</dt><dd>{{ event.actor_name }}</dd></div>
+            <div><dt>تاريخ القرار</dt><dd>{{ event.metadata.received_at }}</dd></div>
+            <div><dt>الملاحظات</dt><dd>{{ event.notes|default:'لا توجد ملاحظات.' }}</dd></div>
+        </dl>
+        <p class="completion-receipt-disclaimer">هذا المستند نسخة قابلة للطباعة من سجل القرار. الطباعة ليست توقيعاً رقمياً أو بديلاً عن التوقيع المعتمد في سياسة المؤسسة.</p>
+        <div class="completion-receipt-actions"><button type="button" class="completion-button completion-button-primary" data-print-document>طباعة المحضر</button><a href="javascript:window.close()">إغلاق</a></div>
+    </main>
+    <script src="{% static 'pm/completion.js' %}?v=20261018-v1"></script>
+</body>
+</html>

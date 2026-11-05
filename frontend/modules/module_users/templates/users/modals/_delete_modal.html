@@ -1,0 +1,25 @@
+﻿<!-- ===== مودال: تأكيد الحذف ===== -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-content" style="max-width:480px;">
+        <div class="modal-header">
+            <h2><i class="fas fa-trash-alt"></i> تأكيد الحذف</h2>
+            <button class="close-btn" onclick="UsersManager.closeModal('deleteModal')">&times;</button>
+        </div>
+        <div class="modal-body" style="text-align:center;padding:1.5rem 0;">
+            <div style="font-size:64px;margin-bottom:1rem;">⚠️</div>
+            <h3 style="color:var(--text-primary);font-size:1.2rem;margin-bottom:0.5rem;">هل أنت متأكد من الحذف؟</h3>
+            <p style="color:var(--text-muted);font-size:0.95rem;margin-bottom:0.5rem;" id="deleteUserInfo">حذف المستخدم</p>
+            <p style="color:#ef4444;font-weight:600;font-size:0.85rem;">
+                <i class="fas fa-exclamation-triangle"></i> هذا الإجراء لا يمكن التراجع عنه
+            </p>
+        </div>
+        <div class="modal-footer" style="justify-content:center;">
+            <button class="btn btn-secondary" onclick="UsersManager.closeModal('deleteModal')">
+                <i class="fas fa-times"></i> إلغاء
+            </button>
+            <button class="btn btn-danger" onclick="UsersManager.confirmDeleteUser()">
+                <i class="fas fa-trash"></i> تأكيد الحذف
+            </button>
+        </div>
+    </div>
+</div>

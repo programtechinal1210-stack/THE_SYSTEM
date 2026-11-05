@@ -1,0 +1,43 @@
+<div class="header-right" aria-label="إجراءات المستخدم">
+    <a class="header-icon-btn header-settings-shortcut" href="/settings/" aria-label="الإعدادات" title="الإعدادات">
+        <i class="fas fa-cog" aria-hidden="true"></i>
+    </a>
+    <button type="button" class="header-icon-btn theme-toggle" aria-label="تفعيل الوضع الفاتح" title="تفعيل الوضع الفاتح">
+        <i class="fas fa-sun" aria-hidden="true"></i>
+    </button>
+    <a class="header-icon-btn" href="/notifications/" aria-label="الإشعارات" title="الإشعارات">
+        {% include 'partials/core_icon.html' with icon='notifications' %}
+        <span id="coreUnreadCount" class="core-count"></span>
+    </a>
+    <details class="core-user-menu" data-topbar-menu>
+        <summary class="user-menu-btn" aria-label="قائمة حساب المستخدم">
+            <span class="core-avatar">{{ core_identity.full_name|default:'م'|slice:':1' }}</span>
+            <span class="core-header-user">{{ core_identity.full_name|default:'حسابي' }}<small>{% if core_identity.is_admin %}مدير النظام{% else %}حساب مؤسسي{% endif %}</small></span>
+            <i class="fas fa-chevron-down core-user-menu__chevron" aria-hidden="true"></i>
+        </summary>
+        <div class="core-user-menu__panel">
+            <div class="core-user-menu__identity">
+                <span class="core-avatar">{{ core_identity.full_name|default:'م'|slice:':1' }}</span>
+                <span>
+                    <strong>{{ core_identity.full_name|default:'حسابي' }}</strong>
+                    <small>{% if core_identity.is_admin %}مدير النظام{% else %}حساب مؤسسي{% endif %}</small>
+                </span>
+            </div>
+            <a href="/users/profile/" class="core-topbar-menu__link">
+                <i class="fas fa-user" aria-hidden="true"></i><span>الملف الشخصي</span>
+            </a>
+            <a href="/users/profile/settings/" class="core-topbar-menu__link">
+                <i class="fas fa-user-cog" aria-hidden="true"></i><span>إعدادات الحساب</span>
+            </a>
+            <a href="/settings/" class="core-topbar-menu__link core-user-menu__system-settings">
+                <i class="fas fa-cog" aria-hidden="true"></i><span>إعدادات النظام</span>
+            </a>
+            <form method="post" action="/auth/logout/" class="core-user-menu__logout">
+                {% csrf_token %}
+                <button type="submit" class="core-topbar-menu__link">
+                    <i class="fas fa-sign-out-alt" aria-hidden="true"></i><span>تسجيل الخروج</span>
+                </button>
+            </form>
+        </div>
+    </details>
+</div>

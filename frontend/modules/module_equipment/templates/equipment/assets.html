@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% load static %}
+{% block module_token_bridge %}<link rel="stylesheet" href="{% static 'module_equipment/core-token-bridge.css' %}?v=20261024">{% endblock %}
+{% block title %}سجل المعدات | THE_SYSTEM{% endblock %}
+{% block page_title %}سجل المعدات{% endblock %}
+{% block breadcrumb_text %}إدارة وتشغيل المعدات / سجل المعدات{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'module_equipment/asset-registry.css' %}">{% endblock %}
+{% block content %}
+<main class="emo-registry" dir="rtl">
+  <header class="registry-hero">
+    <div>
+      <span class="registry-eyebrow">سجل المعدات</span>
+      <h2>اعثر على المعدة وافتح بطاقتها</h2>
+      <p>ابحث بالرمز أو الاسم أو الرقم التسلسلي، ثم استخدم الفلاتر لتضييق النتائج.</p>
+    </div>
+    <div class="registry-hero-actions">
+      <a class="registry-button registry-button-quiet" href="{% url 'equipment:home' %}">العودة إلى مركز التحكم</a>
+      {% if can_add_asset %}<a class="registry-button registry-button-primary" href="{{ add_asset_url }}">＋ إضافة معدة</a>{% endif %}
+    </div>
+  </header>
+
+  <section class="registry-toolbar" aria-label="البحث والتصفية">
+    <form class="registry-filters" method="get" action="{% url 'equipment:assets' %}">
+      <div class="registry-search">
+        <label for="asset-search">بحث في السجل</label>
+        <div class="registry-search-row">
+          <input id="asset-search" type="search" name="search" value="{{ active_filters.search|default:'' }}" placeholder="الرمز أو الاسم أو الرقم التسلسلي">
+          <button class="registry-button registry-button-primary" type="submit">بحث</button>
+        </div>
+      </div>
+      <label>
+        <span>التصنيف</span>
+        <select name="category_id">
+          <option value="">كل التصنيفات</option>
+          {% for category in categories %}
+          <option value="{{ category.id }}" {% if category.selected %}selected{% endif %}>{{ category.category_code }} — {{ category.category_name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        <span>الحالة الحياتية</span>
+        <select name="lifecycle_status">
+          <option value="">كل الحالات</option>
+          <option value="in_service" {% if active_filters.lifecycle_status == "in_service" %}selected{% endif %}>ضمن الخدمة</option>
+          <option value="suspended" {% if active_filters.lifecycle_status == "suspended" %}selected{% endif %}>موقوفة مؤقتاً</option>
+          <option value="retired" {% if active_filters.lifecycle_status == "retired" %}selected{% endif %}>متقاعدة</option>
+          <option value="disposed" {% if active_filters.lifecycle_status == "disposed" %}selected{% endif %}>مستبعدة</option>
+        </select>
+      </label>
+      <label>
+        <span>الحالة الفنية</span>
+        <select name="technical_status">
+          <option value="">كل الحالات الفنية</option>
+          <option value="unknown" {% if active_filters.technical_status == "unknown" %}selected{% endif %}>غير محددة</option>
+          <option value="unsafe" {% if active_filters.technical_status == "unsafe" %}selected{% endif %}>غير آمنة</option>
+          <option value="maintenance" {% if active_filters.technical_status == "maintenance" %}selected{% endif %}>تحت الصيانة</option>
+          <option value="out_of_service" {% if active_filters.technical_status == "out_of_service" %}selected{% endif %}>خارج الخدمة</option>
+        </select>
+      </label>
+      <label>
+        <span>الجهة المسؤولة</span>
+        <select name="responsible_entity_id">
+          <option value="">كل الجهات</option>
+          {% for entity in responsible_entities %}
+          <option value="{{ entity.id }}" {% if entity.selected %}selected{% endif %}>{{ entity.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>
+        <span>الموقع الحالي</span>
+        <select name="location">
+          <option value="">كل المواقع</option>
+          {% for location in locations %}
+          <option value="{{ location }}" {% if active_filters.location == location %}selected{% endif %}>{{ location }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="registry-sort">
+        <span>ترتيب النتائج</span>
+        <select name="sort_by">
+          <option value="asset_code" {% if sort_by == "asset_code" %}selected{% endif %}>رمز المعدة</option>
+          <option value="asset_name" {% if sort_by == "asset_name" %}selected{% endif %}>اسم المعدة</option>
+          <option value="category_name" {% if sort_by == "category_name" %}selected{% endif %}>التصنيف</option>
+          <option value="lifecycle_status" {% if sort_by == "lifecycle_status" %}selected{% endif %}>الحالة الحياتية</option>
+          <option value="current_location" {% if sort_by == "current_location" %}selected{% endif %}>الموقع</option>
+          <option value="created_at" {% if sort_by == "created_at" %}selected{% endif %}>الأحدث إضافة</option>
+        </select>
+      </label>
+      <label>
+        <span>اتجاه الترتيب</span>
+        <select name="sort_dir">
+          <option value="asc" {% if sort_dir == "asc" %}selected{% endif %}>تصاعدي</option>
+          <option value="desc" {% if sort_dir == "desc" %}selected{% endif %}>تنازلي</option>
+        </select>
+      </label>
+      <input type="hidden" name="view" value="{{ view_mode }}">
+      <div class="registry-filter-actions">
+        <button class="registry-button registry-button-primary" type="submit">تطبيق الفلاتر</button>
+        <a class="registry-button registry-button-quiet" href="{% url 'equipment:assets' %}">إعادة ضبط</a>
+      </div>
+    </form>
+  </section>
+
+  <section class="registry-results" aria-labelledby="registry-results-title">
+    <div class="registry-results-heading">
+      <div>
+        <h2 id="registry-results-title">المعدات المسجلة</h2>
+        <p>عرض {{ first_result }}–{{ last_result }} من {{ total }} معدة</p>
+      </div>
+      <div class="registry-view-switch" role="group" aria-label="طريقة عرض السجل">
+        <button type="button" data-registry-view="cards" aria-pressed="{% if view_mode == 'cards' %}true{% else %}false{% endif %}">بطاقات</button>
+        <button type="button" data-registry-view="table" aria-pressed="{% if view_mode == 'table' %}true{% else %}false{% endif %}">جدول</button>
+      </div>
+    </div>
+
+    {% if assets %}
+    <div class="registry-card-grid" data-registry-panel="cards" {% if view_mode != "cards" %}hidden{% endif %}>
+      {% for asset in assets %}
+      <article class="registry-asset-card">
+        <div class="registry-card-top">
+          <div>
+            <span class="registry-asset-code">{{ asset.asset_code }}</span>
+            <h3>{{ asset.asset_name }}</h3>
+          </div>
+          <span class="registry-category">{{ asset.category_name|default:"تصنيف غير محدد" }}</span>
+        </div>
+        <dl class="registry-asset-facts">
+          <div><dt>الموقع الحالي</dt><dd>{{ asset.current_location|default:"غير محدد" }}</dd></div>
+          <div><dt>الجهة المسؤولة</dt><dd>{{ asset.responsible_entity_name|default:"غير محددة" }}</dd></div>
+        </dl>
+        <div class="registry-status-row">
+          <span class="registry-status lifecycle">{{ asset.lifecycle_label }}</span>
+          <span class="registry-status technical">{{ asset.technical_label }}</span>
+          {% if can_view_assignments %}
+          <span class="registry-status assignment">{{ asset.assignment_label }}</span>
+          {% endif %}
+        </div>
+        {% if asset.safety_blockers %}
+        <ul class="registry-blockers" aria-label="موانع سلامة موثقة">
+          {% for blocker in asset.safety_blockers %}<li>{{ blocker }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+        {% if asset.technical_status == "unknown" %}
+        <p class="registry-readiness-note">الجاهزية غير محددة؛ الحالة الحياتية وحدها لا تكفي للتقييم.</p>
+        {% endif %}
+        <a class="registry-open-card" href="{% url 'equipment:asset-detail' asset_id=asset.detail_id %}">فتح بطاقة المعدة <span aria-hidden="true">←</span></a>
+      </article>
+      {% endfor %}
+    </div>
+
+    <div class="registry-table-wrap" data-registry-panel="table" {% if view_mode != "table" %}hidden{% endif %}>
+      <table>
+        <thead><tr><th>الرمز</th><th>المعدة</th><th>التصنيف</th><th>الموقع</th><th>الجهة المسؤولة</th><th>الحالة الحياتية</th><th>الحالة الفنية</th><th>التكليف</th><th>البطاقة</th></tr></thead>
+        <tbody>
+          {% for asset in assets %}
+          <tr>
+            <td>{{ asset.asset_code }}</td><td>{{ asset.asset_name }}</td><td>{{ asset.category_name|default:"—" }}</td>
+            <td>{{ asset.current_location|default:"غير محدد" }}</td><td>{{ asset.responsible_entity_name|default:"غير محددة" }}</td>
+            <td>{{ asset.lifecycle_label }}</td><td>{{ asset.technical_label }}</td>
+            <td>{% if can_view_assignments %}{{ asset.assignment_label }}{% else %}غير متاح{% endif %}</td>
+            <td><a href="{% url 'equipment:asset-detail' asset_id=asset.detail_id %}">فتح البطاقة</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="registry-empty-state">
+      <span aria-hidden="true">⌕</span>
+      <h3>{% if active_filters %}لا توجد نتائج مطابقة{% else %}لا توجد معدات مسجلة{% endif %}</h3>
+      <p>{% if active_filters %}جرّب تغيير البحث أو الفلاتر، أو أعد ضبطها لعرض السجل كاملاً.{% else %}ستظهر المعدات هنا بعد تسجيلها ضمن نطاقك المؤسسي.{% endif %}</p>
+      {% if active_filters %}<a class="registry-button registry-button-quiet" href="{% url 'equipment:assets' %}">إعادة ضبط البحث</a>{% endif %}
+    </div>
+    {% endif %}
+
+    {% if total and page_count > 1 %}
+    <nav class="registry-pagination" aria-label="صفحات سجل المعدات">
+      {% if previous_url %}<a href="{{ previous_url }}">السابق</a>{% else %}<span aria-disabled="true">السابق</span>{% endif %}
+      <span>صفحة {{ page }} من {{ page_count }}</span>
+      {% if next_url %}<a href="{{ next_url }}">التالي</a>{% else %}<span aria-disabled="true">التالي</span>{% endif %}
+    </nav>
+    {% endif %}
+  </section>
+</main>
+{% endblock %}
+{% block extra_js %}
+<script>
+  document.querySelectorAll("[data-registry-view]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      const mode = button.dataset.registryView;
+      document.querySelectorAll("[data-registry-view]").forEach(function (item) {
+        item.setAttribute("aria-pressed", String(item === button));
+      });
+      document.querySelectorAll("[data-registry-panel]").forEach(function (panel) {
+        panel.hidden = panel.dataset.registryPanel !== mode;
+      });
+      const viewInput = document.querySelector('.registry-filters input[name="view"]');
+      if (viewInput) viewInput.value = mode;
+      const pageUrl = new URL(window.location.href);
+      pageUrl.searchParams.set("view", mode);
+      window.history.replaceState(null, "", pageUrl);
+      document.querySelectorAll(".registry-pagination a").forEach(function (link) {
+        const targetUrl = new URL(link.href);
+        targetUrl.searchParams.set("view", mode);
+        link.href = targetUrl.toString();
+      });
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,359 @@
+{% extends 'pm/reference_base.html' %}
+{% load static %}
+{% block title %}مساحة المشروع — {{ item.name }}{% endblock %}
+{% block extra_head %}{{ block.super }}
+    <link rel="stylesheet" href="{% static 'pm/design-workspace.css' %}?v=20261102-schedule-v2">
+    <link rel="stylesheet" href="{% static 'pm/approval.css' %}?v=20261020-approval-correction-2">
+{% endblock %}
+{% block pm_content %}
+<section class="dw" data-project="{{ item.id }}" data-root="{{ project_root }}" data-initial-planning-step="{{ planning_step }}">
+    <section class="dw-project-overview" aria-label="نظرة عامة على المشروع">
+        <header class="dw-project-head">
+            <div class="dw-project-title">
+                <div class="dw-project-identity">
+                    <i class="fas fa-folder-open dw-project-icon" aria-hidden="true"></i>
+                    <div class="dw-project-title-line">
+                        <h1 id="dw-project-name">{{ item.name }}</h1>
+                        <bdi class="dw-project-code">{{ item.project_code }}</bdi>
+                    </div>
+                </div>
+            </div>
+            <div class="dw-project-context">
+                <span class="dw-badge dw-status-{{ item.status }}">{{ project_status }}</span>
+                <a class="dw-center-link" href="/pm/planning/" title="العودة إلى قائمة المشاريع التي يجري تخطيطها" data-help="ارجع إلى مركز التخطيط لاختيار مشروع آخر.">العودة إلى مركز التخطيط <i class="fas fa-arrow-left" aria-hidden="true"></i></a>
+            </div>
+        </header>
+
+        <dl class="dw-project-metrics" aria-label="مؤشرات المشروع">
+            <div class="dw-project-metric dw-project-metric-progress">
+                <dt><i class="fas fa-chart-simple" aria-hidden="true"></i>نسبة الإنجاز</dt>
+                <dd>
+                    {% if progress_percent != None %}
+                    <strong>{{ progress_percent }}%</strong>
+                    <progress max="100" value="{{ progress_percent }}" aria-label="نسبة الإنجاز"></progress>
+                    {% else %}<strong>—</strong>{% endif %}
+                </dd>
+            </div>
+            <div class="dw-project-metric">
+                <dt><i class="fas fa-calendar-days" aria-hidden="true"></i>تاريخ البدء</dt>
+                <dd>{% if item.start_date %}<bdi>{{ item.start_date }}</bdi>{% else %}—{% endif %}</dd>
+            </div>
+            <div class="dw-project-metric">
+                <dt><i class="fas fa-hourglass-half" aria-hidden="true"></i>المدة المخططة</dt>
+                <dd>{% if item.planned_duration != None %}<bdi>{{ item.planned_duration }}</bdi> ساعة{% else %}—{% endif %}</dd>
+            </div>
+            <div class="dw-project-metric">
+                <dt><i class="fas fa-coins" aria-hidden="true"></i>التكلفة المخططة</dt>
+                <dd>
+                    {% if item.planned_cost != None %}
+                    <bdi>{{ item.planned_cost }}</bdi>{% if item.currency %} <bdi>{{ item.currency }}</bdi>{% endif %}
+                    {% else %}—{% endif %}
+                </dd>
+            </div>
+            <div class="dw-project-metric">
+                <dt><i class="fas fa-user-tie" aria-hidden="true"></i>مدير المشروع</dt>
+                <dd>{% if item.manager_name %}{{ item.manager_name }}{% else %}—{% endif %}</dd>
+            </div>
+        </dl>
+
+        <section class="dw-project-actions" aria-label="إجراءات المشروع">
+            <nav class="dw-project-actions-links" aria-label="إجراءات الخطة">
+                <a class="dw-project-actions-primary" href="{{ approval_url }}" title="إرسال الخطة للإقرار"><i class="fas fa-paper-plane" aria-hidden="true"></i> إرسال الخطة للإقرار</a>
+                <a href="{{ document_url }}" title="عرض الخطة المتكاملة"><i class="fas fa-file-lines" aria-hidden="true"></i> عرض الخطة المتكاملة</a>
+                <a href="{{ slides_url }}" title="عرض الخطة كسلايدات"><i class="fas fa-desktop" aria-hidden="true"></i> عرض الخطة كسلايدات</a>
+            </nav>
+        </section>
+    </section>
+
+    <section class="dw-journey-card" aria-label="خطوات تخطيط المشروع">
+        <div class="dw-journey-heading">
+            <span>مساحة تخطيط المشروع</span>
+            <small>ستة أقسام مترابطة للمشروع نفسه</small>
+        </div>
+        <nav class="dw-journey" role="tablist" aria-label="خطوات تخطيط المشروع" dir="rtl">
+            {% for step in planning_steps %}
+            <button type="button" role="tab" id="planning-tab-{{ step.index }}"
+                    aria-controls="planning-step-{% if step.index == 0 %}wbs{% elif step.index == 1 %}schedule{% elif step.index == 2 %}resources{% elif step.index == 3 %}risks{% elif step.index == 4 %}communications{% else %}review{% endif %}"
+                    data-planning-step="{{ step.index }}" data-step-title="{{ step.title }}"
+                    data-guidance-required="{{ step.hint }}"
+                    data-guidance-next="{% if step.index == 0 %}الجدول الزمني{% elif step.index == 1 %}الموارد والتكاليف{% elif step.index == 2 %}المخاطر{% elif step.index == 3 %}خطة التواصل{% elif step.index == 4 %}المراجعة والاعتماد{% else %}مسار الإقرار الرسمي{% endif %}"
+                    class="{% if planning_step == step.index %}active{% endif %}"
+                    title="{{ step.hint }}" data-help="{{ step.hint }}"
+                    aria-selected="{% if planning_step == step.index %}true{% else %}false{% endif %}"
+                    tabindex="{% if planning_step == step.index %}0{% else %}-1{% endif %}"
+                    {% if planning_step == step.index %}aria-current="step"{% endif %}>
+                <i class="dw-tab-icon fas {% if step.index == 0 %}fa-sitemap{% elif step.index == 1 %}fa-calendar-days{% elif step.index == 2 %}fa-coins{% elif step.index == 3 %}fa-shield-halved{% elif step.index == 4 %}fa-comments{% else %}fa-clipboard-check{% endif %}" aria-hidden="true"></i>
+                <span class="dw-journey-copy"><strong>{{ step.title }}</strong></span>
+            </button>
+            {% endfor %}
+        </nav>
+    </section>
+
+    <section class="dw-guidance" aria-label="إرشادات الخطوة الحالية" data-planning-guidance data-project-name="{{ item.name }}">
+        <div><span>أين أنا الآن؟</span><strong data-guidance-current>{{ item.name }} / {% if planning_step == 0 %}هيكل تجزئة العمل{% elif planning_step == 1 %}الجدول الزمني{% elif planning_step == 2 %}الموارد والتكاليف{% elif planning_step == 3 %}المخاطر{% elif planning_step == 4 %}خطة التواصل{% else %}المراجعة والاعتماد{% endif %}</strong></div>
+        <div><span>ما المطلوب؟</span><strong data-guidance-required>{% if planning_step == 0 %}أضف المراحل ثم المهام والأنشطة.{% elif planning_step == 1 %}راجع التواريخ والمدد والاعتماديات المسجلة.{% elif planning_step == 2 %}راجع احتياجات الأنشطة والتكاليف المخططة.{% elif planning_step == 3 %}راجع المخاطر وتقييمها وإجراءات معالجتها.{% elif planning_step == 4 %}راجع الأطراف والتقارير ووسائل التواصل.{% else %}راجع جاهزية الخطة واستخدم مسار الإقرار الرسمي.{% endif %}</strong></div>
+        <div><span>القسم التالي</span><strong data-guidance-next>{% if planning_step == 0 %}الجدول الزمني{% elif planning_step == 1 %}الموارد والتكاليف{% elif planning_step == 2 %}المخاطر{% elif planning_step == 3 %}خطة التواصل{% elif planning_step == 4 %}المراجعة والاعتماد{% else %}مسار الإقرار الرسمي{% endif %}</strong></div>
+    </section>
+
+    <section class="dw-step-panel dw-work-panel" id="planning-step-wbs" role="tabpanel" aria-labelledby="planning-tab-0" data-planning-panel="0"
+             {% if planning_step != 0 %}hidden{% endif %}>
+    <header class="dw-work-heading dw-wbs-heading">
+        <div>
+            <h2 id="dw-hierarchy-heading">هيكل العمل (WBS)</h2>
+            <p>نظّم مراحل المشروع ومهامه وأنشطته ضمن تسلسل واضح.</p>
+        </div>
+        <div class="dw-wbs-counts" role="group" aria-label="ملخص عناصر الهيكل">
+            <span class="dw-wbs-count dw-wbs-count-phases"><i class="fas fa-folder" aria-hidden="true"></i><strong>{{ planning_tabs.0.count }}</strong> مراحل</span>
+            <span class="dw-wbs-count dw-wbs-count-tasks"><i class="fas fa-list-ul" aria-hidden="true"></i><strong>{{ planning_tabs.1.count }}</strong> مهام</span>
+            <span class="dw-wbs-count dw-wbs-count-activities"><i class="fas fa-circle-check" aria-hidden="true"></i><strong>{{ activity_count }}</strong> أنشطة</span>
+        </div>
+    </header>
+    <div class="dw-layout">
+    <section class="dw-card dw-structure" aria-labelledby="dw-hierarchy-heading">
+        <div class="dw-toolbar dw-wbs-toolbar">
+            {% if phase_create_url %}<a class="dw-primary" href="{{ phase_create_url }}" data-pm-dialog title="إضافة مرحلة جديدة إلى هيكل المشروع"><i class="fas fa-plus" aria-hidden="true"></i> إضافة مرحلة</a>{% endif %}
+            {% if work_rows %}
+            <button class="dw-wbs-add-item" type="button" data-dw-add-selected disabled title="حدد مرحلة أو مهمة لإضافة عنصر تابع"><i class="fas fa-plus" aria-hidden="true"></i> إضافة عنصر</button>
+            <label class="dw-search">
+                <span class="dw-visually-hidden">البحث في هيكل العمل</span>
+                <input type="search" data-dw-search placeholder="ابحث بالاسم أو الرمز…" autocomplete="off">
+            </label>
+            {% endif %}
+            {% if work_rows %}
+            <div class="dw-wbs-tree-actions" role="group" aria-label="طي وتوسيع الهيكل">
+                <button type="button" data-dw-collapse title="طي جميع المراحل والمهام"><i class="fas fa-compress-alt" aria-hidden="true"></i> طي الكل</button>
+                <button type="button" data-dw-expand title="توسيع جميع المراحل والمهام" disabled><i class="fas fa-expand-alt" aria-hidden="true"></i> توسيع الكل</button>
+            </div>
+                {% endif %}
+            {% if hierarchy_url or work_rows %}
+                {% if hierarchy_url %}<a class="dw-wbs-template" href="{{ project_root }}copy/" data-pm-dialog title="نسخ هيكل جاهز إلى هذا المشروع"><i class="fas fa-copy" aria-hidden="true"></i> نسخ / استخدام قالب</a>{% endif %}
+                {% if work_rows %}
+                <label class="dw-kind-filter">
+                    <span class="dw-visually-hidden">تصفية نوع العنصر</span>
+                    <select data-dw-filter>
+                        <option value="">جميع الأنواع</option>
+                        <option value="phases">المراحل</option>
+                        <option value="tasks">المهام</option>
+                        <option value="activities">الأنشطة</option>
+                    </select>
+                </label>
+                <button type="button" data-dw-view aria-pressed="false" title="التبديل بين العرض الهرمي والجدولي"><i class="fas fa-table" aria-hidden="true"></i> عرض جدولي</button>
+                <button type="button" data-dw-clear-filters title="إزالة البحث والتصفية الحالية"><i class="fas fa-filter-circle-xmark" aria-hidden="true"></i> مسح التصفية</button>
+                {% endif %}
+            {% endif %}
+        </div>
+            <div class="dw-table-wrap">
+                <table class="dw-table">
+                    <colgroup>
+                        <col class="dw-col-name">
+                        <col class="dw-col-type">
+                        <col class="dw-col-status">
+                        <col class="dw-col-duration">
+                        <col class="dw-col-cost">
+                        <col class="dw-col-actions">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th scope="col">الاسم</th>
+                            <th scope="col">النوع</th>
+                            <th scope="col">حالة التخطيط</th>
+                            <th scope="col">المدة المخططة</th>
+                            <th scope="col">التكلفة المخططة</th>
+                            <th scope="col"><span>الإجراءات</span><small class="dw-action-heading-hint">تعديل العنصر أو إضافة تابع أو حذفه</small></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in work_rows %}
+                        <tr data-id="{{ row.id }}" data-parent="{{ row.parent }}" data-kind="{{ row.kind }}" data-depth="{{ row.depth }}">
+                            <td>
+                                <div class="dw-node" style="--depth:{{ row.depth }}">
+                                    {% if row.kind != 'activities' %}
+                                    <button type="button" data-dw-toggle aria-expanded="true" aria-label="طي أو توسيع {{ row.name }}">⌄</button>
+                                    {% else %}<span class="dw-node-spacer" aria-hidden="true"></span>{% endif %}
+                                    <a href="{{ row.href }}" data-dw-select aria-current="false" title="تحديد {{ row.type_label }} دون فتح التفاصيل">
+                                        <small>{{ row.code }}</small>{{ row.name }}
+                                    </a>
+                                </div>
+                            </td>
+                            <td><span class="dw-type dw-type-{{ row.kind }}">{{ row.type_label }}</span></td>
+                            <td class="dw-status-cell"><span>{{ row.status_label|default:'—' }}</span></td>
+                            <td class="dw-number-cell dw-duration-cell"><bdi dir="ltr">{{ row.planned_duration }}</bdi><span>ساعة</span></td>
+                            <td class="dw-number-cell dw-cost-cell"><bdi dir="ltr">{{ row.currency|default:item.currency }}</bdi><bdi dir="ltr">{{ row.planned_cost }}</bdi></td>
+                            <td class="dw-row-action-cell">
+                                <div class="dw-row-actions">
+                                    {% if row.resource_url %}<a class="dw-row-resource" href="{{ row.resource_url }}" data-pm-dialog aria-label="الموارد والاحتياجات {{ row.name }}" title="الموارد والاحتياجات">الموارد والاحتياجات</a>{% endif %}
+                                    {% if row.risk_add_url %}<a class="dw-row-risk" href="{{ row.risk_add_url }}" data-pm-dialog aria-label="إضافة خطر ضمن {{ row.name }}" title="إضافة خطر ضمن {{ row.name }}">إضافة خطر</a>{% endif %}
+                                    <a class="dw-row-details" href="{{ row.href }}" data-dw-open aria-label="عرض تفاصيل {{ row.type_label }} {{ row.name }}" title="عرض التفاصيل"><span aria-hidden="true">⌕</span><span>تفاصيل</span></a>
+                                    {% if row.edit_url %}<a class="dw-row-edit" href="{{ row.edit_url }}" data-pm-dialog aria-label="تعديل {{ row.type_label }} {{ row.name }}" title="تعديل {{ row.type_label }} {{ row.name }}"><span class="dw-row-edit-icon" aria-hidden="true">✎</span><span class="dw-visually-hidden">تعديل</span></a>{% endif %}
+                                    {% if row.add_url and not row.resource_url %}<a class="dw-row-add" href="{{ row.add_url }}" data-pm-dialog aria-label="إضافة {{ row.add_action_label }} ضمن {{ row.name }}" title="إضافة {{ row.add_action_label }} ضمن {{ row.name }}"><span class="dw-row-add-icon" aria-hidden="true">+</span><span class="dw-visually-hidden">إضافة {{ row.add_action_label }}</span></a>{% endif %}
+                                    {% if row.delete_url %}<a class="dw-row-delete" href="{{ row.delete_url }}" aria-label="حذف {{ row.type_label }} {{ row.name }}" title="حذف {{ row.type_label }} {{ row.name }}"><i class="fa-solid fa-trash-can" aria-hidden="true"></i><span class="dw-visually-hidden">حذف</span></a>{% endif %}
+                                    {% if not row.edit_url and not row.add_url and not row.delete_url %}<span class="dw-row-action-empty" aria-label="لا توجد إجراءات متاحة">—</span>{% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="6" class="dw-empty-row">ابدأ بإضافة مرحلة لبناء هيكل المشروع.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <aside class="dw-card dw-detail" aria-label="تفاصيل العنصر" aria-live="polite">
+            <div class="dw-heading">
+                <h2>تفاصيل العنصر</h2>
+                <div class="dw-detail-controls">
+                    <button type="button" data-dw-wide aria-pressed="false" aria-label="توسيع لوحة التفاصيل" title="توسيع أو تصغير لوحة التفاصيل" data-help="غيّر عرض لوحة التفاصيل لتسهيل قراءة بيانات العنصر.">⤢</button>
+                    <button type="button" data-dw-close aria-label="إغلاق لوحة التفاصيل" title="إغلاق لوحة التفاصيل" data-help="أغلق تفاصيل العنصر للعودة إلى مساحة الهيكل.">×</button>
+                </div>
+            </div>
+            <div data-dw-content>
+                <div class="dw-empty">اختر مرحلة أو مهمة أو نشاطًا من الهيكل لعرض التفاصيل وإدارة العمل.</div>
+            </div>
+        </aside>
+    </div>
+    </section>
+
+    <section class="dw-step-panel dw-card dw-planning-panel dw-work-panel" id="planning-step-schedule" role="tabpanel" aria-labelledby="planning-tab-1" data-planning-panel="1"
+             {% if planning_step != 1 %}hidden{% endif %}>
+        <header class="dw-planning-panel-heading">
+            <div><span class="dw-eyebrow">الخطوة الثانية</span><h2>الجدول الزمني</h2></div>
+            {% if hierarchy_url %}<a class="dw-primary" href="{{ project_root }}dependencies/" title="تحديد العلاقات بين الأنشطة السابقة واللاحقة" data-help="افتح شاشة ربط الأنشطة ومراجعة تسلسلها الزمني.">إدارة تبعيات الأنشطة</a>{% endif %}
+        </header>
+        <p>يعرض النظام تواريخ البداية والنهاية المخططة كما حُفظت. لا يُحسب مسار حرج أو تعارض CPM تلقائياً.</p>
+        {% if schedule_rows %}
+        <div class="dw-schedule-tools">
+            <label class="dw-schedule-search">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <span class="dw-visually-hidden">البحث في الجدول الزمني</span>
+                <input type="search" data-schedule-search placeholder="ابحث باسم النشاط أو رمزه أو التاريخ…" autocomplete="off">
+            </label>
+            <button type="button" data-schedule-clear disabled><i class="fas fa-xmark" aria-hidden="true"></i> مسح البحث</button>
+            <output data-schedule-count aria-live="polite">عرض {{ schedule_rows|length }} من {{ schedule_rows|length }} نشاط</output>
+        </div>
+        {% endif %}
+        {% include 'pm/planning_timeline.html' %}
+        <section class="dw-schedule-table-section" aria-labelledby="dw-schedule-table-title">
+            <header class="dw-planning-panel-heading"><div><span class="dw-eyebrow">بيانات الأنشطة</span><h3 id="dw-schedule-table-title">جدول المدد والتبعيات</h3></div></header>
+            <div class="dw-detail-table-wrap"><table class="dw-detail-table dw-schedule-table"><thead><tr><th scope="col">النشاط</th><th scope="col">البداية المخططة</th><th scope="col">النهاية المخططة</th><th scope="col">المدة</th><th scope="col">الأنشطة السابقة</th></tr></thead><tbody>
+            {% for row in schedule_rows %}<tr data-schedule-row><td>{% if row.edit_url %}<a href="{{ row.edit_url }}" data-pm-dialog><bdi>{{ row.activity_code }}</bdi> — {{ row.name }}</a>{% else %}<bdi>{{ row.activity_code }}</bdi> — {{ row.name }}{% endif %}</td><td><bdi>{{ row.planned_start_date|default:'غير محدد' }}</bdi></td><td><bdi>{{ row.planned_end_date|default:'غير محدد' }}</bdi></td><td><bdi>{{ row.planned_duration|default:'—' }}</bdi>{% if row.planned_duration %} ساعة{% endif %}</td><td>{% if row.predecessors %}{% for code in row.predecessors %}<bdi>{{ code }}</bdi>{% if not forloop.last %}، {% endif %}{% endfor %}{% else %}—{% endif %}</td></tr>{% empty %}<tr><td colspan="5" class="dw-empty-row">أضف أنشطة إلى هيكل المشروع لتظهر بياناتها الزمنية هنا.</td></tr>{% endfor %}
+            <tr data-schedule-no-results hidden><td colspan="5" class="dw-empty-row">لا توجد أنشطة تطابق البحث.</td></tr>
+            </tbody></table></div>
+        </section>
+        {% if schedule_warnings %}
+        <section class="dw-schedule-warnings" aria-label="تنبيهات تبعيات الجدول" role="status">
+            <h3>تنبيهات التبعيات المسجلة</h3>
+            {% for warning in schedule_warnings %}
+            <article class="dw-schedule-warning">
+                <strong>{{ warning.predecessor_name }} ← {{ warning.successor_name }}</strong>
+                <span>{{ warning.relation_label }}: {{ warning.message }}</span>
+            </article>
+            {% endfor %}
+        </section>
+        {% endif %}
+    </section>
+
+    <section class="dw-step-panel dw-card dw-planning-panel dw-work-panel" id="planning-step-resources" role="tabpanel" aria-labelledby="planning-tab-2" data-planning-panel="2"
+             {% if planning_step != 2 %}hidden{% endif %}>
+        <header class="dw-planning-panel-heading">
+            <div><span class="dw-eyebrow">الخطوة الثالثة</span><h2>الموارد والتكاليف المخططة</h2></div>
+        </header>
+        <p>القيم المحولة والتكلفة مصدرها خدمة التخطيط وأسعار الصرف المحفوظة، ولا تُعاد حسابها في المتصفح.</p>
+        {% if requirement_cost_totals %}
+        <dl class="dw-facts dw-cost-totals">
+            {% for total in requirement_cost_totals %}
+            <div><dt>إجمالي الاحتياجات بعملة {{ total.currency }}</dt><dd><bdi>{{ total.amount }} {{ total.currency }}</bdi></dd></div>
+            {% endfor %}
+        </dl>
+        {% endif %}
+        <div class="dw-detail-table-wrap">
+            <table class="dw-detail-table dw-resource-table">
+                <thead><tr><th scope="col">النشاط</th><th scope="col">الاحتياج</th><th scope="col">النوع / المصدر</th><th scope="col">الكمية</th><th scope="col">سعر الوحدة</th><th scope="col">التكلفة المخططة</th><th scope="col">إجراء</th></tr></thead>
+                <tbody>
+                {% for resource in requirement_rows %}
+                    <tr>
+                        <td><bdi>{{ resource.activity_code }}</bdi> — {{ resource.activity_name }}</td>
+                        <td>{{ resource.name }}</td>
+                        <td>{{ resource.resource_type|default:'—' }} / {{ resource.source|default:'—' }}</td>
+                        <td><bdi>{{ resource.quantity }}</bdi> {{ resource.unit }}</td>
+                        <td><bdi>{{ resource.unit_price }}</bdi> {{ resource.currency }}</td>
+                        <td><bdi>{{ resource.planned_cost }}</bdi> {{ resource.planned_cost_currency }}</td>
+                        <td>{% if resource.edit_url %}<a href="{{ resource.edit_url }}" data-pm-dialog>تعديل</a>{% else %}للقراءة{% endif %}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="7" class="dw-empty-row">لا توجد احتياجات موارد مخططة بعد.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if activity_resource_links %}
+        <h3 class="dw-subheading">إضافة احتياج إلى نشاط</h3>
+        <div class="dw-resource-activity-links">
+            {% for activity in activity_resource_links %}
+            <a href="{{ activity.url }}" data-pm-dialog><bdi>{{ activity.code }}</bdi> — {{ activity.name }} <span>＋ احتياج</span></a>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </section>
+
+    <section class="dw-step-panel dw-card dw-planning-panel dw-work-panel" id="planning-step-risks" role="tabpanel" aria-labelledby="planning-tab-3" data-planning-panel="3" {% if planning_step != 3 %}hidden{% endif %}>
+        <header class="dw-planning-panel-heading"><div><span class="dw-eyebrow">حوكمة المشروع</span><h2>المخاطر وإجراءات المعالجة</h2></div>{% if can_manage_risks and risk_create_url %}<a class="dw-primary" href="{{ risk_create_url }}?create=1" data-pm-dialog><i class="fas fa-plus" aria-hidden="true"></i> إضافة خطر</a>{% endif %}</header>
+        {% if can_view_risks %}
+        <div class="dw-risk-grid">
+            {% for risk in risk_rows %}<article class="dw-risk-card"><header><span><bdi>{{ risk.risk_code|default:'—' }}</bdi></span><span class="dw-risk-state">{% if risk.status == 'closed' %}مغلق{% else %}نشط{% endif %}</span></header><h3>{{ risk.description|default:'خطر دون وصف' }}</h3><p>{{ risk.classification|default:'دون تصنيف' }}</p><dl><div><dt>الاحتمال</dt><dd>{{ risk.probability|default:'0' }}%</dd></div><div><dt>الأثر</dt><dd>{{ risk.impact|default:'0' }}/5</dd></div><div><dt>الأهمية</dt><dd>{{ risk.importance|default:'0' }}</dd></div></dl><section><strong>إجراء المعالجة</strong><p>{{ risk.corrective_action|default:'لم يُسجل إجراء معالجة.' }}</p></section><footer><a href="{{ project_root }}risks/{{ risk.id }}/">التفاصيل</a>{% if can_manage_risks %}<a href="{{ project_root }}risks/{{ risk.id }}/edit/" data-pm-dialog>تعديل</a>{% endif %}</footer></article>{% empty %}<div class="dw-timeline-empty"><strong>لا توجد مخاطر مسجلة</strong><p>ستظهر هنا مخاطر المشروع وتقييماتها وإجراءات معالجتها.</p></div>{% endfor %}
+        </div>
+        {% else %}<p class="dw-notice">لا تتوفر تفاصيل المخاطر ضمن صلاحياتك الحالية.</p>{% endif %}
+    </section>
+
+    <section class="dw-step-panel dw-card dw-planning-panel dw-work-panel" id="planning-step-communications" role="tabpanel" aria-labelledby="planning-tab-4" data-planning-panel="4" {% if planning_step != 4 %}hidden{% endif %}>
+        <header class="dw-planning-panel-heading"><div><span class="dw-eyebrow">أصحاب العلاقة</span><h2>خطة التواصل</h2></div>{% if can_manage_communications and communication_url %}<a class="dw-primary" href="{{ communication_url }}?create=1" data-pm-dialog><i class="fas fa-plus" aria-hidden="true"></i> إضافة ترتيب تواصل</a>{% endif %}</header>
+        {% if can_view_communications %}<div class="dw-communication-grid">
+            {% for row in communication_rows %}<article class="dw-communication-card"><header><bdi>{{ row.item_code|default:row.id|default:'بند تواصل' }}</bdi><span>{{ row.report_type|default:'نوع التقرير غير محدد' }}</span></header><p>{{ row.purpose|default:'لم يُسجل الغرض بعد.' }}</p><dl><div><dt>التكرار</dt><dd>{{ row.frequency|default:'غير محدد' }}</dd></div><div><dt>المرسل</dt><dd>{{ row.sender_name|default:'غير محدد' }}</dd></div><div><dt>المستلمون</dt><dd>{{ row.receivers|default:'غير محددين' }}</dd></div><div><dt>وسيلة التواصل</dt><dd>{{ row.mechanism|default:'غير محددة' }}</dd></div></dl>{% if row.notes %}<p class="dw-communication-notes">{{ row.notes }}</p>{% endif %}{% if communication_url %}<footer><a href="{{ communication_url }}{{ row.id }}/">عرض التفاصيل</a>{% if can_manage_communications %}<a href="{{ communication_url }}{{ row.id }}/edit/" data-pm-dialog>تعديل</a>{% endif %}</footer>{% endif %}</article>{% empty %}<div class="dw-timeline-empty"><strong>لا توجد ترتيبات تواصل بعد</strong><p>أضف بنود الخطة لتوضيح التقارير المطلوبة، والأطراف، والتكرار، ووسيلة التواصل.</p></div>{% endfor %}
+        </div>{% else %}<p class="dw-notice">لا تتوفر خطة التواصل ضمن صلاحياتك الحالية.</p>{% endif %}
+    </section>
+
+    <section class="dw-step-panel dw-card dw-planning-panel dw-work-panel" id="planning-step-review" role="tabpanel" aria-labelledby="planning-tab-5" data-planning-panel="5"
+             {% if planning_step != 5 %}hidden{% endif %}>
+        <header class="dw-planning-panel-heading">
+            <div><span class="dw-eyebrow">القسم السادس</span><h2>مراجعة الخطة والاعتماد</h2></div>
+        </header>
+        <dl class="dw-facts dw-review-facts">
+            <div><dt>المراحل</dt><dd>{{ planning_tabs.0.count }}</dd></div>
+            <div><dt>المهام</dt><dd>{{ planning_tabs.1.count }}</dd></div>
+            <div><dt>الأنشطة</dt><dd>{{ activity_count }}</dd></div>
+            <div><dt>أنشطة بمدة صفرية أو غير محددة</dt><dd>{{ review_missing_duration|length }}</dd></div>
+            <div><dt>أنشطة بتواريخ ناقصة</dt><dd>{{ review_missing_dates|length }}</dd></div>
+            <div><dt>تنبيهات التبعيات المسجلة</dt><dd>{{ schedule_warnings|length }}</dd></div>
+            <div><dt>مخاطر مفتوحة</dt><dd>{% if can_view_risks %}{{ open_risks|length }}{% else %}غير متاح{% endif %}</dd></div>
+            <div><dt>ترتيبات التواصل</dt><dd>{{ communication_rows|length }}</dd></div>
+            <div><dt>التكلفة المخططة</dt><dd><bdi>{{ item.planned_cost }} {{ item.currency }}</bdi></dd></div>
+        </dl>
+        <aside class="dw-notice">هذه مؤشرات إرشادية. شروط اعتماد الأنشطة وتغيير حالة المشروع يطبقها مسار الاعتماد الخلفي فقط.</aside>
+        {% include 'pm/approval_content.html' with approval=approval_content error=approval_content.error result=approval_content.result project_url=project_url approval_post_url=approval_post_url approval_embedded=True %}
+        {% if schedule_warnings %}
+        <section class="dw-schedule-warnings" aria-label="مشكلات الجدول في مراجعة الخطة">
+            <h3>تنبيهات التبعيات المسجلة</h3>
+            {% for warning in schedule_warnings %}
+            <article class="dw-schedule-warning">
+                <strong>{{ warning.predecessor_name }} ← {{ warning.successor_name }}</strong>
+                <span>{{ warning.relation_label }}: {{ warning.message }}</span>
+            </article>
+            {% endfor %}
+        </section>
+        {% endif %}
+    </section>
+
+    <footer class="dw-work-footer">
+        <span>يُحفظ كل عنصر عبر نموذج التخطيط المعتمد.</span>
+        <div class="dw-work-footer-actions" role="group" aria-label="التنقل بين خطوات التخطيط">
+            <button type="button" data-planning-step-nav="-1" {% if planning_step == 0 %}disabled{% endif %} title="العودة إلى القسم السابق">السابق</button>
+            <button class="dw-primary" type="button" data-planning-step-nav="1" {% if planning_step == 5 %}hidden{% endif %} title="الانتقال إلى القسم التالي">التالي</button>
+        </div>
+    </footer>
+    <div class="dw-status" role="status" aria-live="polite" data-dw-status></div>
+</section>
+{% endblock %}
+{% block extra_js %}{{ block.super }}
+<script src="{% static 'pm/design-workspace.js' %}?v=20261102-schedule-v1" defer></script>
+<script src="{% static 'pm/approval.js' %}?v=20261020-approval-correction-2" defer></script>
+{% endblock %}

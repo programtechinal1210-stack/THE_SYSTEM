@@ -1,0 +1,664 @@
+/* Source: PM/static/css/reports_v2.css; scoped to PM only. */
+@scope (.pm-reference) {
+﻿/* ============================================================
+   Reports V2 - additive UI layer
+   Uses existing system theme variables where available.
+   ============================================================ */
+
+.rv2-nav-badge {
+    margin-right: auto;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    background: var(--secondary, #27AE60);
+    color: #fff;
+}
+
+.rv2-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.rv2-toolbar,
+.rv2-card {
+    background: var(--bg-card, #fff);
+    border-radius: var(--radius, 16px);
+    box-shadow: var(--shadow, 0 8px 32px rgba(0,0,0,.08));
+    border: 1px solid rgba(0,0,0,.05);
+}
+
+.rv2-toolbar {
+    padding: 18px 20px;
+    display: flex;
+    align-items: end;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.rv2-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 170px;
+    flex: 1;
+}
+
+.rv2-filter label {
+    font-size: .78rem;
+    font-weight: 700;
+    color: var(--text-secondary, #6b7280);
+}
+
+.rv2-filter input,
+.rv2-filter select {
+    width: 100%;
+    border: 1px solid rgba(0,0,0,.12);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: var(--bg-card, #fff);
+    color: var(--text-primary, #1f2937);
+    font-family: inherit;
+}
+
+.rv2-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.rv2-btn {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 700;
+    transition: transform .15s ease, opacity .15s ease;
+}
+
+.rv2-btn:hover {
+    transform: translateY(-1px);
+}
+
+.rv2-btn-primary {
+    background: var(--secondary, #27AE60);
+    color: white;
+}
+
+.rv2-btn-secondary {
+    background: rgba(0,0,0,.06);
+    color: var(--text-primary, #1f2937);
+}
+
+.rv2-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.rv2-heading h3 {
+    margin: 0;
+    color: var(--text-primary, #1f2937);
+}
+
+.rv2-heading p {
+    margin: 4px 0 0;
+    color: var(--text-secondary, #6b7280);
+    font-size: .85rem;
+}
+
+.rv2-kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+}
+
+.rv2-kpi {
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+}
+
+.rv2-kpi-label {
+    font-size: .78rem;
+    color: var(--text-secondary, #6b7280);
+    margin-bottom: 6px;
+}
+
+.rv2-kpi-value {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: var(--text-primary, #1f2937);
+}
+
+.rv2-kpi-desc {
+    margin-top: 8px;
+    font-size: .72rem;
+    color: var(--text-secondary, #6b7280);
+}
+
+.rv2-status-favorable {
+    border-right: 4px solid #16a34a;
+}
+
+.rv2-status-unfavorable {
+    border-right: 4px solid #dc2626;
+}
+
+.rv2-status-on_target {
+    border-right: 4px solid #2563eb;
+}
+
+.rv2-status-neutral {
+    border-right: 4px solid #9ca3af;
+}
+
+.rv2-summary {
+    padding: 18px 20px;
+}
+
+.rv2-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.rv2-summary-item {
+    padding: 12px;
+    border-radius: 10px;
+    background: rgba(0,0,0,.025);
+}
+
+.rv2-summary-item span {
+    display: block;
+    font-size: .75rem;
+    color: var(--text-secondary, #6b7280);
+}
+
+.rv2-summary-item strong {
+    display: block;
+    margin-top: 4px;
+    color: var(--text-primary, #1f2937);
+}
+
+.rv2-charts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 14px;
+}
+
+.rv2-chart-card {
+    padding: 16px;
+    min-height: 300px;
+}
+
+.rv2-chart-card h4 {
+    margin: 0 0 12px;
+    color: var(--text-primary, #1f2937);
+}
+
+.rv2-chart-wrap {
+    position: relative;
+    height: 250px;
+}
+
+.rv2-table-card {
+    overflow: hidden;
+}
+
+.rv2-table-head {
+    padding: 16px 18px;
+    border-bottom: 1px solid rgba(0,0,0,.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.rv2-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.rv2-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1050px;
+}
+
+.rv2-table th,
+.rv2-table td {
+    padding: 11px 12px;
+    text-align: right;
+    border-bottom: 1px solid rgba(0,0,0,.06);
+    white-space: nowrap;
+}
+
+.rv2-table th {
+    font-size: .75rem;
+    color: var(--text-secondary, #6b7280);
+    background: rgba(0,0,0,.025);
+    position: sticky;
+    top: 0;
+}
+
+.rv2-table td {
+    font-size: .82rem;
+    color: var(--text-primary, #1f2937);
+}
+
+.rv2-pill {
+    display: inline-flex;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 700;
+}
+
+.rv2-pill-unfavorable {
+    background: rgba(220,38,38,.1);
+    color: #b91c1c;
+}
+
+.rv2-pill-on_target {
+    background: rgba(37,99,235,.1);
+    color: #1d4ed8;
+}
+
+.rv2-pill-favorable {
+    background: rgba(22,163,74,.1);
+    color: #15803d;
+}
+
+.rv2-loading,
+.rv2-error,
+.rv2-empty {
+    padding: 44px 20px;
+    text-align: center;
+    border-radius: var(--radius, 16px);
+    background: var(--bg-card, #fff);
+    color: var(--text-secondary, #6b7280);
+}
+
+.rv2-error {
+    color: #b91c1c;
+}
+
+.rv2-warning {
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(245,158,11,.1);
+    color: #92400e;
+    font-size: .82rem;
+}
+
+@media (max-width: 768px) {
+    .rv2-toolbar {
+        align-items: stretch;
+    }
+
+    .rv2-filter {
+        min-width: 100%;
+    }
+
+    .rv2-charts {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media print {
+    .rv2-toolbar,
+    .reports-nav,
+    .report-toolbar {
+        display: none !important;
+    }
+
+    .rv2-card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        break-inside: avoid;
+    }
+}
+
+/* Schedule variance helpers */
+.rv2-time-positive {
+    color: #b91c1c;
+    font-weight: 700;
+}
+
+.rv2-time-negative {
+    color: #15803d;
+    font-weight: 700;
+}
+
+/* Cost variance helpers */
+.rv2-cost-over {
+    color: #b91c1c;
+    font-weight: 700;
+}
+
+.rv2-cost-under {
+    color: #15803d;
+    font-weight: 700;
+}
+
+/* Planned vs Actual helpers */
+.rv2-progress-behind {
+    color: #b91c1c;
+    font-weight: 700;
+}
+
+.rv2-progress-ahead {
+    color: #15803d;
+    font-weight: 700;
+}
+
+/* Project hierarchy health helpers */
+.rv2-health-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 800;
+}
+
+.rv2-health-critical {
+    background: rgba(220,38,38,.12);
+    color: #b91c1c;
+}
+
+.rv2-health-warning {
+    background: rgba(245,158,11,.14);
+    color: #92400e;
+}
+
+.rv2-health-healthy {
+    background: rgba(22,163,74,.12);
+    color: #15803d;
+}
+
+.rv2-health-completed {
+    background: rgba(37,99,235,.12);
+    color: #1d4ed8;
+}
+
+/* Risk exposure helpers */
+.rv2-risk-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 800;
+}
+
+.rv2-risk-critical {
+    background: rgba(127,29,29,.14);
+    color: #991b1b;
+}
+
+.rv2-risk-high {
+    background: rgba(220,38,38,.12);
+    color: #b91c1c;
+}
+
+.rv2-risk-medium {
+    background: rgba(245,158,11,.14);
+    color: #92400e;
+}
+
+.rv2-risk-low {
+    background: rgba(22,163,74,.12);
+    color: #15803d;
+}
+
+/* Resource load helpers */
+.rv2-resource-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 800;
+}
+
+.rv2-resource-new {
+    background: rgba(37,99,235,.12);
+    color: #1d4ed8;
+}
+
+.rv2-resource-reused {
+    background: rgba(22,163,74,.12);
+    color: #15803d;
+}
+
+.rv2-resource-consumed {
+    background: rgba(245,158,11,.14);
+    color: #92400e;
+}
+
+.rv2-resource-generic {
+    background: rgba(100,116,139,.12);
+    color: #475569;
+}
+
+/* Work orders performance helpers */
+.rv2-wo-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: .72rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.rv2-wo-critical {
+    background: rgba(220,38,38,.12);
+    color: #b91c1c;
+}
+
+.rv2-wo-warning {
+    background: rgba(245,158,11,.14);
+    color: #92400e;
+}
+
+.rv2-wo-healthy {
+    background: rgba(22,163,74,.12);
+    color: #15803d;
+}
+
+.rv2-wo-completed {
+    background: rgba(37,99,235,.12);
+    color: #1d4ed8;
+}
+
+.rv2-wo-link {
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.rv2-wo-link:hover {
+    text-decoration: underline;
+}
+
+.rv2-priority-card {
+    margin-top: 16px;
+}
+
+.rv2-priority-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 12px;
+}
+
+.rv2-priority-item {
+    border: 1px solid rgba(148,163,184,.25);
+    border-radius: 14px;
+    padding: 14px;
+    background: rgba(255,255,255,.5);
+}
+
+.rv2-priority-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.rv2-priority-title {
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.rv2-priority-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: .78rem;
+    opacity: .85;
+}
+
+.rv2-priority-meta span {
+    padding: 3px 7px;
+    border-radius: 8px;
+    background: rgba(148,163,184,.10);
+}
+
+/* ============================================================
+   Reports UI — Management Levels
+   ============================================================ */
+
+.reports-management-levels {
+    margin: 0 0 14px;
+    padding: 12px;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 12px;
+    background: var(--card-bg, #ffffff);
+}
+
+.reports-management-levels-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    font-weight: 800;
+    font-size: 0.9rem;
+}
+
+.reports-management-levels-title i {
+    opacity: 0.8;
+}
+
+.reports-management-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+}
+
+.reports-management-tab {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 67px;
+    padding: 8px 6px;
+    border: 1px solid var(--border-color, #dfe4ea);
+    border-radius: 9px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font: inherit;
+    transition:
+        transform 0.15s ease,
+        border-color 0.15s ease,
+        background 0.15s ease;
+}
+
+.reports-management-tab:hover {
+    transform: translateY(-1px);
+    background: rgba(127, 127, 127, 0.06);
+}
+
+.reports-management-tab.active {
+    border-color: var(--primary-color, #2e7d32);
+    background: color-mix(
+        in srgb,
+        var(--primary-color, #2e7d32) 10%,
+        transparent
+    );
+}
+
+.reports-management-tab > i {
+    font-size: 1rem;
+}
+
+.reports-management-tab-text {
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1.25;
+    text-align: center;
+}
+
+.reports-management-count {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    min-width: 19px;
+    height: 19px;
+    padding: 0 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: rgba(127, 127, 127, 0.12);
+    font-size: 0.65rem;
+    font-weight: 800;
+}
+
+.reports-management-hint {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 9px;
+    padding-top: 9px;
+    border-top: 1px dashed var(--border-color, #e5e7eb);
+    font-size: 0.73rem;
+    line-height: 1.5;
+    opacity: 0.85;
+}
+
+.reports-management-hint strong {
+    font-size: 0.78rem;
+}
+
+.report-nav-item[aria-hidden="true"] {
+    display: none !important;
+}
+
+@media (max-width: 900px) {
+    .reports-management-tabs {
+        grid-template-columns: 1fr;
+    }
+
+    .reports-management-tab {
+        min-height: 48px;
+        flex-direction: row;
+    }
+}
+
+
+}

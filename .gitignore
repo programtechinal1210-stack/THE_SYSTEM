@@ -1,0 +1,95 @@
+# Secrets and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*credentials*.json
+*secrets*.json
+
+# Databases and runtime data
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.sqlite3-*
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Runtime and generated files
+__pycache__/
+*.py[cod]
+*.log
+logs/
+tmp/
+temp/
+media/
+uploads/
+staticfiles/
+
+# Python environments
+venv/
+.venv/
+env/
+
+# Test and temporary directories
+work/
+.work/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Node dependencies
+node_modules/
+
+# Historical copies and backup artifacts
+*.bak
+*.bak-*
+*.backup
+*.orig
+*.old
+*.swp
+*.swo
+
+# Archives and database exports
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.rar
+*.sql.gz
+*.dump
+
+# Unverified example configuration secrets
+.env.example
+backend/.env.example
+
+# Runtime lock files
+*.lock
+*.pid
+
+# SQLite temporary files
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite-journal
+
+# Exclude runtime data directory
+/data/
+
+# Empty local document
+/الاسئلة وال.docx
+
+# Pending security review
+/frontend/modules/module_auth/tests/test_views.py
+/frontend/modules/module_notifications/tests/test_views.py
+/frontend/modules/module_users/tests/test_views.py

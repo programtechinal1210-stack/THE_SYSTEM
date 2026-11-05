@@ -1,0 +1,23 @@
+{% if document.posted_reversal %}
+<p role="status">عُكس الأثر بمستند مستقل: <a href="{{ base_url }}&document={{ document.posted_reversal.id }}">{{ document.posted_reversal.document_no }}</a>. بقي سجل الأصل محفوظًا.</p>
+{% endif %}
+{% if document.reverses_document_id %}
+<p>عكس المستند: <a href="{{ base_url }}&document={{ document.reverses_document_id }}">{{ document.reversal_original_document_no }}</a></p>
+<p>القيود المقابلة {% if document.status != 'POSTED' and document.status != 'CLOSED' %}المقترحة — لا أثر حتى الترحيل{% endif %}</p>
+{% for leg in document.reversal_legs %}
+<p data-reversal-leg>{{ leg.stock_status }} · الكمية <bdi dir="ltr">{{ leg.quantity_delta }}</bdi>{% if leg.value_delta_valuation != None %} · القيمة ({{ readiness.valuation_currency }}) <bdi dir="ltr">{{ leg.value_delta_valuation }}</bdi>{% endif %}</p>
+{% endfor %}
+{% endif %}
+{% if reversal_options.enabled %}
+<form method="post" data-reversal-form>{% csrf_token %}
+<input type="hidden" name="warehouse_id" value="{{ selected_warehouse }}"><input type="hidden" name="document_id" value="{{ document.id }}">
+<label>تاريخ العكس في فترة مفتوحة<input type="date" name="reversal_date" value="{{ today }}" required></label>
+<label>سبب العكس<textarea name="reversal_reason" minlength="3" maxlength="2000" required></textarea></label>
+<button class="btn" name="command" value="reverse">إنشاء مسودة عكس مستقلة</button>
+<p>تحتاج المسودة إلى اعتماد مستقل. لا يعاد تنشيط الحجوزات التاريخية تلقائيًا؛ احجز الطلب المتبقي بإجراء جديد عند الحاجة.</p>
+</form>
+{% elif reversal_options.reason == 'REVERSE_ACTIVE_SETTLEMENTS_FIRST' %}
+<p role="status">اعكس تسويات المصدر النافذة أولًا؛ لا يجوز عكس تسليم أو إرسال أو استلام قبل مرتجعاته وتسوياته المرتبطة.</p>
+{% elif reversal_options.reason == 'EXTERNAL_SOURCE_REQUIRES_OWNER_COMPENSATION' or reversal_options.reason == 'EXTERNAL_PART_REQUIRES_OWNER_COMPENSATION' %}
+<p role="status">هذا المستند مرتبط بوحدة أخرى. يلزم مسار تعويض معتمد من الوحدة المالكة.</p>
+{% endif %}

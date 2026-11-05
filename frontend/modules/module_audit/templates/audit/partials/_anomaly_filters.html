@@ -1,0 +1,118 @@
+﻿<!-- ============================================================
+     فلاتر الحالات الشاذة
+     ============================================================ -->
+<div class="filter-bar" id="anomalyFilterBar">
+    <!-- بحث -->
+    <div class="filter-group">
+        <label>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            بحث
+        </label>
+        <input type="text" 
+               name="search" 
+               placeholder="عنوان، وصف، مستخدم..." 
+               value="{{ filters.search|default:'' }}"
+               hx-get="/audit/api/anomalies/"
+               hx-trigger="keyup changed delay:500ms"
+               hx-target="#anomalyList"
+               hx-include="#anomalyFilterBar">
+    </div>
+
+    <!-- نوع الشذوذ -->
+    <div class="filter-group">
+        <label>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            نوع الشذوذ
+        </label>
+        <select name="anomaly_type"
+                hx-get="/audit/api/anomalies/"
+                hx-trigger="change"
+                hx-target="#anomalyList"
+                hx-include="#anomalyFilterBar">
+            <option value="">الكل</option>
+            <option value="brute_force_attempt" {% if filters.anomaly_type == 'brute_force_attempt' %}selected{% endif %}>🔐 محاولة اقتحام</option>
+            <option value="bulk_delete" {% if filters.anomaly_type == 'bulk_delete' %}selected{% endif %}>🗑️ حذف جماعي</option>
+            <option value="off_hours_activity" {% if filters.anomaly_type == 'off_hours_activity' %}selected{% endif %}>🌙 نشاط خارج الدوام</option>
+            <option value="sensitive_permission_change" {% if filters.anomaly_type == 'sensitive_permission_change' %}selected{% endif %}>🔑 تغيير صلاحيات</option>
+            <option value="large_data_export" {% if filters.anomaly_type == 'large_data_export' %}selected{% endif %}>📦 تصدير كبير</option>
+        </select>
+    </div>
+
+    <!-- الخطورة -->
+    <div class="filter-group">
+        <label>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            </svg>
+            الخطورة
+        </label>
+        <select name="severity"
+                hx-get="/audit/api/anomalies/"
+                hx-trigger="change"
+                hx-target="#anomalyList"
+                hx-include="#anomalyFilterBar">
+            <option value="">الكل</option>
+            <option value="warning" {% if filters.severity == 'warning' %}selected{% endif %}>⚠️ تحذير</option>
+            <option value="critical" {% if filters.severity == 'critical' %}selected{% endif %}>🔴 حرج</option>
+        </select>
+    </div>
+
+    <!-- حالة الحل -->
+    <div class="filter-group">
+        <label>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+            </svg>
+            حالة الحل
+        </label>
+        <select name="resolution_status"
+                hx-get="/audit/api/anomalies/"
+                hx-trigger="change"
+                hx-target="#anomalyList"
+                hx-include="#anomalyFilterBar">
+            <option value="">الكل</option>
+            <option value="open" {% if filters.resolution_status == 'open' %}selected{% endif %}>🔴 مفتوحة</option>
+            <option value="investigating" {% if filters.resolution_status == 'investigating' %}selected{% endif %}>🔍 قيد التحقيق</option>
+            <option value="resolved" {% if filters.resolution_status == 'resolved' %}selected{% endif %}>✅ محلولة</option>
+            <option value="dismissed" {% if filters.resolution_status == 'dismissed' %}selected{% endif %}>❌ مهملة</option>
+            <option value="false_positive" {% if filters.resolution_status == 'false_positive' %}selected{% endif %}>⚠️ إنذار خاطئ</option>
+        </select>
+    </div>
+
+    <!-- أزرار -->
+    <button class="btn-search" 
+            hx-get="/audit/api/anomalies/" 
+            hx-target="#anomalyList" 
+            hx-include="#anomalyFilterBar"
+            hx-trigger="click">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        بحث
+    </button>
+    
+    <button class="btn-reset" 
+            onclick="resetAnomalyFilters()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>
+        </svg>
+        إعادة تعيين
+    </button>
+
+    <button class="btn-search" style="background: #ef4444;" 
+            hx-post="/audit/api/anomalies/detect/"
+            hx-target="#anomalyList"
+            hx-include="#anomalyFilterBar"
+            hx-trigger="click"
+            onclick="showToast('🔍 جاري فحص النظام...', 'info')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        فحص الآن
+    </button>
+</div>

@@ -1,0 +1,170 @@
+{% extends "pm/reference_base.html" %}
+{% load static %}
+{% block title %}إدارة المشاريع — THE_SYSTEM{% endblock %}
+{% block extra_head %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'pm/home.css' %}?v=20261016-reference">
+<link rel="stylesheet" href="{% static 'pm/home-reference.css' %}?v=20261016-compact3">
+{% endblock %}
+{% block breadcrumb %}{% endblock %}
+{% block global_search_input %}<input type="search" id="pm-dashboard-search" placeholder="البحث في المشاريع ..." aria-label="البحث في المشاريع">{% endblock %}
+{% block pm_content %}
+<section class="pm-home" aria-labelledby="pm-title">
+    <div class="pm-dashboard-title"><span class="pm-title-icon"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></span><div><h1 id="pm-title">إدارة المشاريع</h1><p>لوحة قيادة المشاريع والتخطيط والتنفيذ والرقابة</p></div></div>
+    <header class="pm-home-hero">
+        <span class="pm-welcome-target" aria-hidden="true"><i class="fa-solid fa-bullseye"></i></span>
+        <div class="pm-home-intro"><h2>مرحباً بك في إدارة المشاريع</h2><p>تابع أداء المشاريع، راقب التقدم، وأدر المخاطر والموارد لتحقيق أهداف المؤسسة بكفاءة.</p><span class="pm-home-visually-hidden">لوحة متابعة المحفظة</span></div>
+        <div class="pm-welcome-caption"><strong>من الفكرة إلى الإنجاز</strong><small>إدارة متكاملة لدورة حياة المشاريع</small></div>
+        <div class="pm-welcome-art" aria-hidden="true"><span class="pm-art-sheet"></span><span class="pm-art-chart"><b></b><b></b><b></b><b></b></span><span class="pm-art-note"></span></div>
+    </header>
+
+    {% if dashboard_available %}
+    <section class="pm-home-kpis" aria-label="مؤشرات المحفظة">
+        <article class="pm-home-kpi blue"><span class="pm-home-kpi-icon"><i class="fa-regular fa-folder" aria-hidden="true"></i></span><span class="pm-home-kpi-label">مشاريع قيد التنفيذ</span><strong>{{ active_projects }}</strong><small>من إجمالي {{ total_projects }} مشروع</small></article>
+        <article class="pm-home-kpi red"><span class="pm-home-kpi-icon"><i class="fa-regular fa-clock" aria-hidden="true"></i></span><span class="pm-home-kpi-label">المشاريع المتأخرة</span><strong aria-label="غير متاح">—</strong><small>بيانات التأخير غير متاحة</small></article>
+        <article class="pm-home-kpi orange"><span class="pm-home-kpi-icon"><i class="fa-regular fa-file-lines" aria-hidden="true"></i></span><span class="pm-home-kpi-label">الخطط بانتظار الاعتماد</span><strong aria-label="غير متاح">—</strong><small>بيانات الاعتماد غير متاحة</small></article>
+        <article class="pm-home-kpi blue"><span class="pm-home-kpi-icon"><i class="fa-solid fa-gear" aria-hidden="true"></i></span><span class="pm-home-kpi-label">أوامر التشغيل</span><strong>{{ total_work_orders }}</strong><small>إجمالي الأوامر ضمن نطاقك</small></article>
+        <article class="pm-home-kpi teal"><span class="pm-home-kpi-icon pm-mini-ring" aria-hidden="true"></span><span class="pm-home-kpi-label">نسبة الالتزام بالخطة</span><strong aria-label="غير متاح">—</strong><small>بيانات الالتزام غير متاحة</small></article>
+        <article class="pm-home-kpi teal"><span class="pm-home-kpi-icon"><i class="fa-solid fa-money-bill-1-wave" aria-hidden="true"></i></span><span class="pm-home-kpi-label">إجمالي الميزانية المخططة</span><div class="pm-budget-values">{% for budget in budget_totals %}<strong><bdi>{{ budget.amount }}</bdi> <small>{{ budget.currency }}</small></strong>{% empty %}<strong>—</strong>{% endfor %}</div><small>حسب عملة المشروع</small></article>
+    </section>
+
+    <div class="pm-home-insights">
+        <section class="pm-home-panel pm-home-status-panel" aria-labelledby="pm-status-heading">
+            <header class="pm-home-panel-heading">
+                <div><span class="pm-home-panel-kicker">توزيع المحفظة</span><h2 id="pm-status-heading"><i class="fa-solid fa-chart-pie" aria-hidden="true"></i> توزيع المشاريع حسب الحالة</h2></div>
+                <span class="pm-home-panel-total">{{ total_projects }} مشروع</span>
+            </header>
+            {% if total_projects %}
+            <div class="pm-status-chart"><div class="pm-donut" style="background:conic-gradient({{ status_gradient }})" role="img" aria-label="توزيع {{ total_projects }} مشروع حسب الحالة"><span><strong>{{ total_projects }}</strong><small>مشروع</small></span></div><div class="pm-home-status-list">
+                {% for row in status_breakdown %}
+                {% if row.count %}
+                <div class="pm-home-status-row">
+                    <div class="pm-home-status-label"><span class="pm-home-status-dot {{ row.code }}"></span><span>{{ row.label }}</span><strong>{{ row.count }} ({{ row.width }}%)</strong></div>
+                    <div class="pm-home-status-track" role="img" aria-label="{{ row.label }}: {{ row.count }} من {{ total_projects }}">
+                        <span class="{{ row.code }}" style="width: {{ row.width }}%"></span>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div></div>
+            {% else %}
+            <p class="pm-home-no-data">لا توجد مشاريع متاحة ضمن نطاق تقاريرك.</p>
+            {% endif %}
+        </section>
+
+        <section class="pm-home-panel pm-trend-panel" aria-labelledby="pm-trend-heading"><header class="pm-home-panel-heading"><h2 id="pm-trend-heading"><i class="fa-solid fa-chart-column" aria-hidden="true"></i> تقدم المشاريع خلال الأشهر الأخيرة</h2><span class="pm-period">6 أشهر</span></header><div class="pm-chart-empty"><div class="pm-chart-grid" aria-hidden="true"></div><span><i class="fa-solid fa-chart-column" aria-hidden="true"></i><b>لا تتوفر بيانات تاريخية للتقدم</b><small>ستظهر الاتجاهات عند توفر التقارير المؤرخة</small></span></div><div class="pm-chart-legend"><span>● مكتمل</span><span>● قيد التنفيذ</span><span>● متأخر</span></div></section>
+        <section class="pm-home-panel pm-upcoming-panel" aria-labelledby="pm-upcoming-heading"><header class="pm-home-panel-heading"><h2 id="pm-upcoming-heading"><i class="fa-solid fa-calendar-days" aria-hidden="true"></i> المواعيد القادمة</h2></header><div class="pm-panel-empty"><i class="fa-regular fa-calendar" aria-hidden="true"></i><strong>لا تتوفر مواعيد في التقرير الحالي</strong><small>راجع خطة المشروع للاطلاع على تواريخه</small></div></section>
+
+        <section class="pm-home-panel pm-home-attention-panel" aria-labelledby="pm-attention-heading">
+            <header class="pm-home-panel-heading">
+                <div><span class="pm-home-panel-kicker">متابعة الرقابة</span><h2 id="pm-attention-heading">التنبيهات والاعتمادات</h2></div>
+                <i class="fa-solid fa-bell" aria-hidden="true"></i>
+            </header>
+            {% if risk_link_available %}<a class="pm-home-attention-link risk" href="/pm/workspace/risks/">
+                <span class="pm-home-attention-icon"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></span>
+                <span><strong>المخاطر المفتوحة</strong><small>راجع المخاطر النشطة في المشاريع</small></span><b>{{ open_risks }}</b>
+            </a>{% endif %}
+            {% if deviation_link_available %}<a class="pm-home-attention-link deviation" href="/pm/workspace/deviations/">
+                <span class="pm-home-attention-icon"><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i></span>
+                <span><strong>الانحرافات المفتوحة</strong><small>تابع الإجراءات التصحيحية</small></span><b>{{ open_deviations }}</b>
+            </a>{% endif %}
+            <p class="pm-home-data-note">تعرض هذه اللوحة الأعداد المتاحة في التقارير الحالية؛ لا تشمل تنبيهات أو مواعيد غير مسجلة في مصدرها.</p>
+        </section>
+    </div>
+
+    {% endif %}
+    <section class="pm-home-actions-panel" aria-labelledby="pm-actions-heading">
+        <header class="pm-home-panel-heading">
+            <h2 id="pm-actions-heading"><i class="fa-solid fa-bolt" aria-hidden="true"></i> إجراءات سريعة</h2>
+            <nav class="pm-home-utility-links" aria-label="روابط إدارة المشاريع">
+                {% for entry in secondary_operation_links %}
+                <a href="{{ entry.url }}" title="{{ entry.description }}">
+                    <i class="fa-solid {{ entry.icon }}" aria-hidden="true"></i>{{ entry.label }}
+                </a>
+                {% endfor %}
+                {% for entry in quick_links %}
+                {% if entry.url != "/pm/projects/" %}
+                <a href="{{ entry.url }}"{% if entry.dialog %} data-pm-dialog{% endif %}>
+                    <i class="fa-solid {{ entry.icon }}" aria-hidden="true"></i>{{ entry.label }}
+                </a>
+                {% endif %}
+                {% endfor %}
+            </nav>
+        </header>
+        {% if quick_operation_links or quick_links %}
+        <nav class="pm-home-hero-actions" aria-label="إجراءات إدارة المشاريع">
+            {% for entry in quick_links %}
+            {% if entry.url == "/pm/projects/" %}
+            <a class="pm-home-card pm-home-project-action" href="{{ entry.url }}">
+                <span class="pm-home-card-icon" aria-hidden="true"><i class="fa-solid {{ entry.icon }}"></i></span>
+                <span class="pm-home-card-title">{{ entry.label }}</span>
+            </a>
+            {% endif %}
+            {% endfor %}
+            {% for entry in quick_operation_links %}
+            <a class="pm-home-card" href="{{ entry.url }}" title="{{ entry.description }}">
+                <span class="pm-home-card-icon" aria-hidden="true"><i class="fa-solid {{ entry.icon }}"></i></span>
+                <span class="pm-home-card-title">{{ entry.label }}</span>
+            </a>
+            {% endfor %}
+        </nav>
+        {% else %}
+        <div class="pm-home-empty" role="status">
+            <span class="pm-home-empty-icon" aria-hidden="true"><i class="fa-solid fa-lock"></i></span>
+            <h2>لا توجد أقسام تشغيلية متاحة</h2>
+            <p>إذا كنت تتوقع الوصول إلى قسم معين، يُرجى مراجعة مسؤول النظام بشأن الصلاحيات.</p>
+        </div>
+        {% endif %}
+    </section>
+    {% if dashboard_available %}
+    <section class="pm-home-panel pm-home-projects-panel" aria-labelledby="pm-projects-heading">
+        <header class="pm-home-panel-heading">
+            <div><span class="pm-home-panel-kicker">نظرة تنفيذية</span><h2 id="pm-projects-heading"><i class="fa-solid fa-briefcase" aria-hidden="true"></i> مشاريعي الحالية</h2></div>
+            <div class="pm-home-project-actions">
+                {% for entry in quick_links %}
+                {% if entry.url == "/pm/reporting/" %}
+                <a href="{{ entry.url }}" class="pm-home-view-all">{{ entry.label }} <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
+                {% endif %}
+                {% if entry.url == "/pm/projects/edit/" %}
+                <a href="{{ entry.url }}" class="pm-home-view-all"{% if entry.dialog %} data-pm-dialog{% endif %}><i class="fa-solid {{ entry.icon }}" aria-hidden="true"></i>{{ entry.label }}</a>
+                {% endif %}
+                {% if entry.url == "/pm/recycle/" %}
+                <a href="{{ entry.url }}" class="pm-home-view-all">{{ entry.label }} <i class="fa-solid {{ entry.icon }}" aria-hidden="true"></i></a>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </header>
+        <div class="pm-home-table-wrap">
+            <table class="pm-home-project-table">
+                <thead><tr><th scope="col">المشروع</th><th scope="col">الحالة</th><th scope="col">الميزانية المخططة</th><th scope="col">التكلفة الفعلية</th><th scope="col">المخاطر</th><th scope="col">الانحرافات</th><th scope="col"><span class="pm-home-visually-hidden">فتح التقرير</span></th></tr></thead>
+                <tbody>
+                    {% for row in project_rows %}
+                    <tr>
+                        <td><a href="{{ row.href }}" class="pm-home-project-name"><strong>{{ row.name }}</strong><small>{{ row.project_code }}</small></a></td>
+                        <td><span class="pm-home-status-pill {{ row.status }}">{{ row.status_label }}</span></td>
+                        <td><bdi>{{ row.planned_cost }}</bdi> <small>{{ row.currency }}</small></td>
+                        <td><bdi>{{ row.actual_cost }}</bdi> <small>{{ row.currency }}</small></td>
+                        <td><span class="pm-home-table-count {% if row.open_risks %}warning{% endif %}">{{ row.open_risks }}</span></td>
+                        <td><span class="pm-home-table-count {% if row.open_deviations %}warning{% endif %}">{{ row.open_deviations }}</span></td>
+                        <td><a class="pm-home-row-link" href="{{ row.href }}" aria-label="فتح تقرير {{ row.name }}"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="pm-home-no-data">لا توجد مشاريع متاحة ضمن نطاق تقاريرك.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p class="pm-home-data-note">تُعرض التكلفة بعملة كل مشروع، ولا تُجمع عملات المشاريع المختلفة في إجمالي واحد.</p>
+    </section>
+    {% else %}
+    <section class="pm-home-no-access" role="status">
+        <i class="fa-solid fa-chart-pie" aria-hidden="true"></i>
+        <div><h2>مؤشرات المحفظة غير متاحة لهذا الحساب</h2><p>تظهر بيانات المشاريع والتقارير عند توفر صلاحية تقارير إدارة المشاريع.</p></div>
+        {% if quick_links %}<a href="{{ quick_links.0.url }}">الانتقال إلى القسم المتاح</a>{% endif %}
+    </section>
+    {% endif %}
+
+
+</section>
+{% endblock %}
+
+{% block extra_js %}{{ block.super }}<script src="{% static 'pm/home.js' %}?v=20261016-reference" defer></script>{% endblock %}

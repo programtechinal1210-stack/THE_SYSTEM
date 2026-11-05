@@ -1,0 +1,63 @@
+﻿<!-- ============================================================
+     ترقيم سجل التنفيذ
+     ============================================================ -->
+{% if total_pages > 1 %}
+<div class="pagination-container">
+    <div class="pagination-info">
+        عرض <strong>{{ page_start }} - {{ page_end }}</strong> من أصل <strong>{{ total_count }}</strong> سجل تنفيذ
+    </div>
+    
+    <div class="pagination">
+        {% if current_page > 1 %}
+        <button class="pagination-btn" 
+                hx-get="/audit/api/execution/?page=1" 
+                hx-target="#executionTable" 
+                hx-include="#executionFilterBar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/>
+            </svg>
+        </button>
+        <button class="pagination-btn" 
+                hx-get="/audit/api/execution/?page={{ current_page|add:-1 }}" 
+                hx-target="#executionTable" 
+                hx-include="#executionFilterBar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"/>
+            </svg>
+        </button>
+        {% endif %}
+
+        {% for page_num in page_range %}
+            {% if page_num == current_page %}
+            <button class="pagination-btn active">{{ page_num }}</button>
+            {% elif page_num == '...' %}
+            <span class="pagination-ellipsis">...</span>
+            {% else %}
+            <button class="pagination-btn" 
+                    hx-get="/audit/api/execution/?page={{ page_num }}" 
+                    hx-target="#executionTable" 
+                    hx-include="#executionFilterBar">{{ page_num }}</button>
+            {% endif %}
+        {% endfor %}
+
+        {% if current_page < total_pages %}
+        <button class="pagination-btn" 
+                hx-get="/audit/api/execution/?page={{ current_page|add:1 }}" 
+                hx-target="#executionTable" 
+                hx-include="#executionFilterBar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"/>
+            </svg>
+        </button>
+        <button class="pagination-btn" 
+                hx-get="/audit/api/execution/?page={{ total_pages }}" 
+                hx-target="#executionTable" 
+                hx-include="#executionFilterBar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>
+            </svg>
+        </button>
+        {% endif %}
+    </div>
+</div>
+{% endif %}

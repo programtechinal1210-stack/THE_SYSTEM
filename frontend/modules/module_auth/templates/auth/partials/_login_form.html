@@ -1,0 +1,86 @@
+﻿{% load static %}
+
+<form class="auth-form" method="post" autocomplete="off" novalidate>
+    {% csrf_token %}
+    
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- حقل اسم المستخدم                                   -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <div class="form-group">
+        <div class="input-wrapper">
+            <i class="fas fa-user input-icon"></i>
+            <input 
+                type="text" 
+                name="{{ form.username.name }}" 
+                id="{{ form.username.id_for_label }}"
+                placeholder="البريد الإلكتروني أو اسم المستخدم" 
+                required 
+                autocomplete="username"
+                dir="ltr"
+                value="{{ form.username.value|default:'' }}"
+            >
+        </div>
+        {% if form.username.errors %}
+        <div class="field-error">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ form.username.errors.0 }}
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- حقل كلمة المرور                                    -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <div class="form-group">
+        <div class="input-wrapper password-wrapper">
+            <i class="fas fa-lock input-icon"></i>
+            <input 
+                type="password" 
+                name="{{ form.password.name }}" 
+                id="{{ form.password.id_for_label }}"
+                placeholder="كلمة المرور" 
+                required 
+                autocomplete="current-password"
+                dir="ltr"
+            >
+            <button type="button" class="toggle-password" aria-label="إظهار كلمة المرور" tabindex="-1">
+                <i class="fas fa-eye"></i>
+            </button>
+        </div>
+        {% if form.password.errors %}
+        <div class="field-error">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ form.password.errors.0 }}
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- خيارات إضافية                                      -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <div class="form-options">
+        <label class="remember-me">
+            <input type="checkbox" name="remember_me" id="id_remember">
+            <span>تذكرني</span>
+        </label>
+        <a href="{% url 'auth:forgot_password' %}" class="forgot-link">نسيت كلمة المرور؟</a>
+    </div>
+    
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- رسائل الخطأ العامة                                  -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    {% if form.non_field_errors %}
+    <div class="form-errors">
+        {% for error in form.non_field_errors %}
+        <p><i class="fas fa-exclamation-triangle"></i> {{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- ═══════════════════════════════════════════════════ -->
+    <!-- زر تسجيل الدخول                                    -->
+    <!-- ═══════════════════════════════════════════════════ -->
+    <button type="submit" class="btn-auth">
+        <i class="fas fa-arrow-left btn-arrow"></i> تسجيل الدخول
+    </button>
+</form>

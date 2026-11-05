@@ -1,0 +1,162 @@
+{% load static %}
+{% if not section and not local_workspace_assets %}
+<script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
+<script src="{% static 'vendor/alpine/alpine.min.js' %}" defer></script>
+<script src="{% static 'js/main.js' %}"></script>
+{% endif %}
+<script>
+(function () {
+    'use strict';
+
+    function initCoreSidebar() {
+        if (document.documentElement.getAttribute('data-core-sidebar-initialized') === 'true') return;
+        document.documentElement.setAttribute('data-core-sidebar-initialized', 'true');
+        var sidebar = document.getElementById('sidebar');
+        var overlay = document.getElementById('sidebarOverlay');
+        var toggleBtn = document.getElementById('sidebarToggle');
+        var collapseBtn = document.getElementById('sidebarCollapse');
+        var main = document.getElementById('mainContent');
+        var lastTrigger = null;
+        var togglePlaceholder = null;
+        var isMobile = function () { return window.matchMedia && window.matchMedia('(max-width: 768px)').matches; };
+
+        if (!sidebar) return;
+        if (toggleBtn) toggleBtn.setAttribute('aria-expanded', isMobile() && !sidebar.classList.contains('show') ? 'false' : 'true');
+        sidebar.setAttribute('aria-hidden', isMobile() && !sidebar.classList.contains('show') ? 'true' : 'false');
+        if (overlay) overlay.setAttribute('aria-hidden', 'true');
+
+        /* الشريط الجانبي المطوي (سطح المكتب) */
+        try {
+            if (sidebar && localStorage.getItem('goms_sidebar') === 'collapsed') {
+                sidebar.classList.add('collapsed');
+                if (main) main.classList.add('expanded');
+            }
+            if (collapseBtn && sidebar) {
+                var initialCollapsed = sidebar.classList.contains('collapsed');
+                collapseBtn.setAttribute('aria-expanded', initialCollapsed ? 'false' : 'true');
+                collapseBtn.setAttribute('aria-label', initialCollapsed ? 'فتح القائمة' : 'طي القائمة');
+                collapseBtn.title = initialCollapsed ? 'فتح القائمة' : 'طي القائمة';
+            }
+        } catch (e) {}
+
+        if (collapseBtn && sidebar) {
+            collapseBtn.addEventListener('click', function () {
+                var collapsed = sidebar.classList.toggle('collapsed');
+                if (main) main.classList.toggle('expanded', collapsed);
+                collapseBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+                collapseBtn.setAttribute('aria-label', collapsed ? 'فتح القائمة' : 'طي القائمة');
+                collapseBtn.title = collapsed ? 'فتح القائمة' : 'طي القائمة';
+                try { localStorage.setItem('goms_sidebar', collapsed ? 'collapsed' : 'open'); } catch (e) {}
+            });
+        }
+
+        /* قائمة الجوال */
+        function openSidebar() {
+            if (!sidebar) return;
+            lastTrigger = toggleBtn || document.activeElement;
+            sidebar.classList.add('show');
+            if (overlay) overlay.classList.add('show');
+            if (isMobile() && toggleBtn && toggleBtn.parentNode !== document.body) {
+                togglePlaceholder = document.createComment('core-sidebar-toggle-home');
+                toggleBtn.parentNode.insertBefore(togglePlaceholder, toggleBtn);
+                document.body.appendChild(toggleBtn);
+                toggleBtn.classList.add('menu-toggle-floating');
+            }
+            if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'true');
+            sidebar.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSidebar() {
+            if (!sidebar) return;
+            sidebar.classList.remove('show');
+            if (overlay) overlay.classList.remove('show');
+            if (toggleBtn && togglePlaceholder && togglePlaceholder.parentNode) {
+                togglePlaceholder.parentNode.insertBefore(toggleBtn, togglePlaceholder);
+                togglePlaceholder.remove();
+                togglePlaceholder = null;
+                toggleBtn.classList.remove('menu-toggle-floating');
+            }
+            if (isMobile()) {
+                if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+                sidebar.setAttribute('aria-hidden', 'true');
+            }
+            document.body.style.overflow = '';
+            if (lastTrigger && typeof lastTrigger.focus === 'function') lastTrigger.focus();
+            lastTrigger = null;
+        }
+        window.openSidebar = openSidebar;
+        window.closeSidebar = closeSidebar;
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function () {
+                if (sidebar && sidebar.classList.contains('show')) closeSidebar();
+                else openSidebar();
+            });
+        }
+        if (overlay) overlay.addEventListener('click', closeSidebar);
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeSidebar();
+        });
+
+        /* إغلاق رسائل التنبيه */
+        document.querySelectorAll('.alert-close').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var alert = btn.closest('.alert');
+                if (alert) {
+                    alert.style.transition = 'opacity .2s ease, transform .2s ease';
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateY(-6px)';
+                    setTimeout(function () { alert.remove(); }, 200);
+                }
+            });
+        });
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initCoreSidebar, { once: true });
+    else initCoreSidebar();
+})();
+</script>
+{% load static %}
+<script src="{% static 'js/core-workspace.js' %}?v=20261010-views" defer></script>
+<script>
+(function () {
+    'use strict';
+    // Idle auto-logout: any server contact renews the backend sliding window (default 10 min).
+    // This client timer only warns + redirects when the browser itself is idle (no server contact
+    // would have renewed the window either). Tab remains usable while the user keeps working.
+    var IDLE_LIMIT_MS = 10 * 60 * 1000, WARN_BEFORE_MS = 2 * 60 * 1000, lastActive = Date.now(), warned = false, banner = null;
+    function touch() { lastActive = Date.now(); if (warned && Date.now() - lastActive < WARN_BEFORE_MS) { warned = false; hideBanner(); } }
+    ['mousemove', 'keydown', 'click', 'scroll', 'touchstart'].forEach(function (ev) {
+        document.addEventListener(ev, touch, { passive: true });
+    });
+    // AJAX/htmx traffic also counts as activity on this tab.
+    var _fetch = window.fetch;
+    if (_fetch) window.fetch = function () { touch(); return _fetch.apply(this, arguments); };
+    function showBanner(remaining) {
+        if (!banner) {
+            banner = document.createElement('div');
+            banner.setAttribute('role', 'alert');
+            banner.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:9999;background:#7c2d12;color:#fff;padding:10px 18px;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.25);font-size:14px';
+            document.body.appendChild(banner);
+        }
+        var mins = Math.max(1, Math.ceil(remaining / 60000));
+        banner.textContent = 'تنبيه: سيتم تسجيل خروجك تلقائيًا بعد ' + mins + ' بسبب الخمول. أي نشاط الآن يمدد الجلسة.';
+        banner.style.display = 'block';
+    }
+    function hideBanner() { if (banner) banner.style.display = 'none'; }
+    setInterval(function () {
+        // Skip login/health/static pages (no session to protect).
+        if (location.pathname.indexOf('/auth/') === 0) return;
+        var idle = Date.now() - lastActive, remaining = IDLE_LIMIT_MS - idle;
+        if (remaining <= 0) {
+            try {
+                var f = document.createElement('form');
+                f.method = 'post'; f.action = '/auth/logout/';
+                var c = document.querySelector('input[name=csrfmiddlewaretoken]');
+                if (c) { var h = document.createElement('input'); h.type = 'hidden'; h.name = 'csrfmiddlewaretoken'; h.value = c.value; f.appendChild(h); }
+                document.body.appendChild(f); f.submit();
+            } catch (e) { location.href = '/auth/login/'; }
+        } else if (remaining <= WARN_BEFORE_MS) { warned = true; showBanner(remaining); }
+    }, 15000);
+})();
+</script>

@@ -1,0 +1,16 @@
+{
+  "schema": "ude.feature-flags.v1",
+  "version": "1.1.0",
+  "default_enabled": false,
+  "production_load": false,
+  "pages": {
+    "shell": false,
+    "tokens": false,
+    "themes": false,
+    "contrast_validator": false
+  },
+  "rollback": {
+    "mode": "remove-ude-assets-and-revert-page-flag",
+    "legacy_contract_preserved": true
+  }
+}

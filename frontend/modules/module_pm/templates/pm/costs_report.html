@@ -1,0 +1,46 @@
+{% extends "pm/reference_base.html" %}
+{% load static %}
+{% block extra_head %}{{ block.super }}<link rel="stylesheet" href="{% static 'pm/costs-report.css' %}?v=20261021-r01">{% endblock %}
+{% block pm_content %}
+<main class="cost-report" dir="rtl">
+  <nav class="cr-crumb"><a href="/">الرئيسية</a><span>‹</span><a href="/pm/reporting/">التقارير</a><span>‹</span><strong>التقرير المالي والتكاليف</strong></nav>
+  <header class="cr-heading"><div><p>تقارير المشروع</p><h1>التقرير المالي والتكاليف</h1><small>مقارنة التكلفة المخططة بالتكلفة الفعلية المشتقة من الاستهلاكات المسجلة.</small></div><div class="cr-actions"><a href="/pm/reporting/">العودة إلى مركز التقارير</a><a href="?{{ export_query }}">تحديث</a><button type="button" data-pm-print>طباعة</button><a class="cr-primary" href="?{{ export_query }}&amp;download=json">تصدير JSON</a></div></header>
+
+  <form class="cr-filters" method="get" aria-label="مرشحات التقرير المالي">
+    <input type="hidden" name="report" value="costs">
+    <label class="cr-project">المشروع<strong>{{ center.name|default:center.project_code|default:"المشروع" }}</strong></label>
+    <label>من تاريخ<input type="date" name="date_from" value="{{ filters.date_from }}"></label>
+    <label>إلى تاريخ<input type="date" name="date_to" value="{{ filters.date_to }}"></label>
+    <label>المرحلة<select name="phase_id"><option value="">جميع المراحل</option>{% for phase in options.phases %}<option value="{{ phase.id }}" {% if filters.phase_id == phase.id|stringformat:'s' %}selected{% endif %}>{{ phase.name }}</option>{% endfor %}</select></label>
+    <button type="submit">تطبيق</button>
+  </form>
+
+  <section class="cr-kpis" aria-label="ملخص التكاليف">
+    <article><span class="cr-icon blue">▤</span><div><small>التكلفة المخططة</small><strong>{{ planned_total|floatformat:2 }} <em>{{ currency }}</em></strong></div></article>
+    <article><span class="cr-icon green">◉</span><div><small>التكلفة الفعلية</small><strong>{{ actual_total|floatformat:2 }} <em>{{ currency }}</em></strong></div></article>
+    <article class="{% if variance_total < 0 %}is-over{% else %}is-good{% endif %}"><span class="cr-icon red">↗</span><div><small>الانحراف (المخطط − الفعلي)</small><strong>{{ variance_total|floatformat:2 }} <em>{{ currency }}</em></strong></div></article>
+    <article><span class="cr-icon orange">◷</span><div><small>نسبة الفعلي إلى المخطط</small><strong>{% if spend_ratio != None %}{{ spend_ratio|floatformat:1 }}%{% else %}—{% endif %}</strong></div></article>
+  </section>
+
+  <section class="cr-grid">
+    <article class="cr-panel cr-phase-panel"><header><div><h2>التكلفة حسب المرحلة</h2><p>مقارنة المبالغ المسجلة والمخططة ضمن العملة نفسها</p></div><span class="cr-legend"><i></i> مخطط <b></b> فعلي</span></header>
+      <div class="cr-phase-list">{% for row in phase_rows %}<div class="cr-phase-row"><strong>{{ row.phase_name }}</strong><div class="cr-bars"><span><small>مخطط</small><i style="width:{{ row.planned_width }}%"></i></span><span><small>فعلي</small><i style="width:{{ row.actual_width }}%"></i></span></div><b>{{ row.planned|floatformat:2 }} / {{ row.actual|floatformat:2 }} <small>{{ currency }}</small></b></div>{% empty %}<p class="cr-empty">لا توجد بيانات تكلفة للمرشحات المحددة.</p>{% endfor %}</div>
+    </article>
+    <aside class="cr-note"><span>i</span><div><strong>قراءة التقرير</strong><p>الفعلي مشتق من استهلاكات أوامر التشغيل المسجلة. الأرقام المخططة تمثل الخطة الحالية وليست لقطة تاريخية عند بداية الفترة.</p>{% if period_basis %}<small>{{ period_basis }}</small>{% endif %}</div></aside>
+  </section>
+
+  <section class="cr-panel cr-table-panel"><header><div><h2>تفاصيل التكلفة حسب النشاط</h2><p>الانحراف الموجب يعني أن المخطط أعلى من الفعلي؛ والسالب يشير إلى تجاوز المخطط.</p></div><label class="cr-search">بحث في الأنشطة<input type="search" data-cost-search placeholder="اسم النشاط أو رمزه"></label></header>
+    <div class="cr-table-scroll"><table><thead><tr><th>#</th><th>المرحلة</th><th>النشاط</th><th>التكلفة المخططة</th><th>التكلفة الفعلية</th><th>الانحراف</th><th>الإنفاق</th><th>الحالة</th></tr></thead><tbody>
+      {% for row in cost_rows %}<tr data-cost-row><td>{{ forloop.counter }}</td><td>{{ row.phase_name }}</td><td><strong>{{ row.activity_name }}</strong><small>{{ row.activity_code }}</small></td><td>{{ row.planned|floatformat:2 }} {{ currency }}</td><td>{{ row.actual|floatformat:2 }} {{ currency }}</td><td class="{% if row.variance < 0 %}cr-negative{% else %}cr-positive{% endif %}">{{ row.variance|floatformat:2 }} {{ currency }}</td><td>{% if row.ratio != None %}{{ row.ratio|floatformat:1 }}%{% else %}—{% endif %}</td><td><span class="cr-status {% if row.over_plan %}over{% elif row.actual %}within{% else %}none{% endif %}">{% if row.over_plan %}تجاوز المخطط{% elif row.actual %}ضمن المخطط{% else %}لا يوجد فعلي مسجل{% endif %}</span></td></tr>{% empty %}<tr><td colspan="8" class="cr-empty">لا توجد أنشطة مطابقة.</td></tr>{% endfor %}
+    </tbody></table></div>
+  </section>
+
+  <section class="cr-panel cr-review"><header><div><h2>أنشطة تجاوزت التكلفة المخططة</h2><p>قائمة مشتقة آلياً من مقارنة الفعلي بالمخطط، دون افتراض سبب للتجاوز.</p></div><span>{{ review_rows|length }} نشاط</span></header><div class="cr-review-list">{% for row in review_rows %}<article><strong>{{ row.activity_name }}</strong><small>{{ row.phase_name }} · {{ row.activity_code }}</small><b>{{ row.variance|floatformat:2 }} {{ currency }}</b></article>{% empty %}<p class="cr-empty">لا توجد تجاوزات ضمن المرشحات الحالية.</p>{% endfor %}</div></section>
+</main>
+<script>
+document.querySelector('[data-cost-search]')?.addEventListener('input', function () {
+  const query = this.value.trim().toLocaleLowerCase();
+  document.querySelectorAll('[data-cost-row]').forEach(row => { row.hidden = !row.textContent.toLocaleLowerCase().includes(query); });
+});
+</script>
+{% endblock %}

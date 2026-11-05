@@ -1,0 +1,66 @@
+{% extends "pm/reference_base.html" %}
+{% load static %}
+{% block title %}إدارة المشاريع — THE_SYSTEM{% endblock %}
+{% block extra_head %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'pm/home-portal.css' %}?v=20261101-pm-portal-refine-2">
+{% endblock %}
+{% block breadcrumb %}{% endblock %}
+{% block global_search_input %}<input type="search" id="pm-dashboard-search" placeholder="البحث في المشاريع ..." aria-label="البحث في المشاريع">{% endblock %}
+{% block pm_content %}
+<main class="pm-home pm-home-portal" aria-labelledby="pm-title">
+    <header class="pm-portal-heading">
+        <h1 id="pm-title">إدارة المشاريع</h1>
+        <p>مركز الربط والتحكم للوصول إلى جميع واجهات إدارة المشاريع.</p>
+    </header>
+
+    {% if status_summary %}
+    <section class="pm-status-summary" aria-labelledby="pm-status-heading">
+        <header class="pm-status-summary-header">
+            <div>
+                <h2 id="pm-status-heading">ملخص حالة المشاريع</h2>
+                <p>نظرة سريعة على حالة المشاريع في النظام.</p>
+            </div>
+            <i class="fa-solid fa-chart-column" aria-hidden="true"></i>
+        </header>
+        <div class="pm-status-summary-items">
+            {% for item in status_summary %}
+                {% if item.href %}
+                <a class="pm-status-summary-item" href="{{ item.href }}">
+                {% else %}
+                <div class="pm-status-summary-item is-unavailable" title="{{ item.empty }}" aria-label="{{ item.label }}: {{ item.empty }}">
+                {% endif %}
+                    <span class="pm-status-summary-icon" aria-hidden="true"><i class="fa-solid {{ item.icon }}"></i></span>
+                    <span class="pm-status-summary-copy">
+                        <strong>{{ item.label }}</strong>
+                        {% if not item.href %}<span>{{ item.empty }}</span>{% endif %}
+                    </span>
+                    <strong class="pm-status-summary-count">{{ item.count }}</strong>
+                {% if item.href %}</a>{% else %}</div>{% endif %}
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    {% if portal_groups %}
+    <div class="pm-portal-groups" aria-label="أقسام إدارة المشاريع">
+        {% for group in portal_groups %}
+        <section class="pm-portal-group pm-portal-group-{{ group.key }}" aria-labelledby="pm-portal-{{ group.key }}">
+            <header class="pm-portal-group-heading">
+                <div class="pm-portal-group-title"><span class="pm-portal-group-icon" aria-hidden="true"><i class="fa-solid {{ group.icon }}"></i></span><div><h2 id="pm-portal-{{ group.key }}">{{ group.label }}</h2><p>{{ group.description }}</p></div></div>
+            </header>
+            <div class="pm-portal-cards">
+                {% for entry in group.items %}
+                <a class="pm-portal-card pm-portal-card-{{ group.tone }}" href="{{ entry.url }}">
+                    <span class="pm-portal-card-icon" aria-hidden="true"><i class="fa-solid {{ entry.icon }}"></i></span>
+                    <span class="pm-portal-card-copy"><strong>{{ entry.label }}</strong><small>{{ entry.description }}</small></span>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+        {% endfor %}
+    </div>
+    {% else %}
+    <section class="pm-portal-empty" role="status"><i class="fa-solid fa-lock" aria-hidden="true"></i><h2>لا توجد أقسام متاحة</h2><p>لا توجد صلاحيات تشغيلية متاحة لهذا الحساب.</p></section>
+    {% endif %}
+</main>
+{% endblock %}

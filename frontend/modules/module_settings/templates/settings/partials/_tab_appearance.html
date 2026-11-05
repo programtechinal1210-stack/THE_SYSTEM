@@ -1,0 +1,275 @@
+<!-- ═══════════════════════════════════════════════════════════════
+   🎨 تبويب: المظهر - تنقل بين الباقات + توليد باقة جديدة
+   ═══════════════════════════════════════════════════════════════ -->
+
+<div class="settings-content" id="tab-appearance">
+    
+    <div style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:1rem;padding:1rem;margin-bottom:1.5rem;display:flex;gap:2rem;flex-wrap:wrap;align-items:center;font-size:0.85rem;">
+        <div>🌗 <strong id="liveTheme">-</strong></div>
+        <div>🎨 <strong id="livePackage">-</strong></div>
+        <div>📐 <strong id="liveFont">-</strong></div>
+        <div>📏 <strong id="liveDensity">-</strong></div>
+    </div>
+
+    <!-- 🌗 الوضع -->
+    <div style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;margin-bottom:1.5rem;">
+        <div style="font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:1.2rem;">🌗 الوضع</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">
+            <div class="theme-card" data-theme="light" onclick="setThemeLive('light', this)" style="background:rgba(255,255,255,0.03);border:2px solid var(--border-color);border-radius:1rem;padding:1.2rem;text-align:center;cursor:pointer;">
+                <div style="font-size:2.5rem;">☀️</div><div style="font-weight:700;">فاتح</div>
+                <div class="tbadge" style="margin-top:0.5rem;padding:0.3rem 0.8rem;border-radius:2rem;font-size:0.7rem;background:rgba(255,255,255,0.05);color:var(--text-muted);display:inline-block;">اختيار</div>
+            </div>
+            <div class="theme-card" data-theme="dark" onclick="setThemeLive('dark', this)" style="background:rgba(255,255,255,0.03);border:2px solid var(--border-color);border-radius:1rem;padding:1.2rem;text-align:center;cursor:pointer;">
+                <div style="font-size:2.5rem;">🌙</div><div style="font-weight:700;">داكن</div>
+                <div class="tbadge" style="margin-top:0.5rem;padding:0.3rem 0.8rem;border-radius:2rem;font-size:0.7rem;background:rgba(255,255,255,0.05);color:var(--text-muted);display:inline-block;">اختيار</div>
+            </div>
+            <div class="theme-card" data-theme="system" onclick="setThemeLive('system', this)" style="background:rgba(255,255,255,0.03);border:2px solid var(--border-color);border-radius:1rem;padding:1.2rem;text-align:center;cursor:pointer;">
+                <div style="font-size:2.5rem;">🔄</div><div style="font-weight:700;">تلقائي</div>
+                <div class="tbadge" style="margin-top:0.5rem;padding:0.3rem 0.8rem;border-radius:2rem;font-size:0.7rem;background:rgba(255,255,255,0.05);color:var(--text-muted);display:inline-block;">اختيار</div>
+            </div>
+        </div>
+    </div>
+
+    {% if ude_color_palettes_enabled %}
+    <section data-ude-palette-picker aria-labelledby="ude-palette-title" class="ude-palette-settings">
+        <div class="ude-palette-settings__heading">
+            <div><h2 id="ude-palette-title">باقات الألوان</h2><p>اختر باقة مستقلة لحسابك دون تغيير ألوان المستخدمين الآخرين.</p></div>
+            <div role="group" aria-label="وضع معاينة الباقة">
+                <button type="button" class="btn btn-secondary btn-sm" data-ude-palette-mode="light" aria-pressed="true">فاتح</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-ude-palette-mode="dark" aria-pressed="false">داكن</button>
+            </div>
+        </div>
+        <div data-ude-palette-grid role="group" aria-label="باقات الألوان"></div>
+        <div data-ude-palette-preview aria-live="polite"><strong data-ude-palette-preview-name>الكحلي المؤسسي</strong><p>معاينة فورية لعناصر UDE المتأثرة فقط.</p><button type="button" class="btn btn-primary">زر معاينة</button></div>
+        <div data-ude-palette-status role="status" aria-live="polite"></div>
+        <div class="ude-palette-settings__actions"><button type="button" class="btn btn-secondary" data-ude-palette-reset>استعادة الافتراضي</button><button type="button" class="btn btn-primary" data-ude-palette-save>حفظ الباقة</button></div>
+    </section>
+    {% endif %}
+
+    <!-- 🎨 باقات الألوان -->
+    <div style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;margin-bottom:1.5rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.8rem;">
+            <div style="font-size:1.1rem;font-weight:700;color:var(--text-primary);">
+                🎨 باقات الألوان <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted);" id="packageCount"></span>
+            </div>
+            <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                <!-- 🆕 أزرار التنقل والتوليد -->
+                <button class="btn btn-secondary btn-sm" onclick="prevPackage()" title="الباقة السابقة">◀ السابقة</button>
+                <span style="font-size:0.8rem;color:var(--text-muted);min-width:60px;text-align:center;" id="packageIndex">1 / 24</span>
+                <button class="btn btn-secondary btn-sm" onclick="nextPackage()" title="الباقة التالية">التالية ▶</button>
+                <span style="color:var(--border-color);margin:0 0.3rem;">|</span>
+                <button class="btn btn-success btn-sm" onclick="generateNewPackage()" title="توليد باقة عشوائية جديدة">🎲 باقة عشوائية</button>
+                <input type="text" id="packageSearch" placeholder="🔍 بحث..." oninput="filterPackages()" style="padding:0.4rem 0.8rem;border:1px solid var(--border-color);border-radius:0.5rem;background:var(--bg-input);color:var(--text-primary);font-size:0.8rem;width:130px;font-family:'Tajawal';">
+            </div>
+        </div>
+        <div style="max-height:400px;overflow-y:auto;padding-right:0.3rem;" id="packageScroll">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.6rem;" id="packageGrid"></div>
+        </div>
+    </div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+   📐 قسم: الخطوط - عرض كامل مع معاينة وشريط تمرير
+   ═══════════════════════════════════════════════════════════════ -->
+
+<div style="background:var(--bg-glass);border:1px solid var(--border-color);border-radius:1rem;padding:1.5rem;margin-top:1.5rem;grid-column:1/-1;width:100%;">
+    <div style="font-size:1.1rem;font-weight:700;color:var(--text-primary);margin-bottom:1.2rem;">
+        📐 الخطوط
+        <span style="font-size:0.75rem;font-weight:400;color:var(--text-muted);">نوع وحجم الخط</span>
+    </div>
+
+    <!-- صف: معاينة + حجم الخط -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+        
+        <!-- 🖼️ معاينة مباشرة -->
+        <div id="fontPreview" style="background:var(--bg-primary);border:2px dashed var(--border-color);border-radius:1rem;padding:1.5rem;text-align:center;transition:all 0.4s;">
+            <div style="font-size:2rem;font-weight:900;margin-bottom:0.3rem;line-height:1.2;" id="previewHeading">نظام إدارة المكتب الحكومي</div>
+            <div style="font-size:1rem;opacity:0.7;" id="previewSubtext">Government Office Management System</div>
+            <div style="font-size:0.85rem;opacity:0.5;margin-top:0.5rem;" id="previewSample">أ ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن هـ و ي</div>
+            <div style="font-size:0.8rem;opacity:0.4;margin-top:0.3rem;direction:ltr;" id="previewLatin">ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789</div>
+        </div>
+
+        <!-- 📏 شريط حجم الخط -->
+        <div style="display:flex;flex-direction:column;justify-content:center;">
+            <div style="font-weight:600;color:var(--text-primary);margin-bottom:1rem;">📏 حجم الخط</div>
+            <div style="display:flex;align-items:center;gap:1rem;background:var(--bg-primary);border-radius:1rem;padding:1.5rem;">
+                <span style="font-size:0.75rem;opacity:0.5;">A</span>
+                <input type="range" id="fontSizeSlider" min="0" max="100" value="50" oninput="setFontSizeSlider(this.value)" style="flex:1;accent-color:var(--gradient-2);">
+                <span style="font-size:1.5rem;opacity:0.7;">A</span>
+                <span style="font-weight:700;color:var(--gradient-2);min-width:80px;text-align:center;font-size:0.95rem;" id="fontSizeLabel">متوسط</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:0.5rem;font-size:0.7rem;color:var(--text-muted);padding:0 0.3rem;">
+                <span>صغير</span><span>متوسط</span><span>كبير</span><span>كبير جداً</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 🔤 شبكة أنواع الخطوط - 5 أعمدة -->
+    <div>
+        <div style="font-weight:600;color:var(--text-primary);margin-bottom:0.8rem;">🔤 نوع الخط</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.8rem;" id="fontFamilyGrid">
+            <!-- يتم التوليد تلقائياً بواسطة JavaScript -->
+        </div>
+    </div>
+
+</div><div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1.5rem;">
+        <button class="btn btn-secondary" onclick="resetAppearance()">↺ إعادة تعيين</button>
+        <button class="btn btn-primary" onclick="saveAppearance()">💾 حفظ</button>
+    </div>
+
+</div>
+
+<script>
+var packageKeys = [];
+var currentPackageIndex = 0;
+
+function buildAllPackages() {
+    var grid = document.getElementById('packageGrid');
+    if (!grid || !AppSettings.colorPackages) return;
+    
+    packageKeys = Object.keys(AppSettings.colorPackages);
+    var html = '';
+    
+    for (var i = 0; i < packageKeys.length; i++) {
+        var key = packageKeys[i];
+        var pkg = AppSettings.colorPackages[key];
+        var c = pkg.light;
+        var c1 = c['--gradient-1'] || '#888';
+        var c2 = c['--gradient-2'] || '#aaa';
+        var c3 = c['--icon-color'] || '#aaa';
+        var searchText = (pkg.name + ' ' + pkg.type + ' ' + key).toLowerCase();
+        
+        html += '<div class="pkg-card" data-pkg="' + key + '" data-search="' + searchText + '" onclick="setPackageLive(\'' + key + '\', this)" style="background:' + c1 + '10;border:2px solid var(--border-color);border-radius:0.8rem;padding:0.7rem;text-align:center;cursor:pointer;transition:all 0.3s;">';
+        html += '<div style="display:flex;gap:2px;justify-content:center;margin-bottom:0.3rem;"><span style="width:12px;height:12px;border-radius:2px;background:' + c1 + ';"></span><span style="width:12px;height:12px;border-radius:2px;background:' + c2 + ';"></span><span style="width:12px;height:12px;border-radius:2px;background:' + c3 + ';"></span></div>';
+        html += '<div style="font-weight:700;color:var(--text-primary);font-size:0.78rem;line-height:1.2;">' + (pkg.name || key) + '</div>';
+        html += '<div style="font-size:0.65rem;color:var(--text-muted);">' + (pkg.type || '') + '</div>';
+        html += '<div class="pbadge" style="margin-top:0.3rem;padding:0.15rem 0.5rem;border-radius:2rem;font-size:0.6rem;background:rgba(255,255,255,0.05);color:var(--text-muted);display:inline-block;">اختيار</div>';
+        html += '</div>';
+    }
+    grid.innerHTML = html;
+    document.getElementById('packageCount').textContent = '(' + packageKeys.length + ' باقة)';
+    
+    // تحديد الباقة الحالية في العداد
+    var current = AppSettings.getColorPackage();
+    currentPackageIndex = packageKeys.indexOf(current);
+    if (currentPackageIndex < 0) currentPackageIndex = 0;
+    updatePackageIndex();
+}
+
+// 🆕 التنقل بين الباقات
+function nextPackage() {
+    if (packageKeys.length === 0) return;
+    currentPackageIndex = (currentPackageIndex + 1) % packageKeys.length;
+    var key = packageKeys[currentPackageIndex];
+    AppSettings.setColorPackage(key);
+    highlightCard('pkg-card', key, 'data-pkg');
+    updateLivePreview();
+    updatePackageIndex();
+    // تمرير إلى الباقة المحددة
+    var el = document.querySelector('.pkg-card[data-pkg="' + key + '"]');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function prevPackage() {
+    if (packageKeys.length === 0) return;
+    currentPackageIndex = (currentPackageIndex - 1 + packageKeys.length) % packageKeys.length;
+    var key = packageKeys[currentPackageIndex];
+    AppSettings.setColorPackage(key);
+    highlightCard('pkg-card', key, 'data-pkg');
+    updateLivePreview();
+    updatePackageIndex();
+    var el = document.querySelector('.pkg-card[data-pkg="' + key + '"]');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function updatePackageIndex() {
+    document.getElementById('packageIndex').textContent = (currentPackageIndex + 1) + ' / ' + packageKeys.length;
+}
+
+// 🆕 توليد باقة عشوائية جديدة
+function generateNewPackage() {
+    var hue = Math.floor(Math.random() * 360);
+    var names = ['✨', '🌟', '💫', '🔥', '💎', '🎯', '🌈', '🦋', '🌺', '🍀', '🎪', '🌴', '🪐', '🌸', '💜', '🧡', '💙', '🤍'];
+    var types = ['مولدة', 'عشوائية', 'جديدة', 'مميزة', 'فريدة'];
+    var name = names[Math.floor(Math.random() * names.length)] + ' لون ' + hue + '°';
+    var type = types[Math.floor(Math.random() * types.length)];
+    
+    var key = 'gen_' + Date.now();
+    AppSettings.colorPackages[key] = AppSettings.generatePackage({
+        name: name, type: type, hue: hue,
+        lightBg: 'hsl(' + hue + ', 30%, 95%)',
+        darkBg: 'hsl(' + hue + ', 30%, 8%)'
+    });
+    
+    buildAllPackages();
+    AppSettings.setColorPackage(key);
+    currentPackageIndex = packageKeys.indexOf(key);
+    highlightCard('pkg-card', key, 'data-pkg');
+    updateLivePreview();
+    updatePackageIndex();
+    document.getElementById('packageCount').textContent = '(' + packageKeys.length + ' باقة)';
+    showToast('🎲 تم توليد باقة جديدة: ' + name, 'success');
+}
+
+function filterPackages() {
+    var q = (document.getElementById('packageSearch').value || '').toLowerCase();
+    document.querySelectorAll('.pkg-card').forEach(function(c) {
+        c.style.display = q === '' || c.getAttribute('data-search').indexOf(q) > -1 ? '' : 'none';
+    });
+}
+
+// تهيئة
+buildAllPackages();
+updateLivePreview();
+highlightCard('pkg-card', AppSettings.getColorPackage(), 'data-pkg');
+highlightCard('theme-card', AppSettings.getTheme(), 'data-theme');
+highlightBtn('size-btn', AppSettings.getFontSize());
+highlightBtn('density-btn', AppSettings.getDensity());
+
+function updateLivePreview() {
+    var t = AppSettings.getTheme();
+    var p = AppSettings.getColorPackage();
+    var pkg = AppSettings.colorPackages[p];
+    document.getElementById('liveTheme').textContent = t === 'dark' ? '🌙 داكن' : (t === 'light' ? '☀️ فاتح' : '🔄 تلقائي');
+    document.getElementById('livePackage').textContent = pkg ? pkg.name + ' (' + pkg.type + ')' : p;
+    document.getElementById('liveFont').textContent = AppSettings.getFontSize();
+    document.getElementById('liveDensity').textContent = AppSettings.getDensity();
+}
+
+function setThemeLive(theme, el) { AppSettings.setTheme(theme); highlightCard('theme-card', theme, 'data-theme'); updateLivePreview(); }
+function setPackageLive(pkg, el) { AppSettings.setColorPackage(pkg); currentPackageIndex = packageKeys.indexOf(pkg); highlightCard('pkg-card', pkg, 'data-pkg'); updateLivePreview(); updatePackageIndex(); }
+function setFontLive(size, el) { AppSettings.setFontSize(size); highlightBtn('size-btn', size); updateLivePreview(); }
+function setDensityLive(d, el) { AppSettings.setDensity(d); highlightBtn('density-btn', d); updateLivePreview(); }
+
+function highlightCard(cls, val, attr) {
+    document.querySelectorAll('.' + cls).forEach(function(c) {
+        c.style.border = '2px solid var(--border-color)'; c.style.background = 'rgba(255,255,255,0.03)';
+        var b = c.querySelector('.tbadge, .pbadge'); if (b) { b.textContent = 'اختيار'; b.style.background = 'rgba(255,255,255,0.05)'; b.style.color = 'var(--text-muted)'; }
+    });
+    var el = document.querySelector('.' + cls + '[' + attr + '="' + val + '"]');
+    if (el) { el.style.border = '2px solid #a855f7'; el.style.background = 'rgba(168,85,247,0.08)'; var b = el.querySelector('.tbadge, .pbadge'); if (b) { b.textContent = 'مفعل ✓'; b.style.background = 'rgba(168,85,247,0.2)'; b.style.color = '#a855f7'; } }
+}
+
+function highlightBtn(cls, val) {
+    document.querySelectorAll('.' + cls).forEach(function(b) { b.style.border = '2px solid var(--border-color)'; b.style.background = 'transparent'; b.style.color = 'var(--text-muted)'; });
+    var el = document.querySelector('.' + cls + '[data-size="' + val + '"], .' + cls + '[data-density="' + val + '"]');
+    if (el) { el.style.border = '2px solid #a855f7'; el.style.background = 'rgba(168,85,247,0.08)'; el.style.color = 'var(--text-primary)'; }
+}
+
+async function saveAppearance() {
+    const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    try {
+        const response = await fetch('/settings/api/user/save/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf },
+            body: JSON.stringify({ settings: { theme: AppSettings.getTheme(), 'ude.palette': (window.UDEColorPalettes && document.querySelector('[data-ude-palette-card][aria-pressed="true"]')?.getAttribute('data-palette')) || undefined } })
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error('تعذر حفظ تفضيل المظهر');
+        showToast('✅ تم حفظ إعدادات المظهر لجميع أجهزتك', 'success');
+    } catch (error) {
+        showToast('تعذر حفظ المظهر على الحساب. حاول مجددًا.', 'error');
+    }
+}
+function resetAppearance() { if (confirm('⚠️ إعادة تعيين؟')) { AppSettings.resetAll(); updateLivePreview(); showToast('↺ تم', 'warning'); } }
+</script>

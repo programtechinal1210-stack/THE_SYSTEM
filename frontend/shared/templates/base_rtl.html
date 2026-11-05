@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>{% block title %}نظام إدارة المكتب الحكومي - GOMS{% endblock %}</title>
+<script src="/static/tailwind/tailwind.js"></script><link rel="stylesheet" href="/static/fontawesome/css/all.min.css">
+{% load static %}<link rel="stylesheet" href="{% static 'css/style.css' %}"><link rel="stylesheet" href="{% static 'css/rtl.css' %}"><link rel="stylesheet" href="{% static 'css/components.css' %}">
+{% block extra_head %}{% endblock %}</head>
+<body class="rtl">
+    {% include "partials/header.html" %}
+    <div class="flex">
+        {% include "partials/sidebar.html" %}
+        <main class="main-content flex-1 p-6 bg-gray-50 min-h-screen mr-64">
+            {% include "partials/page_back.html" %}
+{% include "partials/breadcrumb.html" %}
+            {% include "partials/flash_messages.html" %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    {% include "partials/footer.html" %}
+    {% include "partials/scripts.html" %}
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

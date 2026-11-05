@@ -1,0 +1,53 @@
+/* HR compatibility layer: loaded only by HR templates after the legacy stylesheet. */
+.hr-dashboard,
+.hr-employee-detail {
+  color: var(--color-text, #152440);
+  font-family: var(--font-family-base, Tajawal, sans-serif);
+}
+
+.hr-dashboard :is(.hr-home-hero, .hr-home-next, .hr-home-card, .hr-panel, .hr-detail-card, .hr-profile-hero, .hr-employees-table-card, .hr-workforce-table-card, .hr-side-panel, .hr-reports-hero),
+.hr-employee-detail :is(.hr-detail-card, .hr-profile-hero, .hr-detail-tabs) {
+  background-color: var(--color-surface, #fff);
+  color: var(--color-text, #152440);
+  border-color: var(--color-border, #dce5f2);
+  border-radius: var(--radius-lg, 14px);
+  box-shadow: var(--shadow-sm, 0 2px 8px rgba(15, 23, 42, .08));
+}
+
+/* Report and dashboard cards use several legacy class families. */
+.hr-dashboard article {
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+  border-radius: var(--ds-radius-lg);
+}
+
+.hr-dashboard :is(input, select, textarea),
+.hr-employee-detail :is(input, select, textarea) {
+  min-height: var(--control-height, 40px);
+  color: var(--color-text, #152440);
+  background: var(--color-surface, #fff);
+  border-color: var(--color-border, #dce5f2);
+  border-radius: var(--radius-md, 10px);
+}
+
+.hr-dashboard :is(.hr-primary-btn, .hr-home-next-link, .hr-filter-btn),
+.hr-employee-detail :is(.hr-primary-btn, .hr-filter-btn) {
+  background: var(--color-primary, #2766e9);
+  border-radius: var(--radius-md, 10px);
+}
+
+.hr-dashboard :is(table th, .hr-responsive-table th),
+.hr-employee-detail :is(table th, .hr-responsive-table th) {
+  color: var(--color-text-muted, #5d6d86);
+  background: var(--color-surface-muted, #f4f7fc);
+}
+
+.hr-dashboard :is(table td, .hr-responsive-table td),
+.hr-employee-detail :is(table td, .hr-responsive-table td) {
+  color: var(--color-text, #152440);
+  border-color: var(--color-border-subtle, #e7edf5);
+}
+
+html[data-density="compact"] .hr-dashboard :is(.hr-home-hero, .hr-home-next, .hr-detail-card, .hr-employees-table-card, .hr-workforce-table-card),
+html[data-density="compact"] .hr-employee-detail :is(.hr-detail-card, .hr-profile-hero) { padding-block: var(--space-3, 12px); }

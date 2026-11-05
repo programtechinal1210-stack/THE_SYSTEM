@@ -1,0 +1,136 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="{{ core_theme|default:'light' }}" data-core-theme="{{ core_theme|default:'light' }}"{% if core_palette %} data-core-palette="{{ core_palette }}"{% endif %} data-core-font-size="{{ core_font_size|default:16 }}" data-core-font-family="{{ core_font_family|default:'Tajawal' }}" data-core-font-weight="{{ core_font_weight|default:'400' }}" data-card-style="{{ core_card_style|default:'soft' }}" data-card-border="{{ core_card_border|default:'1px' }}" data-card-shadow="{{ core_card_shadow|default:'light' }}" data-card-interaction="{{ core_card_interaction|default:'highlight' }}" data-ude-v2-shell="{{ ude_v2_shared_shell_enabled|yesno:'true,false' }}"{% if ude_v2_shared_shell_enabled %} data-ude-theme="{{ ude_v2_theme_profile|default:'ude-light-default' }}"{% endif %} data-sound="{{ core_sound|yesno:'true,false' }}" data-quiet="{{ core_quiet|yesno:'true,false' }}" data-density="{{ core_density|default:'comfortable' }}" style="font-size:{{ core_font_size|default:16 }}px;{% if core_brand_color %}--brand-color:{{ core_brand_color }};{% endif %}--font-family:'{{ core_font_family|default:'Tajawal' }}','IBM Plex Sans Arabic',sans-serif;--ds-font-weight-base:{{ core_font_weight|default:'400' }};--ds-font-weight-normal:{{ core_font_weight_profile.normal|default:'400' }};--ds-font-weight-medium:{{ core_font_weight_profile.medium|default:'500' }};--ds-font-weight-semibold:{{ core_font_weight_profile.semibold|default:'600' }};--ds-font-weight-bold:{{ core_font_weight_profile.bold|default:'700' }};--ds-font-weight-extra:{{ core_font_weight_profile.extra|default:'800' }};--ds-font-weight-black:{{ core_font_weight_profile.black|default:'900' }};--radius-sm:{{ core_radius.sm|default:'6px' }};--radius-md:{{ core_radius.md|default:'12px' }};--radius-lg:{{ core_radius.lg|default:'16px' }}{% if core_accent_color %};--accent:{{ core_accent_color }}{% endif %}{% if core_custom_colors.surface and core_custom_colors.text %};--bg-secondary:{{ core_custom_colors.surface }};--bg-card:{{ core_custom_colors.surface }};--bg-elevated:{{ core_custom_colors.surface }};--bg-input:color-mix(in srgb, {{ core_custom_colors.surface }} 94%, {{ core_custom_colors.text }});--text-primary:{{ core_custom_colors.text }};--text-secondary:{{ core_custom_colors.text }};--border-color:color-mix(in srgb, {{ core_custom_colors.text }} 14%, {{ core_custom_colors.surface }}){% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>{% block title %}THE_SYSTEM — النواة المؤسسية{% endblock %}</title>
+
+    <!-- الخطوط -->
+    <link rel="stylesheet" href="{% static 'vendor/fontawesome/css/all.min.css' %}">
+
+    <!-- أيقونة الموقع -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>%F0%9F%8F%9B%EF%B8%8F</text></svg>">
+
+    <!-- نظام التصميم -->
+    <link rel="stylesheet" href="{% static 'css/variables.css' %}">
+    <link rel="stylesheet" href="{% static 'css/core-design-tokens.css' %}?v=20261026-core-font-scale-v1">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=20261010-views">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}">
+    <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+    <link rel="stylesheet" href="{% static 'css/rtl.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+
+    <link rel="stylesheet" href="{% static 'css/core-workspace.css' %}?v=20261026-core-font-scale-v1">
+    <link rel="stylesheet" href="{% static 'css/core-branding.css' %}?v=1"><script>if(document.documentElement.dataset.theme==='system'){document.documentElement.dataset.theme=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}</script>{% block extra_head %}{% endblock %}
+    {% block module_token_bridge %}{% endblock %}
+    <link rel="stylesheet" href="{% static 'css/legacy-token-bridge.css' %}?v=20261026-core-palette-bridge-v4">
+<link rel="stylesheet" href="{% static 'css/core-fonts.css' %}"><script src="{% static 'js/app_settings.js' %}?v=20261026-core-theme-persistence-v1" defer></script>
+    {% if ude_v2_shared_shell_enabled %}
+    <link rel="stylesheet" href="{% static 'css/ude/tokens.css' %}">
+    <link rel="stylesheet" href="{% static 'css/ude/themes.css' %}">
+    <link rel="stylesheet" href="{% static 'ude/ude-color-palettes-v1.0.css' %}">
+    <link rel="stylesheet" href="{% static 'css/ude/ude-v2-shared-shell-v1.0.0.css' %}">
+    {% endif %}
+    {% if ude_v2_shared_components_enabled %}
+    <link rel="stylesheet" href="{% static 'css/ude/ude-v2-shared-components-v1.0.0.css' %}">
+    {% endif %}
+<link rel="stylesheet" href="{% static 'css/core-shell-geometry.css' %}?v=20261101-mobile-toggle-hit-target-v1">
+<link rel="stylesheet" href="{% static 'css/core-card-system.css' %}?v=20261026-card-system-v3">
+<link rel="stylesheet" href="{% static 'css/core-breadcrumb.css' %}?v=20261027-unified">
+<link rel="stylesheet" href="{% static 'css/core-topbar.css' %}?v=20261027-global-v1">
+</head>
+
+<body class="core-shell{% if ude_v2_shared_shell_enabled %} ude-v2-shared-shell{% endif %}{% if ude_v2_shared_components_enabled %} ude-v2-shared-components{% endif %}">
+    {% if section == 'home' %}<script>document.body.classList.add('core-home-shell');</script>{% endif %}
+
+    <!-- الشريط الجانبي -->
+    {% block sidebar %}
+        {% include "partials/sidebar.html" %}
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    {% endblock %}
+
+    <div class="main-content" id="mainContent">
+
+        <!-- الشريط العلوي -->
+        {% block header %}
+        <header class="top-header">
+            <div class="header-left">
+                <button class="menu-toggle" id="sidebarToggle" aria-label="فتح القائمة">
+                    <span class="menu-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                            <path d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </span>
+                </button>
+
+                <div class="header-title-area">
+                    <span class="core-shell-page-icon" data-core-module-icon aria-hidden="true"><i class="fas fa-layer-group"></i></span>
+                    <h1 class="header-page-title" data-core-module-title>THE_SYSTEM</h1>
+                    <span class="core-shell-page-subtitle" data-core-page-subtitle></span>
+                    <span class="core-shell-page-title-source" data-core-page-title hidden>{% block page_title %}{{ page_title|default:"لوحة التحكم" }}{% endblock %}</span>
+                </div>
+            </div>
+
+            <nav class="core-shell-breadcrumb" aria-label="مسار التنقل" data-core-breadcrumb>
+                <ol class="core-shell-breadcrumb__list" data-breadcrumb-list>
+                    <li><a href="/">الرئيسية</a></li>
+                    <li><span aria-current="page">{{ page_title|default:"لوحة التحكم" }}</span></li>
+                </ol>
+                <details class="core-shell-breadcrumb__details">
+                    <summary aria-label="عرض المسار الكامل" title="عرض المسار الكامل">
+                        <i class="fas fa-ellipsis-h" aria-hidden="true"></i>
+                    </summary>
+                    <ol class="core-shell-breadcrumb__menu" data-breadcrumb-menu></ol>
+                </details>
+            </nav>
+
+            <div class="header-center">
+                <div class="core-global-search" data-topbar-search>
+                    <button class="core-global-search__trigger" type="button" data-search-trigger aria-label="فتح البحث العام" aria-expanded="false">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                    </button>
+                    {% block global_search_input %}<input type="search" placeholder="البحث في النظام..." aria-label="البحث في النظام">{% endblock %}
+                    <kbd>Ctrl + K</kbd>
+                </div>
+            </div>
+
+            {% include "partials/work_context.html" %}
+            {% include "partials/header.html" %}
+        </header>
+        {% endblock %}
+
+        <!-- المحتوى -->
+        <main class="page-content">
+            <div class="content-area">
+{% include "partials/flash_messages.html" %}
+
+                {% if section != 'home' %}{% include "partials/page_back.html" %}{% endif %}
+
+                {% block page_stats %}{% endblock %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
+        {% block footer %}
+            {% include "partials/footer.html" %}
+        {% endblock %}
+    </div>
+
+    {% include "partials/scripts.html" %}
+    <script src="{% static 'js/core-breadcrumb.js' %}?v=20261027-unified-4" defer></script>
+    <script src="{% static 'js/core-topbar.js' %}?v=20261027-global-v1" defer></script>
+    {% if ude_v2_shared_shell_enabled %}
+    {{ ude_v2_theme_bootstrap|json_script:"ude-v2-theme-bootstrap" }}
+    <script src="{% static 'ude/theme-resolver-v1.1.0.js' %}"></script>
+    <script src="{% static 'ude/ude-color-palettes-v1.0.js' %}?v=20261025-palette-balance-v1"></script>
+    <script src="{% static 'js/ude-v2-shared-shell-v1.0.0.js' %}"></script>
+    {% endif %}
+    {% if ude_v2_shared_components_enabled %}
+    <script src="{% static 'js/ude-v2-shared-components-v1.0.0.js' %}"></script>
+    {% endif %}
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}العملات وأسعار الصرف{% endblock %}
+{% block content %}
+<section dir="rtl" class="currency-workspace">
+<style>.currency-workspace{color:#20344d;line-height:1.8}.currency-workspace .currency-card{background:#fff;border:1px solid #d5e1ef;border-radius:14px;padding:22px;margin-bottom:20px}.currency-workspace .currency-forms{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:20px}.currency-workspace label{display:block;margin-top:12px;font-weight:600}.currency-workspace input,.currency-workspace select{width:100%;padding:10px;border:1px solid #b9cbe0;border-radius:7px;box-sizing:border-box;font:inherit}.currency-workspace button{margin-top:18px;padding:10px 20px;background:#245bc2;color:white;border:0;border-radius:8px;font:inherit;cursor:pointer}.currency-workspace table{width:100%;border-collapse:collapse}.currency-workspace th,.currency-workspace td{padding:12px;text-align:start;border-bottom:1px solid #e1e8f0}.currency-workspace th{background:#eff4fb}.currency-workspace :focus-visible{outline:3px solid #d89012;outline-offset:3px}</style>
+<header class="currency-card"><h1>العملات وأسعار الصرف</h1><p><strong>الريال اليمني YER هو أساس مصارفة التخطيط — المعتمد: سعر البيع.</strong></p><p>أدخل عدد الريالات اليمنية مقابل وحدة واحدة من العملة الأجنبية. يُختار السعر الساري في تاريخ العملية، وتبقى لقطات أسعار العمليات السابقة محفوظة.</p></header>
+{% if error %}<p role="alert">{{ error }}</p>{% endif %}
+{% if can_manage %}<div class="currency-forms">
+<form method="post" class="currency-card">{% csrf_token %}<input type="hidden" name="command" value="rate"><h2>إضافة سعر بيع مقابل YER</h2>
+<label for="currency">العملة الأجنبية</label><select id="currency" name="currency" required><option value="">اختر العملة</option>{% for c in foreign_currencies %}<option value="{{ c.code }}" {% if values.currency == c.code %}selected{% endif %}>{{ c.name }} — {{ c.code }}</option>{% endfor %}</select>
+<label for="rate">عدد الريالات اليمنية لكل وحدة</label><input id="rate" name="rate" type="number" min="0.00000001" step="any" value="{{ values.rate }}" required>
+<label for="effective">تاريخ بدء السريان</label><input id="effective" name="effective_date" type="date" value="{{ values.effective_date|default:today }}" required><button type="submit">حفظ سعر البيع</button></form>
+<form method="post" class="currency-card">{% csrf_token %}<input type="hidden" name="command" value="currency"><h2>إضافة عملة</h2>
+<label for="code">الرمز مثل SAR</label><input id="code" name="code" maxlength="10" value="{{ values.code }}" required><label for="name">اسم العملة</label><input id="name" name="name" maxlength="100" value="{{ values.name }}" required><label for="symbol">الرمز المختصر (اختياري)</label><input id="symbol" name="symbol" maxlength="10" value="{{ values.symbol }}"><button type="submit">إضافة العملة</button></form>
+</div>{% endif %}
+<section class="currency-card"><h2>العملات المسجلة</h2><p>{% for c in currencies %}<span>{{ c.name }} ({{ c.code }}){% if c.is_anchor %} — الأساسية{% endif %}</span>{% if not forloop.last %} · {% endif %}{% endfor %}</p></section>
+<section class="currency-card"><h2>سجل أسعار الصرف</h2><p>آخر 100 سجل. التواريخ المستقبلية لا تُستخدم قبل بدء سريانها.</p><div style="overflow:auto"><table><thead><tr><th>من</th><th>إلى</th><th>السعر</th><th>ساري من</th><th>المصدر</th></tr></thead><tbody>{% for r in rates %}<tr><td>{{ r.from_label }}</td><td>{{ r.to_label }}</td><td><bdi>{{ r.rate }}</bdi></td><td>{{ r.effective_date }}</td><td>{{ r.source }}</td></tr>{% empty %}<tr><td colspan="5">لا توجد أسعار مسجلة بعد.</td></tr>{% endfor %}</tbody></table></div></section>
+</section>
+{% endblock %}

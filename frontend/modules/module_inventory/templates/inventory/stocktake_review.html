@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load static %}
+{% block module_token_bridge %}<link rel="stylesheet" href="{% static 'inventory/core-token-bridge.css' %}?v=20261024-batch04b">{% endblock %}
+{% block title %}مراجعة فروقات الجرد | THE_SYSTEM{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'inventory/stocktake-review.css' %}?v=20261020-1">{% endblock %}
+{% block content %}
+<main class="stocktake-review" dir="rtl" data-review-url="{{ review_url }}">
+  <div class="review-head">
+    <div>
+      <a class="back-link" href="{{ center_url }}">← العودة إلى الجرد</a>
+      <p class="eyebrow">مراجعة نتائج العد · {{ detail.identifier|default:detail.number|default:'عملية جرد' }}</p>
+      <h1>مراجعة فروقات الجرد</h1>
+      <p class="subtitle">مقارنة نتائج العد الفعلي بالرصيد المرجعي ومراجعة البنود قبل الإحالة للتسوية.</p>
+      <div class="scope-line">المخزن: <strong>{{ detail.warehouse_name|default:'غير محدد' }}</strong> · الحالة: <strong>{{ detail.status|default:'—' }}</strong></div>
+    </div>
+    <div class="head-actions">
+      {% if can_count %}<a class="button button-secondary" href="{{ execution_url }}">العودة إلى تنفيذ العد</a>{% endif %}
+      {% if actions.approve %}<form method="post">{% csrf_token %}<input type="hidden" name="action" value="approve"><button class="button button-primary" type="submit">✓ اعتماد نتائج المراجعة</button></form>{% endif %}
+      {% if actions.reopen %}<form method="post">{% csrf_token %}<input type="hidden" name="action" value="reopen"><button class="button button-warning" type="submit">↻ إعادة فتح الجرد للعد</button></form>{% endif %}
+    </div>
+  </div>
+
+  {% if api_error %}<div class="alert alert-error">{{ api_error }}</div>{% endif %}
+  <section class="summary-grid" aria-label="ملخص النتائج">
+    <article class="summary-card blue"><span>إجمالي البنود المعدودة</span><strong>{{ counted_total }}</strong><small>من {{ total_lines }} بند</small></article>
+    <article class="summary-card red"><span>بنود العجز</span><strong>{{ shortage_total }}</strong><small>تحتاج مراجعة</small></article>
+    <article class="summary-card green"><span>بنود الزيادة</span><strong>{{ surplus_total }}</strong><small>تحتاج تفسيراً</small></article>
+    <article class="summary-card teal"><span>البنود المطابقة</span><strong>{{ matched_total }}</strong><small>بلا فرق</small></article>
+  </section>
+
+  <nav class="result-tabs" aria-label="تصفية نتائج الجرد">
+    <a class="{% if selected_filter == 'all' %}active{% endif %}" href="{{ review_url }}&filter=all">جميع النتائج <b>{{ counted_total }}</b></a>
+    <a class="{% if selected_filter == 'shortage' %}active{% endif %}" href="{{ review_url }}&filter=shortage">العجز <b>{{ shortage_total }}</b></a>
+    <a class="{% if selected_filter == 'surplus' %}active{% endif %}" href="{{ review_url }}&filter=surplus">الزيادة <b>{{ surplus_total }}</b></a>
+    <a class="{% if selected_filter == 'matched' %}active{% endif %}" href="{{ review_url }}&filter=matched">المطابقة <b>{{ matched_total }}</b></a>
+  </nav>
+
+  <form class="filters" method="get">
+    <input type="hidden" name="section" value="stocktakes"><input type="hidden" name="mode" value="review"><input type="hidden" name="stocktake" value="{{ detail.id }}"><input type="hidden" name="filter" value="{{ selected_filter }}">
+    <label>البحث في الأصناف<input name="search" value="{{ search }}" placeholder="الاسم أو الرمز..." autocomplete="off"></label>
+    <label>الموقع<select name="location"><option value="">جميع المواقع</option></select></label>
+    <button class="button button-primary" type="submit">تطبيق</button>
+    <a class="button button-ghost" href="{{ review_url }}&filter={{ selected_filter }}">إعادة ضبط</a>
+  </form>
+
+  <section class="review-layout">
+    <div class="results-card">
+      <div class="section-title"><h2>نتائج الجرد</h2><span>رتبت البنود التي تحتاج مراجعة أولاً</span></div>
+      {% if not variance_visible %}<div class="notice">بيانات الرصيد المرجعي والفروقات غير متاحة لهذا المستخدم أو لهذه الحالة.</div>{% endif %}
+      {% if rows %}
+      <div class="result-table-wrap"><table class="result-table"><thead><tr><th>الصنف</th><th>الرصيد المرجعي</th><th>الفعلي</th><th>الفرق</th><th>الحالة</th><th>الإجراء التالي</th><th></th></tr></thead>
+      <tbody>{% for row in rows %}<tr class="{% if selected and selected.id == row.id %}selected{% endif %} {% if row.variance_kind == 'shortage' %}shortage-row{% elif row.variance_kind == 'surplus' %}surplus-row{% endif %}">
+        <td data-label="الصنف"><a class="item-link" href="{{ review_url }}&filter={{ selected_filter }}&line={{ row.id }}">{{ row.item_label }}<small>{{ row.item_code_label }} · {{ row.unit_label }} · {{ row.location_label }}</small></a></td>
+        <td data-label="الرصيد المرجعي">{% if row.book_quantity is not None %}{{ row.book_quantity }} {{ row.unit_label }}{% else %}غير متاح{% endif %}</td>
+        <td data-label="الفعلي">{{ row.counted_label }}</td><td data-label="الفرق"><strong class="variance {{ row.variance_kind }}">{{ row.difference_label }}</strong></td>
+        <td data-label="الحالة"><span class="status {{ row.variance_kind }}">{{ row.variance_label }}</span></td><td data-label="الإجراء"><span class="next-action">{{ row.primary_action }}</span></td>
+        <td data-label="التفاصيل"><a class="view-link" href="{{ review_url }}&filter={{ selected_filter }}&line={{ row.id }}">عرض</a></td>
+      </tr>{% endfor %}</tbody></table></div>
+      {% else %}<div class="empty-state">لا توجد نتائج مطابقة للفلاتر الحالية.</div>{% endif %}
+    </div>
+
+    <aside class="detail-card" aria-live="polite">
+      {% if selected %}<div class="detail-heading"><span class="detail-icon">⌁</span><div><h2>تفاصيل الفرق</h2><p>{{ selected.item_label }}</p></div></div>
+      <div class="detail-grid"><div><small>رمز الصنف</small><strong>{{ selected.item_code_label }}</strong></div><div><small>المخزن / الموقع</small><strong>{{ detail.warehouse_name|default:'—' }} · {{ selected.location_label }}</strong></div><div><small>الرصيد المرجعي</small><strong>{% if selected.book_quantity is not None %}{{ selected.book_quantity }} {{ selected.unit_label }}{% else %}غير متاح{% endif %}</strong></div><div><small>الكمية المعدودة</small><strong>{{ selected.counted_label }}</strong></div><div><small>الفرق</small><strong class="variance {{ selected.variance_kind }}">{{ selected.difference_label }}</strong></div><div><small>نتيجة المراجعة</small><strong>{{ selected.variance_label }}</strong></div></div>
+      <div class="detail-note">لا يغيّر تأكيد نتيجة المراجعة الرصيد مباشرة. تتم أي تسوية عبر مستند رسمي معتمد ومرحل وفق دورة النظام.</div>
+      {% if actions.settle %}<div class="notice">التسوية الرسمية متاحة للعهدة المعتمدة، لكنها تتطلب تاريخ مستند وسبباً وأساس تقييم للزيادات عبر نموذج التسوية المعتمد.</div>{% endif %}
+      <div class="detail-actions"><a class="button button-ghost" href="{{ review_url }}&filter={{ selected_filter }}">إغلاق التفاصيل</a>{% if actions.approve %}<form method="post">{% csrf_token %}<input type="hidden" name="action" value="approve"><button class="button button-primary" type="submit">تأكيد النتائج</button></form>{% endif %}</div>
+      {% else %}<div class="empty-state">اختر بنداً لعرض تفاصيله.</div>{% endif %}
+    </aside>
+  </section>
+</main>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'inventory/stocktake-review.js' %}?v=20261020-1" defer></script>{% endblock %}

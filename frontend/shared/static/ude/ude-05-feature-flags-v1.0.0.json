@@ -1,0 +1,11 @@
+{
+  "schema": "ude.feature-flags.v1",
+  "package": "UDE-05",
+  "pilot": "core-home",
+  "enabled": false,
+  "production_load": false,
+  "legacy_template": "core/workspace.html",
+  "pilot_template": "core/workspace_pilot.html",
+  "preview": "local-authenticated-only",
+  "rollback": "disable-flag-and-render-legacy-template"
+}

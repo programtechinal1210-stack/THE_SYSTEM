@@ -1,0 +1,11 @@
+{
+  "schema": "ude.asset-manifest.v1",
+  "package": "UDE-05",
+  "offline": true,
+  "external_references": [],
+  "assets": [
+    {"path":"frontend/shared/static/ude/ude-05-feature-flags-v1.0.0.json","sha256":"82b8ec5a3adb5479f2243e9044858b369427dc61c5fd84fac7d949d4e29f7113"},
+    {"path":"frontend/shared/static/css/ude/ude-05-shell-adapter-v1.0.0.css","sha256":"06ce3cfa4b6c37009fae44b6a14a90b91bd5194aa17436204a5a03f77b4b602d"},
+    {"path":"frontend/shared/static/js/ude-05-shell-adapter-v1.0.0.js","sha256":"149d514464b114382b7d7ff0b8950e401f27411baa2101c5ef3634a47c70d3f9"}
+  ]
+}

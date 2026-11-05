@@ -1,0 +1,1 @@
+﻿# SQLite Core Baseline The historical PostgreSQL/migration chain was retired during the Core extraction. A fresh SQLite baseline migration will be generated after the retained Core models successfully create and validate.

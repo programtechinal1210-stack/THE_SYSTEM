@@ -1,0 +1,1 @@
+﻿{% if preference_cards %}<div class="core-preference-summary">{% for preference in preference_cards %}<div><small>{{ preference.label }}</small><strong>{{ preference.value }}</strong><span>{{ preference.source }}{% if preference.locked %} · مقفل{% endif %}</span></div>{% endfor %}</div>{% endif %}

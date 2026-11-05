@@ -1,0 +1,26 @@
+{
+  "schema": "ude.asset-manifest.v1",
+  "version": "1.1.0",
+  "offline_only": true,
+  "allowed_internal_origins": [
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:8001"
+  ],
+  "external_origins": [],
+  "assets": [
+    {"path": "frontend/shared/static/css/ude/tokens.css", "sha256": "68ae35774d1a7fc12f0ece22ece97fc086aa232129e6f382f50c07e78289e3da", "required": true},
+    {"path": "frontend/shared/static/css/ude/themes.css", "sha256": "186e804c1f45cf6d3dc940104b9d24e6a8f2aa23b7c6dda4bb34d8f04d876c1e", "required": true},
+    {"path": "frontend/shared/static/ude/ude-feature-flags-v1.1.0.json", "sha256": "b0a54a6702364bc9a139ecb06eb7ef71e1cb0f7ab17d6709d81b2ceda995bd79", "required": true},
+    {"path": "frontend/static/fonts/Tajawal-Regular.woff2", "sha256": "1f56c2984babee36c5008ae3290384e27a63931814265ffe8ddda6a2fc38b41e", "required": true},
+    {"path": "frontend/static/fonts/Tajawal-Bold.woff2", "sha256": "1f56c2984babee36c5008ae3290384e27a63931814265ffe8ddda6a2fc38b41e", "required": true},
+    {"path": "frontend/static/fonts/Almarai-Regular.woff2", "sha256": "4f7e839f7fe856cf0b0a30fc4099423362bcacbe52a87debedee64e393402aec", "required": true},
+    {"path": "frontend/static/fonts/Almarai-Bold.woff2", "sha256": "4f7e839f7fe856cf0b0a30fc4099423362bcacbe52a87debedee64e393402aec", "required": true},
+    {"path": "frontend/static/fonts/IBMPlexSansArabic-Regular.ttf", "sha256": "6f611412270a132bbac838da9259d4c68569b4175f3b3b8fa3fa36a30b56dab9", "required": true},
+    {"path": "frontend/static/fonts/IBMPlexSansArabic-Bold.ttf", "sha256": "691e0c891a38637ae6bbdb69700f8042cb0724a137bee615068ffdb92244f61f", "required": true},
+    {"path": "frontend/shared/static/vendor/fontawesome/css/all.min.css", "sha256": "5ceaaba22d75b58e04150311f596306562a3e595e27ed4b1dfa451b82dda9e50", "required": false},
+    {"path": "frontend/shared/static/vendor/fontawesome/webfonts/fa-solid-900.woff2", "sha256": "ae17c16afbea216707b2203ea1cf9bdb45b9bfe47d0f4ae3258ddbc6294dd02f", "required": false},
+    {"path": "frontend/shared/static/vendor/htmx/htmx.min.js", "sha256": "b3bdcf5c741897a53648b1207fff0469a0d61901429ba1f6e88f98ebd84e669e", "required": false},
+    {"path": "frontend/shared/static/vendor/alpine/alpine.min.js", "sha256": "df214f6d418dbc7a53a5e5ad9939e8f2dd624bdf2ed72596cf248e5d4112c720", "required": false},
+    {"path": "frontend/shared/static/vendor/qrcode/qrcode.min.js", "sha256": "c541ef06327885a8415bca8df6071e14189b4855336def4f36db54bde8484f36", "required": false}
+  ]
+}
